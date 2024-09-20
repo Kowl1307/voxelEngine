@@ -119,6 +119,14 @@ namespace Voxel_Engine
 
         private void AddStructureVoxels(ChunkData chunkData)
         {
+            Parallel.ForEach(chunkData.Structures, (structureData) =>
+            {
+                foreach(var (pos, voxelType) in structureData.StructureVoxels)
+                {
+                    Chunk.SetVoxel(chunkData, pos, voxelType);
+                }
+            });
+            /*
             foreach (var structureData in chunkData.Structures)
             {
                 foreach(var (pos, voxelType) in structureData.StructureVoxels)
@@ -126,6 +134,7 @@ namespace Voxel_Engine
                     Chunk.SetVoxel(chunkData, pos, voxelType);
                 }
             }
+            */
         }
 
         private async Task<ConcurrentDictionary<Vector3Int, MeshData>> CreateMeshDataAsync(List<ChunkData> dataToRender)
@@ -167,9 +176,9 @@ namespace Voxel_Engine
             
         }
 
-        private IEnumerator ChunkCreationCoroutine(ConcurrentDictionary<Vector3Int, MeshData> meshDatas)
+        private IEnumerator ChunkCreationCoroutine(ConcurrentDictionary<Vector3Int, MeshData> meshData)
         {
-            foreach (var item in meshDatas)
+            foreach (var item in meshData)
             {
                 CreateChunk(WorldData, item.Key, item.Value);
                 yield return new WaitForEndOfFrame();

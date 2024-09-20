@@ -44,8 +44,8 @@ namespace Voxel_Engine.WorldGen.Trees
             {
                 for (var z = zMin; z < zMax; z++)
                 {
-                    noiseMax[xIndex, zIndex] = UseOctaves ? MyNoise.OctaveSimplex(x,z, noiseSettings) : MyNoise.SimplexNoise(x, z, noiseSettings);
-                    //noiseMax[xIndex, zIndex] = DomainWarping.GenerateDomainNoise(x, z, noiseSettings);
+                    //noiseMax[xIndex, zIndex] = UseOctaves ? MyNoise.OctaveSimplex(x,z, noiseSettings) : MyNoise.SimplexNoise(x, z, noiseSettings);
+                    noiseMax[xIndex, zIndex] = DomainWarping.GenerateDomainNoise(x, z, noiseSettings);
                     zIndex++;
                 }
 

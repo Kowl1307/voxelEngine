@@ -36,9 +36,7 @@ namespace Voxel_Engine.WorldGen
         public ChunkData GenerateChunkData(ChunkData chunkData, Vector2Int mapSeedOffset)
         {
             var biomeSelection = SelectBiomeGenerator(chunkData.WorldPosition, chunkData, false);
-            //var treeData = BiomeGenerator.GetTreeData(chunkData, mapSeedOffset);
             var structureDataList = biomeSelection.BiomeGenerator.GetStructureData(chunkData, mapSeedOffset);
-            //var treeData = biomeSelection.BiomeGenerator.GetTreeData(chunkData, mapSeedOffset);
             foreach(var structureData in structureDataList)
                 chunkData.AddStructureData(structureData);
             
@@ -102,10 +100,13 @@ namespace Voxel_Engine.WorldGen
         private float CalculateInterpolatedHeight(Vector3Int worldPos, ChunkData chunkData, List<BiomeSelectionHelper> biomeSelectionHelpers)
         {
             //General interpolation with Inverse Distance Weighting
-            //If one is exactly on the given position, return
             var terrainHeights = biomeSelectionHelpers.Select(helper =>
-                SelectBiome(helper.Index).GetSurfaceHeightNoise(worldPos.x, worldPos.z, chunkData.ChunkHeight,
-                    SelectBiome(helper.Index).BiomeSettings)).ToList();
+            {
+                var biome = SelectBiome(helper.Index);
+                var floorHeight = biome.GetSurfaceHeightNoise(worldPos.x, worldPos.z, chunkData.ChunkHeight,
+                    biome.BiomeSettings);
+                return floorHeight < biome.BiomeSettings.WaterLevel ? biome.BiomeSettings.WaterLevel : floorHeight;
+            }).ToList();
 
             var distances = biomeSelectionHelpers.Select(helper => helper.Distance).ToList();
             var weights = distances.Select(distance => 1 / (distance * distance)).ToList();
