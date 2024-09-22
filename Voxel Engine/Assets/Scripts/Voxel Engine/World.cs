@@ -180,6 +180,9 @@ namespace Voxel_Engine
         {
             foreach (var item in meshData)
             {
+                //If the data is already gone or this function was called several times and already added the chunk, dont add the chunk
+                if (!WorldData.ChunkDataDictionary.ContainsKey(item.Key) || WorldData.ChunkDictionary.ContainsKey(item.Key))
+                    continue;
                 CreateChunk(WorldData, item.Key, item.Value);
                 yield return new WaitForEndOfFrame();
             }
