@@ -28,7 +28,8 @@ namespace Player
             RaycastHit hit;
             if (!Physics.Raycast(raycastStartPosition, Vector3.down, out hit, world.chunkHeight + 5)) return;
             player = Instantiate(playerPrefab, hit.point + Vector3.up * .5f, Quaternion.identity);
-            cameraVm.Follow = player.transform.GetChild(0);
+            cameraVm = player.GetComponentInChildren<CinemachineVirtualCamera>();
+            //cameraVm.Follow = player.transform.GetChild(0);
             StartCheckingMap();
         }
 
