@@ -20,7 +20,7 @@ namespace Voxel_Engine.WorldGen.Trees
             var treeData = new StructureData();
             var noiseData = GenerateTreeNoise(chunkData, treeNoiseSettings);
             var positions =
-                DataProcessing.FindLocalMaxima(noiseData, chunkData.WorldPosition.x, chunkData.WorldPosition.z, closestTreeDistance);
+                DataProcessing.FindLocalMaxima(noiseData, chunkData.ChunkPositionInVoxel.x, chunkData.ChunkPositionInVoxel.z, closestTreeDistance);
             foreach (var pos in positions)
             {
                 treeData.StructurePointsOfInterest.Add(pos);
@@ -33,9 +33,9 @@ namespace Voxel_Engine.WorldGen.Trees
         private float[,] GenerateTreeNoise(ChunkData chunkData, NoiseSettings noiseSettings)
         {
             var noiseMax = new float[chunkData.ChunkSize, chunkData.ChunkSize];
-            var xMin = chunkData.WorldPosition.x;
+            var xMin = chunkData.ChunkPositionInVoxel.x;
             var xMax = xMin + chunkData.ChunkSize;
-            var zMin = chunkData.WorldPosition.z;
+            var zMin = chunkData.ChunkPositionInVoxel.z;
             var zMax = zMin + chunkData.ChunkSize;
             var xIndex = 0;
             var zIndex = 0;

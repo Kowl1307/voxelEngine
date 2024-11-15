@@ -3,21 +3,30 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using Voxel_Engine;
 using Voxel_Engine.WorldGen;
 using Debug = UnityEngine.Debug;
 using Random = System.Random;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Voxel_Engine
 {
     public class World : MonoBehaviour
     {
-        public int chunkSize = 16, chunkHeight = 100;
+        public int chunkSizeInVoxel = 16;
+        public int chunkHeightInVoxel = 100;
         public Vector3 voxelScaling = Vector3.one;
+        
+        public Vector3 VoxelScalingInverse => new Vector3(1/voxelScaling.x, 1/voxelScaling.y, 1/voxelScaling.z);
+
+        public int chunkSizeInWorld => Mathf.FloorToInt(chunkSizeInVoxel * voxelScaling.x);
+        public int chunkHeightInWorld => Mathf.FloorToInt(chunkHeightInVoxel * voxelScaling.y);
 
         public TerrainGenerator terrainGenerator;
         public Vector2Int MapSeedOffset;
@@ -36,8 +45,8 @@ namespace Voxel_Engine
         {
             WorldData = new WorldData
             {
-                ChunkHeight = this.chunkHeight,
-                ChunkSize = chunkSize,
+                ChunkHeight = chunkHeightInVoxel,
+                ChunkSize = chunkSizeInVoxel,
                 ChunkDataDictionary = new ConcurrentDictionary<Vector3Int, ChunkData>(),
                 ChunkDictionary = new ConcurrentDictionary<Vector3Int, ChunkRenderer>()
             };
@@ -56,11 +65,11 @@ namespace Voxel_Engine
             await GenerateWorld(Vector3Int.zero);
         }
         
-        private async Task GenerateWorld(Vector3Int position)
+        private async Task GenerateWorld(Vector3Int worldPosition)
         {
             print("Starting generating World call");
-            terrainGenerator.GenerateBiomePoints(position, ChunkDrawingRange, chunkSize, MapSeedOffset);
-            var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(position), taskTokenSource.Token);
+            terrainGenerator.GenerateBiomePoints(worldPosition, ChunkDrawingRange, chunkSizeInVoxel, MapSeedOffset);
+            var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(worldPosition), taskTokenSource.Token);
 
             print("Deleting old Chunks..");
             
@@ -164,7 +173,7 @@ namespace Voxel_Engine
             await Task.Run(() => Parallel.ForEach(dataToRender, data =>
             {
                 var meshData = Chunk.GetChunkMeshData(data);
-                dictionary.TryAdd(data.WorldPosition, meshData);
+                dictionary.TryAdd(data.ChunkPositionInWorld, meshData);
             }));
             
             return dictionary;
@@ -181,7 +190,7 @@ namespace Voxel_Engine
                     if(taskTokenSource.Token.IsCancellationRequested)
                         taskTokenSource.Token.ThrowIfCancellationRequested();
                     
-                    var data = new ChunkData(chunkSize, chunkHeight, this, pos);
+                    var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, pos, Vector3Int.RoundToInt(Vector3.Scale(pos, VoxelScalingInverse)));
                     var newData = terrainGenerator.GenerateChunkData(data, MapSeedOffset);
                     dictionary.TryAdd(pos, newData);
                 }
@@ -237,17 +246,18 @@ namespace Voxel_Engine
             return data;
         }
 
-        public VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int worldPositionX, int worldPositionY, int worldPositionZ)
+        public VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int chunkPositionX, int chunkPositionY, int chunkPositionZ)
         {
-            var pos = Chunk.ChunkPositionFromVoxelCoords(this, worldPositionX, worldPositionY, worldPositionZ);
+            var voxelCoords = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, chunkPositionX, chunkPositionY, chunkPositionZ);
+            var pos = Chunk.GetChunkWorldPositionFromVoxelCoords(this, voxelCoords);
             ChunkData containerChunk = null;
 
             WorldData.ChunkDataDictionary.TryGetValue(pos, out containerChunk);
 
             if (containerChunk == null)
                 return VoxelType.Nothing;
-            var voxelChunkCoordinates = Chunk.GetVoxelInChunkCoordinates(containerChunk,
-                new Vector3Int(worldPositionX, worldPositionY, worldPositionZ));
+            var voxelChunkCoordinates = Chunk.GetChunkCoordinateOfVoxelPosition(containerChunk,
+                new Vector3Int(chunkPositionX, chunkPositionY, chunkPositionZ));
             return Chunk.GetVoxelFromChunkCoordinates(containerChunk, voxelChunkCoordinates);
         }
 
@@ -273,7 +283,7 @@ namespace Voxel_Engine
                 var neighbourDataList = Chunk.GetEdgeNeighbourChunk(chunk.ChunkData, pos);
                 foreach (var neighbourData in neighbourDataList)
                 {
-                    var chunkToUpdate = WorldDataHelper.GetChunk(neighbourData.WorldReference, neighbourData.WorldPosition);
+                    var chunkToUpdate = WorldDataHelper.GetChunk(neighbourData.WorldReference, neighbourData.ChunkPositionInWorld);
                     if (chunkToUpdate != null)
                         chunkToUpdate.UpdateChunk();
                 }

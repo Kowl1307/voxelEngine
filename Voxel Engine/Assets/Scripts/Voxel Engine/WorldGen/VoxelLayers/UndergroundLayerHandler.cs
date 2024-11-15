@@ -11,7 +11,7 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
             if (y >= surfaceHeightNoise)
                 return false;
             //Needed for underground layers
-            var localY = y - chunkData.WorldPosition.y;
+            var localY = y - chunkData.ChunkPositionInVoxel.y;
             
             var pos = new Vector3Int(x, localY, z);
             Chunk.SetVoxel(chunkData, pos, undergroundType);
