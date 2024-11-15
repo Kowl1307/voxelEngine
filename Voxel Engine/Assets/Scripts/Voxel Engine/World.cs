@@ -190,7 +190,7 @@ namespace Voxel_Engine
                     if(taskTokenSource.Token.IsCancellationRequested)
                         taskTokenSource.Token.ThrowIfCancellationRequested();
                     
-                    var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, pos, Vector3Int.RoundToInt(Vector3.Scale(pos, VoxelScalingInverse)));
+                    var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, pos, WorldDataHelper.GetVoxelPositionFromWorldPosition(this, pos));
                     var newData = terrainGenerator.GenerateChunkData(data, MapSeedOffset);
                     dictionary.TryAdd(pos, newData);
                 }

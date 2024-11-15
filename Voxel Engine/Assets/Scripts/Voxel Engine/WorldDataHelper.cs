@@ -27,6 +27,16 @@ namespace Voxel_Engine
                 z = Mathf.FloorToInt(worldCoords.z / (float)world.chunkSizeInWorld) * world.chunkSizeInWorld
             };
         }
+
+        public static Vector3Int GetVoxelPositionFromWorldPosition(World world, Vector3Int worldCoords)
+        {
+            return new Vector3Int
+            {
+                x = Mathf.RoundToInt(worldCoords.x / (float)world.chunkSizeInWorld * world.chunkSizeInVoxel),
+                y = Mathf.RoundToInt(worldCoords.y / (float)world.chunkHeightInWorld * world.chunkHeightInVoxel),
+                z = Mathf.RoundToInt(worldCoords.z / (float)world.chunkSizeInWorld * world.chunkSizeInVoxel)
+            };
+        }
         
         public static List<Vector3Int> GetChunkPositionsAroundPlayer(World world, Vector3Int playerPosition)
         {
@@ -138,8 +148,9 @@ namespace Voxel_Engine
         {
             var chunkData = GetChunkData(world, worldPos);
             if (chunkData == null) return;
-            
-            var localPos = Chunk.GetChunkCoordinateOfVoxelPosition(chunkData, worldPos);
+
+            var voxelCoords = GetVoxelPositionFromWorldPosition(world, worldPos);
+            var localPos = Chunk.GetChunkCoordinateOfVoxelPosition(chunkData, voxelCoords);
             Chunk.SetVoxel(chunkData, localPos, voxelType);
         }
 
