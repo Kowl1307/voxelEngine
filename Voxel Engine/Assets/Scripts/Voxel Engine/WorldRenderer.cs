@@ -19,7 +19,7 @@ namespace Voxel_Engine
             chunkPool.Clear();
         }
         
-        public ChunkRenderer RenderChunk(WorldData worldData, Vector3Int position, MeshData meshData)
+        public ChunkRenderer RenderChunk(WorldData worldData, Vector3Int position, MeshData meshData, Vector3 voxelScaling)
         {
             ChunkRenderer newChunk;
             if (chunkPool.Count > 0)

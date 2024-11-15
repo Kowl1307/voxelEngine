@@ -79,7 +79,8 @@ namespace Voxel_Engine
         public static MeshData GetFaceDataInDirection(Direction direction, ChunkData chunkData, int x, int y, int z,
             MeshData meshData, VoxelType voxelType)
         {
-            GetFaceVertices(direction, x, y, z, meshData, voxelType);
+            GetFaceVertices(direction, x, y, z, meshData, voxelType, chunkData.WorldReference.voxelScaling);
+            
             meshData.AddQuadTriangles(VoxelDataManager.VoxelTextureDataDictionary[voxelType].GeneratesCollider);
             meshData.UV.AddRange(FaceUVs(direction,voxelType));
 
@@ -96,47 +97,47 @@ namespace Voxel_Engine
         /// <param name="z"></param>
         /// <param name="meshData"></param>
         /// <param name="blockType"></param>
-        public static void GetFaceVertices(Direction direction, int x, int y, int z, MeshData meshData, VoxelType blockType)
+        public static void GetFaceVertices(Direction direction, int x, int y, int z, MeshData meshData, VoxelType blockType, Vector3 voxelScale)
         {
             var generatesCollider = VoxelDataManager.VoxelTextureDataDictionary[blockType].GeneratesCollider;
             //order of vertices matters for the normals and how we render the mesh
             switch (direction)
             {
                 case Direction.Forward:
-                    meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), voxelScale), generatesCollider);
                     break;
                 case Direction.Backwards:
-                    meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), voxelScale), generatesCollider);
                     break;
                 case Direction.Right:
-                    meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), voxelScale), generatesCollider);
                     break;
                 case Direction.Left:
-                    meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), voxelScale), generatesCollider);
                     break;
                 case Direction.Up:
-                    meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), voxelScale), generatesCollider);
                     break;
                 case Direction.Down:
-                    meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), generatesCollider);
-                    meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), voxelScale), generatesCollider);
                     break;
                 default:
                     break;

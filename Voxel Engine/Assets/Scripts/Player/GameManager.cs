@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
 using Voxel_Engine;
 
@@ -17,7 +17,7 @@ namespace Player
 
         [SerializeField] private float detectionTime = .1f;
 
-        [SerializeField] private CinemachineVirtualCamera cameraVm;
+        [SerializeField] private CinemachineCamera cameraVm;
 
         public void SpawnPlayer()
         {
@@ -28,14 +28,15 @@ namespace Player
             RaycastHit hit;
             if (!Physics.Raycast(raycastStartPosition, Vector3.down, out hit, world.chunkHeight + 5)) return;
             player = Instantiate(playerPrefab, hit.point + Vector3.up * .5f, Quaternion.identity);
-            cameraVm = player.GetComponentInChildren<CinemachineVirtualCamera>();
+            cameraVm = player.GetComponentInChildren<CinemachineCamera>();
             //cameraVm.Follow = player.transform.GetChild(0);
             StartCheckingMap();
         }
 
         private void Start()
         {
-            FindObjectOfType<World>().GenerateWorld();
+            Debug.Log("Initial World Gen call..");
+            FindFirstObjectByType<World>().GenerateWorld();
         }
 
         public void StartCheckingMap()

@@ -20,7 +20,7 @@ namespace Voxel_Engine
         {
             var startX = playerPosition.x - (world.ChunkDrawingRange) * world.chunkSize;
             var startZ = playerPosition.z - (world.ChunkDrawingRange) * world.chunkSize;
-            var endX = playerPosition.x + (world.ChunkDrawingRange) * world.chunkSize;
+            var endX = playerPosition.x + (world.ChunkDrawingRange) * world.chunkSize; 
             var endZ = playerPosition.z + (world.ChunkDrawingRange) * world.chunkSize;
 
             return GetPositionsAroundPlayer(world, startX, startZ, endX, endZ, playerPosition);

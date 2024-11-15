@@ -31,7 +31,7 @@ namespace Player
                 mainCamera = Camera.main;
             playerInput = GetComponent<PlayerInput>();
             _playerMovement = GetComponent<PlayerMovement>();
-            world = FindObjectOfType<World>();
+            world = FindFirstObjectByType<World>();
         }
 
         private void Start()

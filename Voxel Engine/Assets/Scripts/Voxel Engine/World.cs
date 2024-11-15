@@ -2,11 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using Voxel_Engine;
@@ -19,6 +17,7 @@ namespace Voxel_Engine
     public class World : MonoBehaviour
     {
         public int chunkSize = 16, chunkHeight = 100;
+        public Vector3 voxelScaling = Vector3.one;
 
         public TerrainGenerator terrainGenerator;
         public Vector2Int MapSeedOffset;
@@ -59,9 +58,12 @@ namespace Voxel_Engine
         
         private async Task GenerateWorld(Vector3Int position)
         {
+            print("Starting generating World call");
             terrainGenerator.GenerateBiomePoints(position, ChunkDrawingRange, chunkSize, MapSeedOffset);
             var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(position), taskTokenSource.Token);
 
+            print("Deleting old Chunks..");
+            
             //This cant be async because data is on main thread
             //Remove unneeded chunks
             foreach (var pos in worldGenerationData.ChunkPositionsToRemove)
@@ -73,6 +75,8 @@ namespace Voxel_Engine
             {
                 WorldDataHelper.RemoveChunkData(this, pos);
             }
+            
+            print("Populating new world data..");
 
             ConcurrentDictionary<Vector3Int, ChunkData> dataDictionary = null;
             try
@@ -91,6 +95,7 @@ namespace Voxel_Engine
                 WorldData.ChunkDataDictionary.TryAdd(calculatedData.Key, calculatedData.Value);
             }
 
+            print("Adding structure voxels..");
             //Add structure blocks after initializing the chunks
             foreach (var chunkData in WorldData.ChunkDataDictionary.Values)
             {
@@ -102,7 +107,7 @@ namespace Voxel_Engine
                 WorldData.ChunkDataDictionary.Where(kvp =>
                     worldGenerationData.ChunkPositionsToCreate.Contains(kvp.Key)).Select(kvp => kvp.Value).ToList();
 
-            
+            print("Creating mesh data..");
             ConcurrentDictionary<Vector3Int, MeshData> meshDataDictionary;
             try
             {
@@ -141,6 +146,7 @@ namespace Voxel_Engine
         {
             var dictionary = new ConcurrentDictionary<Vector3Int, MeshData>();
 
+            /*
             return await Task.Run(() =>
             {
                 foreach (var data in dataToRender)
@@ -154,6 +160,14 @@ namespace Voxel_Engine
 
                 return dictionary;
             }, taskTokenSource.Token);
+            */
+            await Task.Run(() => Parallel.ForEach(dataToRender, data =>
+            {
+                var meshData = Chunk.GetChunkMeshData(data);
+                dictionary.TryAdd(data.WorldPosition, meshData);
+            }));
+            
+            return dictionary;
         }
 
         private async Task<ConcurrentDictionary<Vector3Int, ChunkData>> CalculateWorldChunkData(List<Vector3Int> chunkDataPositionsToCreate)
@@ -178,6 +192,7 @@ namespace Voxel_Engine
 
         private IEnumerator ChunkCreationCoroutine(ConcurrentDictionary<Vector3Int, MeshData> meshData)
         {
+            print("Creating Chunks..");
             foreach (var item in meshData)
             {
                 //If the data is already gone or this function was called several times and already added the chunk, dont add the chunk
@@ -194,7 +209,7 @@ namespace Voxel_Engine
 
         private void CreateChunk(WorldData worldData, Vector3Int position, MeshData meshData)
         {
-            var chunkRenderer = WorldRenderer.RenderChunk(worldData, position, meshData);
+            var chunkRenderer = WorldRenderer.RenderChunk(worldData, position, meshData, voxelScaling);
             WorldData.ChunkDictionary.TryAdd(position, chunkRenderer);
         }
 
