@@ -249,7 +249,7 @@ namespace Voxel_Engine
         public VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int chunkPositionX, int chunkPositionY, int chunkPositionZ)
         {
             var voxelCoords = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, chunkPositionX, chunkPositionY, chunkPositionZ);
-            var pos = Chunk.GetChunkWorldPositionFromVoxelCoords(this, voxelCoords);
+            var pos = WorldDataHelper.GetChunkWorldPositionFromVoxelCoords(this, voxelCoords);
             ChunkData containerChunk = null;
 
             WorldData.ChunkDataDictionary.TryGetValue(pos, out containerChunk);
@@ -274,7 +274,7 @@ namespace Voxel_Engine
 
             var pos = GetVoxelPos(hit);
 
-            WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference, pos, voxelType);
+            WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference, WorldDataHelper.GetVoxelPositionFromWorldPosition(chunk.ChunkData.WorldReference, pos), voxelType);
             chunk.ModifiedByPlayer = true;
             
             //If block is on edge, update neighbour chunk

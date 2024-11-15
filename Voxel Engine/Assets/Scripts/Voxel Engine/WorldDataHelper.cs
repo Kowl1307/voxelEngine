@@ -22,9 +22,9 @@ namespace Voxel_Engine
         {
             return new Vector3Int
             {
-                x = Mathf.FloorToInt(worldCoords.x / (float)world.chunkSizeInWorld) * world.chunkSizeInWorld,
-                y = Mathf.FloorToInt(worldCoords.y / (float)world.chunkHeightInWorld) * world.chunkSizeInWorld,
-                z = Mathf.FloorToInt(worldCoords.z / (float)world.chunkSizeInWorld) * world.chunkSizeInWorld
+                x = Mathf.RoundToInt(worldCoords.x / (float)world.chunkSizeInWorld) * world.chunkSizeInWorld,
+                y = Mathf.RoundToInt(worldCoords.y / (float)world.chunkHeightInWorld) * world.chunkSizeInWorld,
+                z = Mathf.RoundToInt(worldCoords.z / (float)world.chunkSizeInWorld) * world.chunkSizeInWorld
             };
         }
 
@@ -36,6 +36,29 @@ namespace Voxel_Engine
                 y = Mathf.RoundToInt(worldCoords.y / (float)world.chunkHeightInWorld * world.chunkHeightInVoxel),
                 z = Mathf.RoundToInt(worldCoords.z / (float)world.chunkSizeInWorld * world.chunkSizeInVoxel)
             };
+        }
+        
+        public static Vector3Int GetWorldPositionFromVoxelPosition(World world, Vector3Int voxelCoords)
+        {
+            return new Vector3Int
+            {
+                x = Mathf.RoundToInt(voxelCoords.x / (float)world.chunkSizeInVoxel * world.chunkSizeInWorld),
+                y = Mathf.RoundToInt(voxelCoords.y / (float)world.chunkHeightInVoxel * world.chunkHeightInWorld),
+                z = Mathf.RoundToInt(voxelCoords.z / (float)world.chunkSizeInVoxel * world.chunkSizeInWorld)
+            };
+        }
+        
+        public static Vector3Int GetChunkWorldPositionFromVoxelCoords(World world, Vector3Int voxelCoords) => GetChunkWorldPositionFromVoxelCoords(world, voxelCoords.x, voxelCoords.y, voxelCoords.z);
+        
+        public static Vector3Int GetChunkWorldPositionFromVoxelCoords(World world, int voxelPositionX, int voxelPositionY, int voxlePositionZ)
+        {
+            var pos = new Vector3Int
+            {
+                x = Mathf.FloorToInt(voxelPositionX / (float)world.chunkSizeInVoxel) * world.chunkSizeInWorld,
+                y = Mathf.FloorToInt(voxelPositionY / (float)world.chunkHeightInVoxel) * world.chunkHeightInWorld,
+                z = Mathf.FloorToInt(voxlePositionZ / (float)world.chunkSizeInVoxel) * world.chunkSizeInWorld
+            };
+            return pos;
         }
         
         public static List<Vector3Int> GetChunkPositionsAroundPlayer(World world, Vector3Int playerPosition)
@@ -144,19 +167,19 @@ namespace Voxel_Engine
             world.WorldData.ChunkDataDictionary.TryRemove(pos, out _);
         }
 
-        public static void SetVoxel(World world, Vector3Int worldPos, VoxelType voxelType)
+        public static void SetVoxel(World world, Vector3Int voxelCoords, VoxelType voxelType)
         {
-            var chunkData = GetChunkData(world, worldPos);
+            var chunkData = GetChunkDataFromVoxelCoords(world, voxelCoords);
             if (chunkData == null) return;
 
-            var voxelCoords = GetVoxelPositionFromWorldPosition(world, worldPos);
             var localPos = Chunk.GetChunkCoordinateOfVoxelPosition(chunkData, voxelCoords);
             Chunk.SetVoxel(chunkData, localPos, voxelType);
         }
 
-        public static ChunkData GetChunkData(World world, Vector3Int worldPos)
+        public static ChunkData GetChunkDataFromVoxelCoords(World world, Vector3Int voxelCoords)
          {
-            var chunkPos = GetChunkPositionFromVoxelCoords(world, worldPos);
+            //var chunkPos = GetChunkWorldPositionFromWorldCoords(world, GetWorldPositionFromVoxelPosition(world, voxelCoords));
+            var chunkPos = GetChunkWorldPositionFromVoxelCoords(world, voxelCoords);
             ChunkData containerChunk = null;
 
             world.WorldData.ChunkDataDictionary.TryGetValue(chunkPos, out containerChunk);
@@ -168,5 +191,7 @@ namespace Voxel_Engine
         {
             return worldReference.WorldData.ChunkDictionary.ContainsKey(worldPosition) ? worldReference.WorldData.ChunkDictionary[worldPosition] : null;
         }
+
+        
     }
 }

@@ -43,6 +43,7 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
                 }
 
                 //Add Leaves data
+                //We need to do this because the leaves can go out of the current chunk
                 foreach (var leafPos in _treeLeavesStaticLayout)
                 {
                     var leafInChunk = new Vector3Int(x + leafPos.x,
