@@ -257,7 +257,7 @@ namespace Voxel_Engine
             if (containerChunk == null)
                 return VoxelType.Nothing;
             var voxelChunkCoordinates = Chunk.GetChunkCoordinateOfVoxelPosition(containerChunk,
-                new Vector3Int(chunkPositionX, chunkPositionY, chunkPositionZ));
+                voxelCoords);
             return Chunk.GetVoxelFromChunkCoordinates(containerChunk, voxelChunkCoordinates);
         }
 

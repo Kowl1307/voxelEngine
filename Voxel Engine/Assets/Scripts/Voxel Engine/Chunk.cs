@@ -125,9 +125,9 @@ namespace Voxel_Engine
         {
             var pos = new Vector3Int
             {
-                x = Mathf.FloorToInt(voxelPositionX / (float)world.chunkSizeInVoxel) * world.chunkSizeInVoxel,
-                y = Mathf.FloorToInt(voxelPositionY / (float)world.chunkHeightInVoxel) * world.chunkHeightInVoxel,
-                z = Mathf.FloorToInt(voxlePositionZ / (float)world.chunkSizeInVoxel) * world.chunkSizeInVoxel
+                x = Mathf.FloorToInt(voxelPositionX / (float)world.chunkSizeInVoxel) * world.chunkSizeInWorld,
+                y = Mathf.FloorToInt(voxelPositionY / (float)world.chunkHeightInVoxel) * world.chunkHeightInWorld,
+                z = Mathf.FloorToInt(voxlePositionZ / (float)world.chunkSizeInVoxel) * world.chunkSizeInWorld
             };
             return pos;
         }
