@@ -274,7 +274,7 @@ namespace Voxel_Engine
 
             var pos = GetVoxelPos(hit);
 
-            WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference, WorldDataHelper.GetVoxelPositionFromWorldPosition(chunk.ChunkData.WorldReference, pos), voxelType);
+            WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference,pos, voxelType);
             chunk.ModifiedByPlayer = true;
             
             //If block is on edge, update neighbour chunk
@@ -297,6 +297,7 @@ namespace Voxel_Engine
         {
             var pos = new Vector3(GetVoxelPosIn(hit.point.x, hit.normal.x), GetVoxelPosIn(hit.point.y, hit.normal.y),
                 GetVoxelPosIn(hit.point.z, hit.normal.z));
+            pos = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, Vector3Int.RoundToInt(pos));
             return Vector3Int.RoundToInt(pos);
         }
 

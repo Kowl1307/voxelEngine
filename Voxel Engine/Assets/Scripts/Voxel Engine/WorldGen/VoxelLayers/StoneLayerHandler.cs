@@ -15,7 +15,8 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
         
         protected override bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset, BiomeSettingsSO biomeSettings)
         {
-            if (chunkData.ChunkPositionInVoxel.y > surfaceHeightNoise)
+            var voxelY = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, x, y, z).y;
+            if (voxelY > surfaceHeightNoise)
                 return false;
 
             stoneNoiseSettings.WorldOffset = mapSeedOffset;

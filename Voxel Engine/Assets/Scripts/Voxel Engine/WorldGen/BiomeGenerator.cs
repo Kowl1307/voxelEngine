@@ -37,7 +37,11 @@ namespace Voxel_Engine.WorldGen
             var groundPosition = terrainHeightNoise ?? GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.ChunkHeight, BiomeSettings);
 
             //Fill the whole chunk with voxelType data
-            for (var y = chunkData.ChunkPositionInVoxel.y; y < chunkData.ChunkHeight + chunkData.ChunkPositionInVoxel.y; y++)
+            /*for (var y = chunkData.ChunkPositionInVoxel.y; y < chunkData.ChunkHeight + chunkData.ChunkPositionInVoxel.y; y++)
+            {
+                StartLayerHandler.Handle(chunkData, x, y, z, groundPosition, mapSeedOffset, BiomeSettings);
+            }*/
+            for (var y = 0; y < chunkData.ChunkHeight; y++)
             {
                 StartLayerHandler.Handle(chunkData, x, y, z, groundPosition, mapSeedOffset, BiomeSettings);
             }

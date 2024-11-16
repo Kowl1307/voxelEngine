@@ -7,16 +7,18 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
     {
         protected override bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset, BiomeSettingsSO biomeSettings)
         {
-            if (y <= surfaceHeightNoise || y > biomeSettings.WaterLevel)
+            var voxelY = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, x, y, z).y;
+
+            if (voxelY <= surfaceHeightNoise || voxelY > biomeSettings.WaterLevel)
                 return false;
             
             var pos = new Vector3Int(x, y, z);
             
             Chunk.SetVoxel(chunkData, pos, VoxelType.Water);
             
-            if (y != surfaceHeightNoise + 1) return true;
+            if (voxelY != surfaceHeightNoise + 1) return true;
             //Generate the sea floor
-            pos.y = surfaceHeightNoise;
+            pos.y -= 1;
             Chunk.SetVoxel(chunkData, pos, VoxelType.Sand);
             return true;
         }

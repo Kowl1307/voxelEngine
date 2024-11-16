@@ -119,41 +119,41 @@ namespace Voxel_Engine
             return x + chunkData.ChunkSize * y + chunkData.ChunkSize * chunkData.ChunkHeight * z;
         }
 
-        public static bool IsOnEdge(ChunkData chunkData, Vector3Int worldPosition)
+        public static bool IsOnEdge(ChunkData chunkData, Vector3Int voxelPos)
         {
-            var chunkPosition = GetChunkCoordinateOfVoxelPosition(chunkData, worldPosition);
+            var chunkPosition = GetChunkCoordinateOfVoxelPosition(chunkData, voxelPos);
             return chunkPosition.x == 0 || chunkPosition.x == chunkData.ChunkSize - 1 ||
                    chunkPosition.y == 0 || chunkPosition.y == chunkData.ChunkHeight - 1 ||
                    chunkPosition.z == 0 || chunkPosition.z == chunkData.ChunkSize - 1;
         }
 
-        public static List<ChunkData> GetEdgeNeighbourChunk(ChunkData chunkData, Vector3Int worldPosition)
+        public static List<ChunkData> GetEdgeNeighbourChunk(ChunkData chunkData, Vector3Int voxelPos)
         {
-            var chunkPosition = GetChunkCoordinateOfVoxelPosition(chunkData, worldPosition);
+            var chunkPosition = GetChunkCoordinateOfVoxelPosition(chunkData, voxelPos);
             var neighboursToUpdate = new List<ChunkData>();
             if (chunkPosition.x == 0)
             {
-                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, worldPosition - Vector3Int.right));
+                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos - Vector3Int.right));
             }
             if (chunkPosition.x == chunkData.ChunkSize - 1)
             {
-                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, worldPosition + Vector3Int.right));
+                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos + Vector3Int.right));
             }
             if (chunkPosition.y == 0)
             {
-                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, worldPosition - Vector3Int.up));
+                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos - Vector3Int.up));
             }
             if (chunkPosition.y == chunkData.ChunkHeight - 1)
             {
-                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, worldPosition + Vector3Int.up));
+                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos + Vector3Int.up));
             }
             if (chunkPosition.z == 0)
             {
-                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, worldPosition - Vector3Int.forward));
+                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos - Vector3Int.forward));
             }
             if (chunkPosition.z == chunkData.ChunkSize - 1)
             {
-                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, worldPosition + Vector3Int.forward));
+                neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos + Vector3Int.forward));
             }
             return neighboursToUpdate;
         }

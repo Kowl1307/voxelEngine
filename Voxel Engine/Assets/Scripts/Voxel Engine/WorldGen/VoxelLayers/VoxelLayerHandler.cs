@@ -8,6 +8,7 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
         [SerializeField] 
         private VoxelLayerHandler nextLayer;
 
+        
         public bool Handle(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset, BiomeSettingsSO biomeSettings)
         {
             if (TryHandling(chunkData, x, y, z, surfaceHeightNoise, mapSeedOffset, biomeSettings))
@@ -17,6 +18,7 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
             return false;
         }
 
+        
         protected abstract bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise,
             Vector2Int mapSeedOffset, BiomeSettingsSO biomeSettings);
     }
