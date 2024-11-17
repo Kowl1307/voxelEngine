@@ -28,7 +28,7 @@ namespace Voxel_Engine
             };
         }
 
-        public static Vector3Int GetVoxelPositionFromWorldPosition(World world, Vector3Int worldCoords)
+        public static Vector3Int GetVoxelPositionFromWorldPosition(World world, Vector3 worldCoords)
         {
             return new Vector3Int
             {

@@ -291,12 +291,21 @@ namespace Voxel_Engine
             return true;
         }
 
+        /*
         private Vector3Int GetVoxelPos(RaycastHit hit)
         {
             var pos = new Vector3(GetVoxelPosIn(hit.point.x, hit.normal.x), GetVoxelPosIn(hit.point.y, hit.normal.y),
                 GetVoxelPosIn(hit.point.z, hit.normal.z));
-            pos = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, Vector3Int.RoundToInt(pos));
-            return Vector3Int.RoundToInt(pos);
+            var voxelCoords = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, Vector3Int.RoundToInt(pos));
+            return voxelCoords;
+        }
+        */
+        
+        private Vector3Int GetVoxelPos(RaycastHit hit)
+        {
+            var hitPos = hit.point;
+            hitPos -= Vector3.Scale(hit.normal, voxelScaling / 2);
+            return WorldDataHelper.GetVoxelPositionFromWorldPosition(this, hitPos);
         }
 
         private float GetVoxelPosIn(float pos, float normal)

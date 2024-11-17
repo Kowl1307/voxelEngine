@@ -1776,17 +1776,17 @@ PrefabInstance:
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: voxelScaling.x
-      value: 1
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: voxelScaling.y
-      value: 1
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: voxelScaling.z
-      value: 1
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
