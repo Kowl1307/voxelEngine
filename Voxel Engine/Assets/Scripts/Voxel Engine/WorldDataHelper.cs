@@ -23,7 +23,7 @@ namespace Voxel_Engine
             return new Vector3Int
             {
                 x = Mathf.RoundToInt(worldCoords.x / (float)world.chunkSizeInWorld) * world.chunkSizeInWorld,
-                y = Mathf.RoundToInt(worldCoords.y / (float)world.chunkHeightInWorld) * world.chunkSizeInWorld,
+                y = Mathf.RoundToInt(worldCoords.y / (float)world.chunkHeightInWorld) * world.chunkHeightInWorld,
                 z = Mathf.RoundToInt(worldCoords.z / (float)world.chunkSizeInWorld) * world.chunkSizeInWorld
             };
         }

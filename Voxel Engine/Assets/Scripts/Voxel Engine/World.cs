@@ -22,8 +22,6 @@ namespace Voxel_Engine
         public int chunkSizeInVoxel = 16;
         public int chunkHeightInVoxel = 100;
         public Vector3 voxelScaling = Vector3.one;
-        
-        public Vector3 VoxelScalingInverse => new Vector3(1/voxelScaling.x, 1/voxelScaling.y, 1/voxelScaling.z);
 
         public int chunkSizeInWorld => Mathf.FloorToInt(chunkSizeInVoxel * voxelScaling.x);
         public int chunkHeightInWorld => Mathf.FloorToInt(chunkHeightInVoxel * voxelScaling.y);

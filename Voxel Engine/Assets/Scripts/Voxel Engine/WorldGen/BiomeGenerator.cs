@@ -48,7 +48,7 @@ namespace Voxel_Engine.WorldGen
 
             foreach (var layer in additionalLayerHandlers)
             {
-                layer.Handle(chunkData, x, chunkData.ChunkPositionInVoxel.y, z, groundPosition, mapSeedOffset, BiomeSettings);
+                layer.Handle(chunkData, x, 0, z, groundPosition, mapSeedOffset, BiomeSettings);
             }
 
             return chunkData;

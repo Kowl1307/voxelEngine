@@ -13,6 +13,9 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
             if (voxelY != surfaceHeightNoise)
                 return false;
 
+            if(chunkData.ChunkPositionInVoxel.y < 0)
+                Debug.Log("???");
+            
             var pos = new Vector3Int(x, y, z);
             Chunk.SetVoxel(chunkData, pos, surfaceType);
             return true;
