@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -65,9 +66,10 @@ namespace Voxel_Engine
             _meshCollider.sharedMesh = collisionMesh;
         }
 
-        public void UpdateChunk()
+        public async void UpdateChunk()
         {
-            RenderMesh(Chunk.GetChunkMeshData(ChunkData));
+            var meshData = await Task.Run(() =>Chunk.GetChunkMeshData(ChunkData));
+            RenderMesh(meshData);
         }
 
         public void UpdateChunk(MeshData data)

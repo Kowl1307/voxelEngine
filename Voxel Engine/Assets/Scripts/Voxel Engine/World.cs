@@ -265,10 +265,10 @@ namespace Voxel_Engine
             OnNewChunksGenerated?.Invoke();
         }
 
-        public bool SetBlock(RaycastHit hit, VoxelType voxelType)
+        public void SetBlock(RaycastHit hit, VoxelType voxelType)
         {
             var chunk = hit.collider.GetComponent<ChunkRenderer>();
-            if (chunk == null) return false;
+            if (chunk == null) return;
 
             var pos = GetVoxelPos(hit);
 
@@ -288,7 +288,6 @@ namespace Voxel_Engine
             }
             
             chunk.UpdateChunk();
-            return true;
         }
 
         /*
