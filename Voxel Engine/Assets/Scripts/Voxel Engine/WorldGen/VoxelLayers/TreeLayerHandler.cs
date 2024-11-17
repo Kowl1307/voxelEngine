@@ -16,7 +16,8 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
         
         protected override bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset, BiomeSettingsSO biomeSettings)
         {
-            if (chunkData.WorldPosition.y < 0) return false;
+            var voxelY = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, x, y, z).y;
+            if (voxelY < 0) return false;
             //if (y < heightThreshold || y > heightLimit) return false;
 
             var treeStructures = chunkData.Structures.Where(structureData => structureData.Type == StructureType.Tree).ToList();
@@ -26,8 +27,8 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
                 var poiPositions = treeStructure.StructurePointsOfInterest;
 
                 if (!(surfaceHeightNoise < heightLimit) ||
-                    !poiPositions.Contains(new Vector2Int(chunkData.WorldPosition.x + x,
-                        chunkData.WorldPosition.z + z))) return false;
+                    !poiPositions.Contains(new Vector2Int(chunkData.ChunkPositionInVoxel.x + x,
+                        chunkData.ChunkPositionInVoxel.z + z))) return false;
 
                 var chunkCoords = new Vector3Int(x, surfaceHeightNoise, z);
                 var groundType = Chunk.GetVoxelFromChunkCoordinates(chunkData, chunkCoords);
@@ -43,6 +44,7 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
                 }
 
                 //Add Leaves data
+                //We need to do this because the leaves can go out of the current chunk
                 foreach (var leafPos in _treeLeavesStaticLayout)
                 {
                     var leafInChunk = new Vector3Int(x + leafPos.x,

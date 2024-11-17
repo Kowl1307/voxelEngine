@@ -8,6 +8,18 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
         [SerializeField] 
         private VoxelLayerHandler nextLayer;
 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="chunkData"></param>
+        /// <param name="x">ChunkCoords</param>
+        /// <param name="y">ChunkCoords</param>
+        /// <param name="z">ChunkCoords</param>
+        /// <param name="surfaceHeightNoise"></param>
+        /// <param name="mapSeedOffset"></param>
+        /// <param name="biomeSettings"></param>
+        /// <returns></returns>
         public bool Handle(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset, BiomeSettingsSO biomeSettings)
         {
             if (TryHandling(chunkData, x, y, z, surfaceHeightNoise, mapSeedOffset, biomeSettings))
@@ -17,6 +29,17 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="chunkData"></param>
+        /// <param name="x">ChunkCoords</param>
+        /// <param name="y">ChunkCoords</param>
+        /// <param name="z">ChunkCoords</param>
+        /// <param name="surfaceHeightNoise"></param>
+        /// <param name="mapSeedOffset"></param>
+        /// <param name="biomeSettings"></param>
+        /// <returns></returns>
         protected abstract bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise,
             Vector2Int mapSeedOffset, BiomeSettingsSO biomeSettings);
     }

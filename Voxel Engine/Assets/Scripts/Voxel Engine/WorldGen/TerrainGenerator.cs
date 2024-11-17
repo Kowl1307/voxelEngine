@@ -35,7 +35,7 @@ namespace Voxel_Engine.WorldGen
         
         public ChunkData GenerateChunkData(ChunkData chunkData, Vector2Int mapSeedOffset)
         {
-            var biomeSelection = SelectBiomeGenerator(chunkData.WorldPosition, chunkData, false);
+            var biomeSelection = SelectBiomeGenerator(chunkData.ChunkPositionInVoxel, chunkData, false);
             var structureDataList = biomeSelection.BiomeGenerator.GetStructureData(chunkData, mapSeedOffset);
             foreach(var structureData in structureDataList)
                 chunkData.AddStructureData(structureData);
@@ -46,7 +46,7 @@ namespace Voxel_Engine.WorldGen
                 for (var z = 0; z < chunkData.ChunkSize; z++)
                 {
                     //Need to re-define as this the biomeSelection is out of scope for parallel
-                    var biomeGeneratorSelection = SelectBiomeGenerator(new Vector3Int(chunkData.WorldPosition.x + x, 0, chunkData.WorldPosition.z + z), chunkData);
+                    var biomeGeneratorSelection = SelectBiomeGenerator(new Vector3Int(chunkData.ChunkPositionInVoxel.x + x, 0, chunkData.ChunkPositionInVoxel.z + z), chunkData);
                     
                     chunkData = biomeGeneratorSelection.BiomeGenerator.ProcessChunkColumn(chunkData, x, z, mapSeedOffset, biomeGeneratorSelection.TerrainSurfaceNoise);
                 }

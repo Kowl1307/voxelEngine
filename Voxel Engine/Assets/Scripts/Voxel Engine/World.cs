@@ -3,21 +3,28 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using Voxel_Engine;
 using Voxel_Engine.WorldGen;
 using Debug = UnityEngine.Debug;
 using Random = System.Random;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Voxel_Engine
 {
     public class World : MonoBehaviour
     {
-        public int chunkSize = 16, chunkHeight = 100;
+        public int chunkSizeInVoxel = 16;
+        public int chunkHeightInVoxel = 100;
         public Vector3 voxelScaling = Vector3.one;
+
+        public int chunkSizeInWorld => Mathf.FloorToInt(chunkSizeInVoxel * voxelScaling.x);
+        public int chunkHeightInWorld => Mathf.FloorToInt(chunkHeightInVoxel * voxelScaling.y);
 
         public TerrainGenerator terrainGenerator;
         public Vector2Int MapSeedOffset;
@@ -36,8 +43,8 @@ namespace Voxel_Engine
         {
             WorldData = new WorldData
             {
-                ChunkHeight = this.chunkHeight,
-                ChunkSize = chunkSize,
+                ChunkHeight = chunkHeightInVoxel,
+                ChunkSize = chunkSizeInVoxel,
                 ChunkDataDictionary = new ConcurrentDictionary<Vector3Int, ChunkData>(),
                 ChunkDictionary = new ConcurrentDictionary<Vector3Int, ChunkRenderer>()
             };
@@ -56,11 +63,11 @@ namespace Voxel_Engine
             await GenerateWorld(Vector3Int.zero);
         }
         
-        private async Task GenerateWorld(Vector3Int position)
+        private async Task GenerateWorld(Vector3Int worldPosition)
         {
             print("Starting generating World call");
-            terrainGenerator.GenerateBiomePoints(position, ChunkDrawingRange, chunkSize, MapSeedOffset);
-            var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(position), taskTokenSource.Token);
+            terrainGenerator.GenerateBiomePoints(worldPosition, ChunkDrawingRange, chunkSizeInVoxel, MapSeedOffset);
+            var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(worldPosition), taskTokenSource.Token);
 
             print("Deleting old Chunks..");
             
@@ -164,7 +171,7 @@ namespace Voxel_Engine
             await Task.Run(() => Parallel.ForEach(dataToRender, data =>
             {
                 var meshData = Chunk.GetChunkMeshData(data);
-                dictionary.TryAdd(data.WorldPosition, meshData);
+                dictionary.TryAdd(data.ChunkPositionInWorld, meshData);
             }));
             
             return dictionary;
@@ -181,7 +188,7 @@ namespace Voxel_Engine
                     if(taskTokenSource.Token.IsCancellationRequested)
                         taskTokenSource.Token.ThrowIfCancellationRequested();
                     
-                    var data = new ChunkData(chunkSize, chunkHeight, this, pos);
+                    var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, pos, WorldDataHelper.GetVoxelPositionFromWorldPosition(this, pos));
                     var newData = terrainGenerator.GenerateChunkData(data, MapSeedOffset);
                     dictionary.TryAdd(pos, newData);
                 }
@@ -237,17 +244,18 @@ namespace Voxel_Engine
             return data;
         }
 
-        public VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int worldPositionX, int worldPositionY, int worldPositionZ)
+        public VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int chunkPositionX, int chunkPositionY, int chunkPositionZ)
         {
-            var pos = Chunk.ChunkPositionFromVoxelCoords(this, worldPositionX, worldPositionY, worldPositionZ);
+            var voxelCoords = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, chunkPositionX, chunkPositionY, chunkPositionZ);
+            var pos = WorldDataHelper.GetChunkWorldPositionFromVoxelCoords(this, voxelCoords);
             ChunkData containerChunk = null;
 
             WorldData.ChunkDataDictionary.TryGetValue(pos, out containerChunk);
 
             if (containerChunk == null)
                 return VoxelType.Nothing;
-            var voxelChunkCoordinates = Chunk.GetVoxelInChunkCoordinates(containerChunk,
-                new Vector3Int(worldPositionX, worldPositionY, worldPositionZ));
+            var voxelChunkCoordinates = Chunk.GetChunkCoordinateOfVoxelPosition(containerChunk,
+                voxelCoords);
             return Chunk.GetVoxelFromChunkCoordinates(containerChunk, voxelChunkCoordinates);
         }
 
@@ -264,7 +272,7 @@ namespace Voxel_Engine
 
             var pos = GetVoxelPos(hit);
 
-            WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference, pos, voxelType);
+            WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference,pos, voxelType);
             chunk.ModifiedByPlayer = true;
             
             //If block is on edge, update neighbour chunk
@@ -273,7 +281,7 @@ namespace Voxel_Engine
                 var neighbourDataList = Chunk.GetEdgeNeighbourChunk(chunk.ChunkData, pos);
                 foreach (var neighbourData in neighbourDataList)
                 {
-                    var chunkToUpdate = WorldDataHelper.GetChunk(neighbourData.WorldReference, neighbourData.WorldPosition);
+                    var chunkToUpdate = WorldDataHelper.GetChunk(neighbourData.WorldReference, neighbourData.ChunkPositionInWorld);
                     if (chunkToUpdate != null)
                         chunkToUpdate.UpdateChunk();
                 }
@@ -283,11 +291,21 @@ namespace Voxel_Engine
             return true;
         }
 
+        /*
         private Vector3Int GetVoxelPos(RaycastHit hit)
         {
             var pos = new Vector3(GetVoxelPosIn(hit.point.x, hit.normal.x), GetVoxelPosIn(hit.point.y, hit.normal.y),
                 GetVoxelPosIn(hit.point.z, hit.normal.z));
-            return Vector3Int.RoundToInt(pos);
+            var voxelCoords = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, Vector3Int.RoundToInt(pos));
+            return voxelCoords;
+        }
+        */
+        
+        private Vector3Int GetVoxelPos(RaycastHit hit)
+        {
+            var hitPos = hit.point;
+            hitPos -= Vector3.Scale(hit.normal, voxelScaling / 2);
+            return WorldDataHelper.GetVoxelPositionFromWorldPosition(this, hitPos);
         }
 
         private float GetVoxelPosIn(float pos, float normal)

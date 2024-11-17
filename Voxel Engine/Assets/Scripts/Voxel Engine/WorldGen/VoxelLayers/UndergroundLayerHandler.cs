@@ -8,12 +8,11 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
         [SerializeField] private VoxelType undergroundType;
         protected override bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset, BiomeSettingsSO biomeSettings)
         {
-            if (y >= surfaceHeightNoise)
+            var voxelY = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, x, y, z).y;
+            if (voxelY >= surfaceHeightNoise)
                 return false;
-            //Needed for underground layers
-            var localY = y - chunkData.WorldPosition.y;
             
-            var pos = new Vector3Int(x, localY, z);
+            var pos = new Vector3Int(x, y, z);
             Chunk.SetVoxel(chunkData, pos, undergroundType);
             return true;
         }

@@ -12,17 +12,19 @@ namespace Voxel_Engine
         public int ChunkSize = 16;
         public int ChunkHeight = 100;
         public World WorldReference;
-        public Vector3Int WorldPosition;
+        public Vector3Int ChunkPositionInWorld; // Position of the transform in world space
+        public Vector3Int ChunkPositionInVoxel; // Position of the chunk in voxel space
 
         public bool ModifiedByPlayer = false;
         public List<StructureData> Structures = new List<StructureData>();
 
-        public ChunkData(int chunkSize, int chunkHeight, World world, Vector3Int worldPosition)
+        public ChunkData(int chunkSize, int chunkHeight, World world, Vector3Int chunkPositionInWorld, Vector3Int chunkPositionInVoxel)
         {
             ChunkSize = chunkSize;
             ChunkHeight = chunkHeight;
             WorldReference = world;
-            WorldPosition = worldPosition;
+            ChunkPositionInWorld = chunkPositionInWorld;
+            ChunkPositionInVoxel = chunkPositionInVoxel;
             Voxels = new VoxelType[ChunkSize * ChunkHeight * chunkSize];
         }
 

@@ -24,9 +24,9 @@ namespace Player
             if (player != null)
                 return;
 
-            var raycastStartPosition = new Vector3Int(world.chunkSize / 2, world.chunkHeight + 1, world.chunkSize / 2);
+            var raycastStartPosition = new Vector3Int(world.chunkSizeInWorld / 2, world.chunkHeightInWorld + 1, world.chunkSizeInWorld / 2);
             RaycastHit hit;
-            if (!Physics.Raycast(raycastStartPosition, Vector3.down, out hit, world.chunkHeight + 5)) return;
+            if (!Physics.Raycast(raycastStartPosition, Vector3.down, out hit, world.chunkHeightInVoxel + 5)) return;
             player = Instantiate(playerPrefab, hit.point + Vector3.up * .5f, Quaternion.identity);
             cameraVm = player.GetComponentInChildren<CinemachineCamera>();
             //cameraVm.Follow = player.transform.GetChild(0);
@@ -49,9 +49,9 @@ namespace Player
         private IEnumerator CheckIfShouldLoadNextPosition()
         {
             yield return new WaitForSeconds(detectionTime);
-            if (Math.Abs(currentChunkCenter.x - player.transform.position.x) > world.chunkSize ||
-                Math.Abs(currentChunkCenter.z - player.transform.position.z) > world.chunkSize ||
-                Math.Abs(currentPlayerChunkPosition.y - player.transform.position.y) > world.chunkHeight)
+            if (Math.Abs(currentChunkCenter.x - player.transform.position.x) > world.chunkSizeInWorld ||
+                Math.Abs(currentChunkCenter.z - player.transform.position.z) > world.chunkSizeInWorld ||
+                Math.Abs(currentPlayerChunkPosition.y - player.transform.position.y) > world.chunkHeightInWorld)
             {
                 world.LoadAdditionalChucksRequest(player);
             }
@@ -63,10 +63,11 @@ namespace Player
 
         private void SetCurrentChunkCoordinates()
         {
-            currentPlayerChunkPosition =
-                WorldDataHelper.ChunkPositionFromVoxelCoords(world, Vector3Int.RoundToInt(player.transform.position));
-            currentChunkCenter.x = currentPlayerChunkPosition.x + world.chunkSize / 2;
-            currentChunkCenter.z = currentPlayerChunkPosition.z + world.chunkSize / 2;
+            currentPlayerChunkPosition = WorldDataHelper.GetChunkWorldPositionFromWorldCoords(world, Vector3Int.RoundToInt(player.transform.position));
+            //currentPlayerChunkPosition =
+            //    WorldDataHelper.GetChunkPositionFromVoxelCoords(world, Vector3Int.RoundToInt(player.transform.position));
+            currentChunkCenter.x = currentPlayerChunkPosition.x + world.chunkSizeInWorld / 2;
+            currentChunkCenter.z = currentPlayerChunkPosition.z + world.chunkSizeInWorld / 2;
         }
     }
 }
