@@ -15,8 +15,6 @@ namespace Voxel_Engine.WorldGen
     /// </summary>
     public class TerrainGenerator : MonoBehaviour
     {
-        private TerrainInfo _terrainInfo;
-        
         [SerializeField] private List<BiomeCenter> _biomeCenters = new List<BiomeCenter>();
 
         [SerializeField] private NoiseSettings biomeNoiseSettings;
@@ -137,7 +135,7 @@ namespace Voxel_Engine.WorldGen
         /// <exception cref="Exception"></exception>
         private BiomeGenerator SelectBiome(int index)
         {
-            var temp = _terrainInfo.BiomeTemperatureNoise[index];
+            var temp = _biomeCenters[index].Temperature;
             foreach (var data in biomeGeneratorsData.Where(data => temp >= data.temperatureStartThreshold && temp < data.tmperatureEndThreshold))
             {
                 return data.biomeTerrainGenerator;
@@ -203,7 +201,7 @@ namespace Voxel_Engine.WorldGen
 
         private void GenerateTerrainInfo(Vector2Int mapSeedOffset)
         {
-            _terrainInfo.BiomeTemperatureNoise = CalculateBiomeNoise(_biomeCenters, mapSeedOffset);
+            CalculateBiomeNoise(_biomeCenters, mapSeedOffset);
         }
 
         /// <summary>
@@ -212,10 +210,13 @@ namespace Voxel_Engine.WorldGen
         /// <param name="centers"></param>
         /// <param name="mapSeedOffset"></param>
         /// <returns></returns>
-        private List<float> CalculateBiomeNoise(List<BiomeCenter> centers, Vector2Int mapSeedOffset)
+        private void CalculateBiomeNoise(List<BiomeCenter> centers, Vector2Int mapSeedOffset)
         {
             biomeNoiseSettings.WorldOffset = mapSeedOffset;
-            return centers.Select(center => MyNoise.OctavePerlin(center.Position.x, center.Position.y, biomeNoiseSettings)).ToList();
+            foreach(var center in centers)
+            {
+                center.Temperature = MyNoise.OctavePerlin(center.Position.x, center.Position.y, biomeNoiseSettings);
+            }
         }
 
 #if UNITY_EDITOR
@@ -231,19 +232,10 @@ namespace Voxel_Engine.WorldGen
     }
 }
 
-/// <summary>
-/// Struct that holds data for biome selection
-/// Holds info like temperature, humidity, ...
-/// </summary>
-public struct TerrainInfo
-{
-    public List<float> BiomeTemperatureNoise;
-}
-
 public class BiomeCenter
 {
     public Vector3Int Position;
-    public List<float> Temperature;
+    public float Temperature;
 
     public BiomeCenter(Vector3Int position)
     {
