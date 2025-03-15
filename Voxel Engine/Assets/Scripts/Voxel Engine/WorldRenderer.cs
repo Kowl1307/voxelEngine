@@ -46,7 +46,8 @@ namespace Voxel_Engine
 
         public void FillChunkPool(int chunkDrawingRange)
         {
-            _chunkPool.FillTo(chunkDrawingRange * chunkDrawingRange);
+            // Whole area + surrounding edges
+            _chunkPool.FillTo(chunkDrawingRange * chunkDrawingRange + chunkDrawingRange * 4);
         }
     }
 }
