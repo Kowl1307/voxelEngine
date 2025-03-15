@@ -3,25 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.Serialization;
 using Voxel_Engine.WorldGen;
 using Voxel_Engine.WorldGen.Biomes;
 using Voxel_Engine.WorldGen.Noise;
 
 namespace Voxel_Engine.WorldGen
 {
+    /// <summary>
+    /// Handles Biome selection, generates temperature and climate data, and delegates concrete implementation of generation to biomes
+    /// </summary>
     public class TerrainGenerator : MonoBehaviour
     {
-        [SerializeField] private List<Vector3Int> biomeCenters;
-        private List<float> biomeTemperatureNoise = new List<float>();
+        private TerrainInfo _terrainInfo;
+        
+        [SerializeField] private List<BiomeCenter> _biomeCenters = new List<BiomeCenter>();
 
         [SerializeField] private NoiseSettings biomeNoiseSettings;
-        
         public DomainWarping biomeDomainWarping;
 
-        [SerializeField] private List<BiomeData> biomeGeneratorsData = new List<BiomeData>();
+        [SerializeField] private List<BiomeGeneratorData> biomeGeneratorsData = new List<BiomeGeneratorData>();
 
-        public bool DoInterpolateBiomes = true;
+        public bool doInterpolateBiomes = true;
         ///Amount of biomes to use at any point to determine the biome
         public int interpolationSize = 2;
 
@@ -67,6 +70,13 @@ namespace Voxel_Engine.WorldGen
             return chunkData;
         }
 
+        /// <summary>
+        /// Selects the biome Generator for the given world position.
+        /// </summary>
+        /// <param name="worldPos"></param>
+        /// <param name="chunkData"></param>
+        /// <param name="useDomainWarping"></param>
+        /// <returns></returns>
         private BiomeGeneratorSelection SelectBiomeGenerator(Vector3Int worldPos, ChunkData chunkData, bool useDomainWarping = true)
         {
             if (useDomainWarping)
@@ -75,20 +85,18 @@ namespace Voxel_Engine.WorldGen
                 worldPos += new Vector3Int(domainOffset.x, 0, domainOffset.y);
             }
 
-            var biomeSelectionHelpers = GetBiomeSelectionHelpers(worldPos, interpolationSize);
-            
-            var closestGen = SelectBiome(biomeSelectionHelpers[0].Index);
-            
+            var biomeSelectionHelpers = GetBiomeSelectionLocations(worldPos, interpolationSize);
+            var closestBiomeGen = SelectBiome(biomeSelectionHelpers[0].Index);
             var biomeGenerators = biomeSelectionHelpers.Select(helper => SelectBiome(helper.Index)).ToList();
-            var worthInterpolating = biomeGenerators.Any(gen => gen != biomeGenerators[0]);
             
-            if (!DoInterpolateBiomes || biomeSelectionHelpers[0].Distance == 0 || !worthInterpolating)
-                return new BiomeGeneratorSelection(closestGen,
-                    closestGen.GetSurfaceHeightNoise(worldPos.x, worldPos.z, chunkData.ChunkHeight, closestGen.BiomeSettings));
-
+            var worthInterpolating = biomeGenerators.Any(gen => gen != biomeGenerators[0]);
+            if (!doInterpolateBiomes || biomeSelectionHelpers[0].Distance == 0 || !worthInterpolating)
+                return new BiomeGeneratorSelection(closestBiomeGen,
+                    closestBiomeGen.GetSurfaceHeightNoise(worldPos.x, worldPos.z, chunkData.ChunkHeight, closestBiomeGen.BiomeSettings));
             var interpolatedValue = CalculateInterpolatedHeight(worldPos, chunkData, biomeSelectionHelpers);
 
-            return new BiomeGeneratorSelection(closestGen, Mathf.FloorToInt(interpolatedValue));
+            
+            return new BiomeGeneratorSelection(closestBiomeGen, Mathf.FloorToInt(interpolatedValue));
             /*
             var blendStrength = blendFunctionType.Function()(distances.Min() / distances.Max());
             
@@ -121,9 +129,15 @@ namespace Voxel_Engine.WorldGen
             return interpolatedValue;
         }
 
+        /// <summary>
+        /// Selects the biome of the given chunk
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private BiomeGenerator SelectBiome(int index)
         {
-            var temp = biomeTemperatureNoise[index];
+            var temp = _terrainInfo.BiomeTemperatureNoise[index];
             foreach (var data in biomeGeneratorsData.Where(data => temp >= data.temperatureStartThreshold && temp < data.tmperatureEndThreshold))
             {
                 return data.biomeTerrainGenerator;
@@ -133,7 +147,14 @@ namespace Voxel_Engine.WorldGen
             //return biomeGeneratorsData[0].biomeTerrainGenerator;
         }
         
-        private List<BiomeSelectionHelper> GetBiomeSelectionHelpers(Vector3Int worldPos, int returnLength)
+        
+        /// <summary>
+        /// Gets world positions for biome selection (always sets y=0)
+        /// </summary>
+        /// <param name="worldPos"></param>
+        /// <param name="returnLength"></param>
+        /// <returns></returns>
+        private List<BiomeSelectionHelper> GetBiomeSelectionLocations(Vector3Int worldPos, int returnLength)
         {
             worldPos.y = 0;
             return GetClosestBiomeIndex(worldPos, returnLength);
@@ -147,51 +168,91 @@ namespace Voxel_Engine.WorldGen
         /// <returns></returns>
         private List<BiomeSelectionHelper> GetClosestBiomeIndex(Vector3Int worldPos, int returnLength)
         {
-            return biomeCenters.Select((center, index) => new BiomeSelectionHelper
+            return _biomeCenters.Select((center, index) => new BiomeSelectionHelper
             {
-                Index = index, Distance = Vector3.Distance(worldPos, center)
+                Index = index, Distance = Vector3.Distance(worldPos, center.Position)
             }).OrderBy(helper => helper.Distance).Take(returnLength).ToList();
         }
 
+        
+        /// <summary>
+        /// Calculates the Biome points and calculates the biome data (temperature, etc)
+        /// </summary>
+        /// <param name="playerPos"></param>
+        /// <param name="drawRange"></param>
+        /// <param name="chunkSize"></param>
+        /// <param name="mapSeedOffset"></param>
         public void GenerateBiomePoints(Vector3 playerPos, int drawRange, int chunkSize, Vector2Int mapSeedOffset)
         {
-            biomeCenters = BiomeCenterFinder.CalculateBiomeCenters(playerPos, drawRange, chunkSize);
+            _biomeCenters = BiomeCenterFinder.CalculateBiomeCenterPositions(playerPos, drawRange, chunkSize).Select(pos => new BiomeCenter(pos)).ToList();
 
+            // Create the biome centers
             if (biomeDomainWarping != null)
             {
                 //modify biome centers with domain warping
-                for (var i = 0; i < biomeCenters.Count; i++)
+                foreach (var biomeCenter in _biomeCenters)
                 {
-                    var domainWarpingOffset = biomeDomainWarping.GenerateDomainOffsetInt(biomeCenters[i].x, biomeCenters[i].z);
-                    biomeCenters[i] += new Vector3Int(domainWarpingOffset.x, 0, domainWarpingOffset.y);
+                    var domainWarpingOffset = biomeDomainWarping.GenerateDomainOffsetInt(biomeCenter.Position.x, biomeCenter.Position.z);
+                    biomeCenter.Position += new Vector3Int(domainWarpingOffset.x, 0, domainWarpingOffset.y);
                 }
             }
-
-            biomeTemperatureNoise = CalculateBiomeNoise(biomeCenters, mapSeedOffset);
-
+            
+            // Fill the terrain info struct with data for the biome centers
+            GenerateTerrainInfo(mapSeedOffset);
         }
 
-        private List<float> CalculateBiomeNoise(List<Vector3Int> vector3Ints, Vector2Int mapSeedOffset)
+        private void GenerateTerrainInfo(Vector2Int mapSeedOffset)
+        {
+            _terrainInfo.BiomeTemperatureNoise = CalculateBiomeNoise(_biomeCenters, mapSeedOffset);
+        }
+
+        /// <summary>
+        /// Calculates the list of noise values for the given positions
+        /// </summary>
+        /// <param name="centers"></param>
+        /// <param name="mapSeedOffset"></param>
+        /// <returns></returns>
+        private List<float> CalculateBiomeNoise(List<BiomeCenter> centers, Vector2Int mapSeedOffset)
         {
             biomeNoiseSettings.WorldOffset = mapSeedOffset;
-            return biomeCenters.Select(center => MyNoise.OctavePerlin(center.x, center.y, biomeNoiseSettings)).ToList();
+            return centers.Select(center => MyNoise.OctavePerlin(center.Position.x, center.Position.y, biomeNoiseSettings)).ToList();
         }
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.blue;
-            foreach (var biomeCenterPoint in biomeCenters)
+            foreach (var biomeCenter in _biomeCenters)
             {
-                Gizmos.DrawLine(biomeCenterPoint, biomeCenterPoint + Vector3.up * 255);        
+                Gizmos.DrawLine(biomeCenter.Position, biomeCenter.Position + Vector3.up * 255);        
             }
         }
         #endif
     }
 }
 
+/// <summary>
+/// Struct that holds data for biome selection
+/// Holds info like temperature, humidity, ...
+/// </summary>
+public struct TerrainInfo
+{
+    public List<float> BiomeTemperatureNoise;
+}
+
+public class BiomeCenter
+{
+    public Vector3Int Position;
+    public List<float> Temperature;
+
+    public BiomeCenter(Vector3Int position)
+    {
+        Position = position;
+    }
+}
+
 [Serializable]
-public struct BiomeData
+public struct BiomeGeneratorData
 {
     [Range(0, 1)] public float temperatureStartThreshold, tmperatureEndThreshold;
     public BiomeGenerator biomeTerrainGenerator;
