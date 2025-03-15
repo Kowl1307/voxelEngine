@@ -136,7 +136,7 @@ namespace Voxel_Engine.WorldGen
         private BiomeGenerator SelectBiome(int index)
         {
             var temp = _biomeCenters[index].Temperature;
-            foreach (var data in biomeGeneratorsData.Where(data => temp >= data.temperatureStartThreshold && temp < data.tmperatureEndThreshold))
+            foreach (var data in biomeGeneratorsData.Where(data => temp >= data.temperatureStartThreshold && temp < data.temperatureEndThreshold))
             {
                 return data.biomeTerrainGenerator;
             }
@@ -232,20 +232,10 @@ namespace Voxel_Engine.WorldGen
     }
 }
 
-public class BiomeCenter
-{
-    public Vector3Int Position;
-    public float Temperature;
-
-    public BiomeCenter(Vector3Int position)
-    {
-        Position = position;
-    }
-}
-
 [Serializable]
 public struct BiomeGeneratorData
 {
-    [Range(0, 1)] public float temperatureStartThreshold, tmperatureEndThreshold;
+    [Range(0, 1)] public float temperatureStartThreshold;
+    [Range(0, 1)] public float temperatureEndThreshold;
     public BiomeGenerator biomeTerrainGenerator;
 }
