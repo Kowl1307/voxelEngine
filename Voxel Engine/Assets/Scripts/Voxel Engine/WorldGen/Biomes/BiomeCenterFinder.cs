@@ -25,7 +25,7 @@ namespace Voxel_Engine.WorldGen.Biomes
         /// <param name="drawRange">Render range of world</param>
         /// <param name="chunkSize">Size of one chunk</param>
         /// <returns></returns>
-        public static List<Vector3Int> CalculateBiomeCenters(Vector3 playerPos, int drawRange, int chunkSize)
+        public static List<Vector3Int> CalculateBiomeCenterPositions(Vector3 playerPos, int drawRange, int chunkSize)
         {
             var biomeLength = drawRange * chunkSize;
             var origin = new Vector3Int(Mathf.RoundToInt(playerPos.x / biomeLength) * biomeLength, 0, Mathf.RoundToInt(playerPos.z / biomeLength) * biomeLength);
