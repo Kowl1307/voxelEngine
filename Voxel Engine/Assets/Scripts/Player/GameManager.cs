@@ -13,6 +13,8 @@ namespace Player
         private Vector3Int currentPlayerChunkPosition;
         private Vector3Int currentChunkCenter = Vector3Int.zero;
 
+        [SerializeField] private Canvas debugUi;
+
         public World world;
 
         [SerializeField] private float detectionTime = .1f;
@@ -37,6 +39,14 @@ namespace Player
         {
             Debug.Log("Initial World Gen call..");
             FindFirstObjectByType<World>().GenerateWorld();
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.F3))
+            {
+                debugUi.gameObject.SetActive(!debugUi.gameObject.activeSelf);
+            }
         }
 
         public void StartCheckingMap()

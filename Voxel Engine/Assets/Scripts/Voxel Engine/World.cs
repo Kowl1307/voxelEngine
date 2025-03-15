@@ -60,6 +60,9 @@ namespace Voxel_Engine
 
         public async void GenerateWorld()
         {
+            // Fill the Chunk Pool of the WorldRenderer
+            WorldRenderer.FillChunkPool(ChunkDrawingRange);
+            
             await GenerateWorld(Vector3Int.zero);
         }
         
@@ -270,7 +273,7 @@ namespace Voxel_Engine
             var chunk = hit.collider.GetComponent<ChunkRenderer>();
             if (chunk == null) return;
 
-            var pos = GetVoxelPos(hit);
+            var pos = GetVoxelPosOfRaycastHit(hit);
 
             WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference,pos, voxelType);
             chunk.ModifiedByPlayer = true;
@@ -300,7 +303,7 @@ namespace Voxel_Engine
         }
         */
         
-        private Vector3Int GetVoxelPos(RaycastHit hit)
+        public Vector3Int GetVoxelPosOfRaycastHit(RaycastHit hit)
         {
             var hitPos = hit.point;
             hitPos -= Vector3.Scale(hit.normal, voxelScaling / 2);
