@@ -897,7 +897,6 @@ GameObject:
   m_Component:
   - component: {fileID: 773299563}
   - component: {fileID: 773299561}
-  - component: {fileID: 773299564}
   m_Layer: 0
   m_Name: DesertBiomeGenerator
   m_TagString: Untagged
@@ -919,7 +918,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BiomeSettings: {fileID: 11400000, guid: 74f0d0be22c8c324da0139c3a0edb128, type: 2}
   BiomeNoiseSettings: {fileID: 11400000, guid: dd7aaf9260e2da344bddc812d70fd2aa, type: 2}
-  DomainWarping: {fileID: 773299564}
+  DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
   StartLayerHandler: {fileID: 2080080642}
   additionalLayerHandlers: []
@@ -943,22 +942,6 @@ Transform:
   - {fileID: 1367074018}
   m_Father: {fileID: 1098337748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &773299564
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 773299560}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d8f7b3c78b543329e24bcdf50c95b2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  noiseDomainX: {fileID: 11400000, guid: 18acffc472f84ac40b6e0c6eba0e0d50, type: 2}
-  noiseDomainY: {fileID: 11400000, guid: 7e9d88028e37ef3449a8baa6342868bf, type: 2}
-  amplitudeX: 20
-  amplitudeY: 20
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1097,7 +1080,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1098337748}
   - component: {fileID: 1098337747}
-  - component: {fileID: 1098337749}
   - component: {fileID: 1098337750}
   m_Layer: 0
   m_Name: TerrainGenerator
@@ -1118,7 +1100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1c93be52f8d5e545bb4fe61cdd5cbdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _biomeSelector: {fileID: 0}
+  _biomeSelector: {fileID: 1098337750}
 --- !u!4 &1098337748
 Transform:
   m_ObjectHideFlags: 0
@@ -1136,22 +1118,6 @@ Transform:
   - {fileID: 773299563}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1098337749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1098337746}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d8f7b3c78b543329e24bcdf50c95b2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  noiseDomainX: {fileID: 11400000, guid: 18acffc472f84ac40b6e0c6eba0e0d50, type: 2}
-  noiseDomainY: {fileID: 11400000, guid: 7e9d88028e37ef3449a8baa6342868bf, type: 2}
-  amplitudeX: 130
-  amplitudeY: 78
 --- !u!114 &1098337750
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1172,8 +1138,8 @@ MonoBehaviour:
     temperatureEndThreshold: 1
     biomeTerrainGenerator: {fileID: 773299561}
   biomeNoiseSettings: {fileID: 11400000, guid: 07c7f33740744364d81b90e5f704a9dd, type: 2}
-  biomeDomainWarping: {fileID: 1098337749}
-  doInterpolateBiomes: 0
+  biomeDomainWarping: {fileID: 11400000, guid: c16a745ba9888b34f810423a0ea2cbbd, type: 2}
+  doInterpolateBiomes: 1
   interpolationSize: 2
   blendFunctionType: 3
 --- !u!1 &1116328792
@@ -1291,7 +1257,7 @@ MonoBehaviour:
   nextLayer: {fileID: 0}
   stoneThreshold: 0.5
   stoneNoiseSettings: {fileID: 11400000, guid: 93b5831eee30690488885cd4fd15c822, type: 2}
-  DomainWarping: {fileID: 1728092376}
+  DomainWarping: {fileID: 0}
 --- !u!1 &1152699746
 GameObject:
   m_ObjectHideFlags: 0
@@ -1469,7 +1435,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1728092375}
   - component: {fileID: 1728092374}
-  - component: {fileID: 1728092376}
   - component: {fileID: 1728092377}
   m_Layer: 0
   m_Name: WoodsBiomeGenerator
@@ -1492,7 +1457,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BiomeSettings: {fileID: 11400000, guid: 43a06bc04fb45cd458fb101162d9f1e5, type: 2}
   BiomeNoiseSettings: {fileID: 11400000, guid: ab39431b3e5ba8c419c79e7677f14461, type: 2}
-  DomainWarping: {fileID: 1728092376}
+  DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
   StartLayerHandler: {fileID: 726806224}
   additionalLayerHandlers:
@@ -1519,22 +1484,6 @@ Transform:
   - {fileID: 924658648}
   m_Father: {fileID: 1098337748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1728092376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1728092373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d8f7b3c78b543329e24bcdf50c95b2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  noiseDomainX: {fileID: 11400000, guid: 18acffc472f84ac40b6e0c6eba0e0d50, type: 2}
-  noiseDomainY: {fileID: 11400000, guid: 7e9d88028e37ef3449a8baa6342868bf, type: 2}
-  amplitudeX: 20
-  amplitudeY: 20
 --- !u!114 &1728092377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1548,7 +1497,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   treeNoiseSettings: {fileID: 11400000, guid: 04be14057e7778d449250ceb6a19948f, type: 2}
-  DomainWarping: {fileID: 1728092376}
+  DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   closestTreeDistance: 5
   UseOctaves: 0
 --- !u!1 &1821623676

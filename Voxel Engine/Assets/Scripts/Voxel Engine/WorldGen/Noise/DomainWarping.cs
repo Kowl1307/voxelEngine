@@ -2,7 +2,8 @@
 
 namespace Voxel_Engine.WorldGen.Noise
 {
-    public class DomainWarping : MonoBehaviour
+    [CreateAssetMenu(menuName = "Voxel Engine/WorldGen/Domain Warping", fileName = "Domain Warping")]
+    public class DomainWarping : ScriptableObject
     {
         public NoiseSettings noiseDomainX, noiseDomainY;
         public int amplitudeX = 20, amplitudeY = 20;

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d8f7b3c78b543329e24bcdf50c95b2d, type: 3}
+  m_Name: Domain Warping
+  m_EditorClassIdentifier: 
+  noiseDomainX: {fileID: 11400000, guid: 18acffc472f84ac40b6e0c6eba0e0d50, type: 2}
+  noiseDomainY: {fileID: 11400000, guid: 7e9d88028e37ef3449a8baa6342868bf, type: 2}
+  amplitudeX: 20
+  amplitudeY: 20
