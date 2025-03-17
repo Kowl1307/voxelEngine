@@ -1098,6 +1098,7 @@ GameObject:
   - component: {fileID: 1098337748}
   - component: {fileID: 1098337747}
   - component: {fileID: 1098337749}
+  - component: {fileID: 1098337750}
   m_Layer: 0
   m_Name: TerrainGenerator
   m_TagString: Untagged
@@ -1117,18 +1118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1c93be52f8d5e545bb4fe61cdd5cbdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  biomeNoiseSettings: {fileID: 11400000, guid: 07c7f33740744364d81b90e5f704a9dd, type: 2}
-  biomeDomainWarping: {fileID: 1098337749}
-  biomeGeneratorsData:
-  - temperatureStartThreshold: 0
-    temperatureEndThreshold: 0.8
-    biomeTerrainGenerator: {fileID: 1728092374}
-  - temperatureStartThreshold: 0.8
-    temperatureEndThreshold: 1
-    biomeTerrainGenerator: {fileID: 773299561}
-  doInterpolateBiomes: 1
-  interpolationSize: 2
-  blendFunctionType: 2
+  _biomeSelector: {fileID: 0}
 --- !u!4 &1098337748
 Transform:
   m_ObjectHideFlags: 0
@@ -1162,6 +1152,30 @@ MonoBehaviour:
   noiseDomainY: {fileID: 11400000, guid: 7e9d88028e37ef3449a8baa6342868bf, type: 2}
   amplitudeX: 130
   amplitudeY: 78
+--- !u!114 &1098337750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1098337746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55b564d275a74d9cb0de2723b3799983, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  biomeGeneratorsData:
+  - temperatureStartThreshold: 0
+    temperatureEndThreshold: 0.5
+    biomeTerrainGenerator: {fileID: 1728092374}
+  - temperatureStartThreshold: 0.5
+    temperatureEndThreshold: 1
+    biomeTerrainGenerator: {fileID: 773299561}
+  biomeNoiseSettings: {fileID: 11400000, guid: 07c7f33740744364d81b90e5f704a9dd, type: 2}
+  biomeDomainWarping: {fileID: 1098337749}
+  doInterpolateBiomes: 0
+  interpolationSize: 2
+  blendFunctionType: 3
 --- !u!1 &1116328792
 GameObject:
   m_ObjectHideFlags: 0

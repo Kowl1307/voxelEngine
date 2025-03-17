@@ -50,6 +50,8 @@ namespace Voxel_Engine
             };
 
             MapSeedOffset = new Vector2Int(new Random().Next(10000), new Random().Next(10000));
+            
+            
         }
 
         public void OnDisable()
@@ -69,9 +71,8 @@ namespace Voxel_Engine
         private async Task GenerateWorld(Vector3Int worldPosition)
         {
             print("Starting generating World call");
-            terrainGenerator.GenerateBiomePoints(worldPosition, ChunkDrawingRange, chunkSizeInVoxel, MapSeedOffset);
             var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(worldPosition), taskTokenSource.Token);
-
+            terrainGenerator.InitBiomeSelector(this, worldPosition);
             print("Deleting old Chunks..");
             
             //This cant be async because data is on main thread

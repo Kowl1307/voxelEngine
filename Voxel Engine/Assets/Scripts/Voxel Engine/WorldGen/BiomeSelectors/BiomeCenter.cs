@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Voxel_Engine.WorldGen
+namespace Voxel_Engine.WorldGen.BiomeSelectors
 {
     public class BiomeCenter
     {
