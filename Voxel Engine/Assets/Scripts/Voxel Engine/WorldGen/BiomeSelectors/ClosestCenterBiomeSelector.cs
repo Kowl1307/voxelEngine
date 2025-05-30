@@ -158,7 +158,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
         /// <returns></returns>
         private void CalculateBiomeNoise(List<BiomeCenter> centers, Vector2Int mapSeedOffset)
         {
-            biomeNoiseSettings.WorldOffset = mapSeedOffset;
+            biomeNoiseSettings.Seed = mapSeedOffset;
             foreach(var center in centers)
             {
                 center.Temperature = MyNoise.OctavePerlin(center.Position.x, center.Position.y, biomeNoiseSettings);

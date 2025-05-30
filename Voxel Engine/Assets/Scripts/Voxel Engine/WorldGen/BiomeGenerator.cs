@@ -33,7 +33,7 @@ namespace Voxel_Engine.WorldGen
         public ChunkData ProcessChunkColumn(ChunkData chunkData, int x, int z, Vector2Int mapSeedOffset,
             int? terrainHeightNoise)
         {
-            BiomeNoiseSettings.WorldOffset = mapSeedOffset;
+            BiomeNoiseSettings.Seed = mapSeedOffset;
             var groundPosition = terrainHeightNoise ?? GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.ChunkHeight, BiomeSettings);
 
             //Fill the whole chunk with voxelType data

@@ -16,7 +16,7 @@ namespace Voxel_Engine.WorldGen.Trees
 
         public override StructureData GenerateData(ChunkData chunkData, Vector2Int mapSeedOffset)
         {
-            treeNoiseSettings.WorldOffset = mapSeedOffset;
+            treeNoiseSettings.Seed = mapSeedOffset;
             var treeData = new StructureData();
             var noiseData = GenerateTreeNoise(chunkData, treeNoiseSettings);
             var positions =
