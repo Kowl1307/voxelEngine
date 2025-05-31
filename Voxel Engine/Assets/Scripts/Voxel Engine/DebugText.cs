@@ -12,11 +12,11 @@ namespace Voxel_Engine
         private World _world;
         private Transform _playerTransform;
 
-        private const string _debugText = "Coordinates:\n" + 
-                                          "World: \tX:{0:f}\tY:{1:f}\tZ:{2:f}\n" + 
-                                          "Voxel: \tX:{3:f}\tY:{4:f}\tZ:{5:f}\n" + 
-                                          "Chunk ({6:n0},{7:n0},{8:n0}): \tX:{9:f}\tY:{10:f}\tZ:{11:f}\n" +
-                                          "Looking at: {12:n0},{13:n0},{14:n0}";
+        private const string _debugText = "Coordinates:\n" +
+                                          "World: \tX:{0:f}\tY:{1:f}\tZ:{2:f}\n" +
+                                          "Voxel: \tX:{3:f}\tY:{4:f}\tZ:{5:f}\n" +
+                                          "Chunk ({6:n0},{7:n0},{8:n0}): \tX:{9:f}\tY:{10:f}\tZ:{11:f}\n";                                  
+        //"Looking at: {12:n0},{13:n0},{14:n0}";
 
         private void Awake()
         {

@@ -33,7 +33,7 @@ namespace Voxel_Engine.WorldGen
         public ChunkData ProcessChunkColumn(ChunkData chunkData, int x, int z, Vector2Int mapSeedOffset)
         {
             BiomeNoiseSettings.Seed = mapSeedOffset;
-            var groundPosition = GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.ChunkHeight, BiomeSettings);
+            var groundPosition = GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.ChunkHeight / chunkData.WorldReference.voxelScaling.y, BiomeSettings, chunkData.WorldReference.voxelScaling);
 
             //Fill the whole chunk with voxelType data
             /*for (var y = chunkData.ChunkPositionInVoxel.y; y < chunkData.ChunkHeight + chunkData.ChunkPositionInVoxel.y; y++)
@@ -61,9 +61,10 @@ namespace Voxel_Engine.WorldGen
         /// <param name="z"></param>
         /// <param name="chunkHeight"></param>
         /// <returns></returns>
-        public int GetSurfaceHeightNoise(int x, int z, int chunkHeight, BiomeSettingsSO biomeSettings)
+        public int GetSurfaceHeightNoise(int x, int z, float chunkHeight, BiomeSettingsSO biomeSettings, Vector3 voxelScale)
         {
-            var terrainHeight = useDomainWarping ? DomainWarping.GenerateDomainNoise(x, z, BiomeNoiseSettings) : MyNoise.OctavePerlin(x, z, BiomeNoiseSettings);
+            var terrainHeight = useDomainWarping ? DomainWarping.GenerateDomainNoise(x * voxelScale.x, z * voxelScale.z, BiomeNoiseSettings) : MyNoise.OctavePerlin(x * voxelScale.x, z * voxelScale.z, BiomeNoiseSettings);
+            // terrainHeight /= voxelScale.y;
             //var terrainHeight = useDomainWarping ? MyNoise.OctaveSimplex(x,z,BiomeNoiseSettings) : MyNoise.SimplexNoise(x, z, BiomeNoiseSettings);
             terrainHeight = MyNoise.Redistribution(terrainHeight, BiomeNoiseSettings);
             return MyNoise.RemapValue01ToInt(terrainHeight, 0, chunkHeight) + biomeSettings.MinimumHeight;

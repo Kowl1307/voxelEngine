@@ -171,7 +171,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
             {
                 var biome = SelectBiome(helper.Index);
                 var floorHeight = biome.GetSurfaceHeightNoise(worldPos.x, worldPos.z, chunkData.ChunkHeight,
-                    biome.BiomeSettings);
+                    biome.BiomeSettings, chunkData.WorldReference.voxelScaling);
                 return floorHeight < biome.BiomeSettings.WaterLevel ? biome.BiomeSettings.WaterLevel : floorHeight;
             }).ToList();
 

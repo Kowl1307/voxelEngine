@@ -49,9 +49,7 @@ namespace Voxel_Engine
                 ChunkDictionary = new ConcurrentDictionary<Vector3Int, ChunkRenderer>()
             };
 
-            MapSeedOffset = new Vector2Int(new Random().Next(10000), new Random().Next(10000));
-            
-            
+            //MapSeedOffset = new Vector2Int(new Random().Next(10000), new Random().Next(10000));
         }
 
         public void OnDisable()

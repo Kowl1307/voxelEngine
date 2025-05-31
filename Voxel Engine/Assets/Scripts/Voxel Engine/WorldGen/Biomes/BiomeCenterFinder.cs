@@ -27,7 +27,8 @@ namespace Voxel_Engine.WorldGen.Biomes
         /// <returns></returns>
         public static List<Vector3Int> CalculateBiomeCenterPositions(Vector3 playerPos, int drawRange, int chunkSize)
         {
-            var biomeLength = drawRange * chunkSize;
+            // var biomeLength = drawRange * chunkSize;
+            var biomeLength = 16 * 4;
             var origin = new Vector3Int(Mathf.RoundToInt(playerPos.x / biomeLength) * biomeLength, 0, Mathf.RoundToInt(playerPos.z / biomeLength) * biomeLength);
             var biomeCentersTemp = new HashSet<Vector3Int> { origin };
 

@@ -38,7 +38,11 @@ namespace Player
         private void Start()
         {
             Debug.Log("Initial World Gen call..");
-            FindFirstObjectByType<World>().GenerateWorld();
+            // FindFirstObjectByType<World>().GenerateWorld();
+            foreach (var w in FindObjectsByType<World>(FindObjectsSortMode.None))
+            {
+                w.GenerateWorld();
+            }
         }
 
         private void Update()
