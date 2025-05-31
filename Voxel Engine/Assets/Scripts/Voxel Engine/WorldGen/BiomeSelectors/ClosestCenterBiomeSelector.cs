@@ -10,7 +10,6 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
     public class ClosestCenterBiomeSelector : BiomeSelector
     {
         [SerializeField] private List<BiomeGeneratorData> biomeGeneratorsData = new List<BiomeGeneratorData>();
-
         
         [SerializeField] private List<BiomeCenter> _biomeCenters = new List<BiomeCenter>();
         
@@ -36,9 +35,9 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
             GenerateBiomePoints(worldPosition, world.ChunkDrawingRange, world.chunkSizeInVoxel, world.MapSeedOffset);
         }
 
-        public override BiomeGeneratorSelection GetBiomeSelection(Vector3Int voxelPosition, ChunkData chunkData)
+        public override BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, ChunkData chunkData)
         {
-            return SelectBiomeGenerator(voxelPosition, chunkData, false);
+            return SelectBiomeGenerator(voxelPosition, chunkData, false).BiomeGenerator.biomeType;
         }
         
         /// <summary>

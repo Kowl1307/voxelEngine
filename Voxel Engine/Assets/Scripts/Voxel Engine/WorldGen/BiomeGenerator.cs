@@ -12,6 +12,7 @@ namespace Voxel_Engine.WorldGen
 {
     public class BiomeGenerator : MonoBehaviour
     {
+        public BiomeType biomeType = BiomeType.Undefined;
         public BiomeSettingsSO BiomeSettings;
 
         public NoiseSettings BiomeNoiseSettings;

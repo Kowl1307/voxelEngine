@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Voxel_Engine.WorldGen;
 using Voxel_Engine.WorldGen.Biomes;
 using Voxel_Engine.WorldGen.Noise;
@@ -15,12 +16,36 @@ namespace Voxel_Engine.WorldGen
     /// </summary>
     public class TerrainGenerator : MonoBehaviour
     {
-        [SerializeField] private BiomeSelector _biomeSelector;
+        private Dictionary<BiomeType, BiomeGenerator> _biomeGenerators = new Dictionary<BiomeType, BiomeGenerator>();
+
+        [SerializeField] private BiomeSelector biomeSelector;
+
         
+        [Serializable]
+        private struct BiomeTypeGeneratorPair
+        {
+            public BiomeType type;
+            public BiomeGenerator generator;
+        }
+        [SerializeField] private List<BiomeTypeGeneratorPair> biomeTypeGeneratorPairs;
+
+        private void Awake()
+        {
+            foreach (var pair in biomeTypeGeneratorPairs)
+            {
+                _biomeGenerators.Add(pair.type, pair.generator);
+            }
+        }
+
         public ChunkData GenerateChunkData(ChunkData chunkData, Vector2Int mapSeedOffset)
         {
-            var biomeSelection = _biomeSelector.GetBiomeSelection(chunkData.ChunkPositionInVoxel, chunkData);
-            var structureDataList = biomeSelection.BiomeGenerator.GetStructureData(chunkData, mapSeedOffset);
+            var biomeSelection = biomeSelector.GetBiomeTypeAt(chunkData.ChunkPositionInVoxel, chunkData);
+            if (!_biomeGenerators.TryGetValue(biomeSelection, out var biomeGenerator))
+            {
+                throw new Exception("Biome not found in dictionary!");
+            }
+            
+            var structureDataList = biomeGenerator.GetStructureData(chunkData, mapSeedOffset);
             foreach(var structureData in structureDataList)
                 chunkData.AddStructureData(structureData);
             
@@ -29,10 +54,7 @@ namespace Voxel_Engine.WorldGen
             {
                 for (var z = 0; z < chunkData.ChunkSize; z++)
                 {
-                    //Need to re-define as this the biomeSelection is out of scope for parallel
-                    var biomeGeneratorSelection = _biomeSelector.GetBiomeSelection(new Vector3Int(chunkData.ChunkPositionInVoxel.x + x, 0, chunkData.ChunkPositionInVoxel.z + z), chunkData);
-                    
-                    chunkData = biomeGeneratorSelection.BiomeGenerator.ProcessChunkColumn(chunkData, x, z, mapSeedOffset);
+                    chunkData = biomeGenerator.ProcessChunkColumn(chunkData, x, z, mapSeedOffset);
                 }
             });
             
@@ -53,7 +75,7 @@ namespace Voxel_Engine.WorldGen
 
         public void InitBiomeSelector(World world, Vector3Int worldPosition)
         {
-            _biomeSelector.PrecomputeData(world, worldPosition);
+            biomeSelector.PrecomputeData(world, worldPosition);
         }
     }
 }

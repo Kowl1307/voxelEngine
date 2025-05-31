@@ -1,18 +1,40 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
+using Voxel_Engine.WorldGen.Biomes;
 using Voxel_Engine.WorldGen.Noise;
 using Random = System.Random;
 
-namespace Voxel_Engine.WorldGen.Biomes.BiomeRefining
+namespace Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining
 {
-    public class BiomeRefining
+    public class BiomeRefining : BiomeSelector
     {
         struct ResolutionMap
         {
             public int Resolution;
             public Color[,] Map;
+        }
+        
+        private Dictionary<Color, BiomeType> _biomeColorDictionary = new Dictionary<Color, BiomeType>();
+
+        /// <summary>
+        /// Noise settings used for pseudo-randomization
+        /// </summary>
+        [SerializeField] private NoiseSettings _randomNoiseSettings;
+        
+        public override BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, ChunkData chunkData)
+        {
+            var biomeColor = GetBiomeAt(voxelPosition.x, voxelPosition.y, _randomNoiseSettings);
+            if(_biomeColorDictionary.TryGetValue(biomeColor, out var biomeType))
+                return biomeType;
+            
+            throw new Exception("No biome found for this biome color");
+        }
+
+        public override void PrecomputeData(World world, Vector3Int worldPosition)
+        {
+            
         }
         
         public float Test(int x, int y, NoiseSettings noiseSettings)
