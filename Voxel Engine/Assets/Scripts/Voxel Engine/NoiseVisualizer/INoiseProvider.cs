@@ -5,11 +5,11 @@ namespace Voxel_Engine.NoiseVisualizer
 {
     public interface INoiseProvider
     {
-        public float GetNoiseValue(int x, int y, NoiseSettings noiseSettings);
+        public Color GetNoiseValue(int x, int y, NoiseSettings noiseSettings);
 
-        public float[,] GetNoiseValues(int width, int height, NoiseSettings noiseSettings)
+        public Color[,] GetNoiseValues(int width, int height, NoiseSettings noiseSettings)
         {
-            var noise = new float[width, height];
+            var noise = new Color[width, height];
             for (var x = 0; x < width; x++)
             {
                 for (var y = 0; y < height; y++)

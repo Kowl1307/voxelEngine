@@ -7,12 +7,13 @@ namespace Voxel_Engine.NoiseVisualizer
     {
         private DomainWarping _domainWarping = ScriptableObject.CreateInstance<DomainWarping>();
         
-        public float GetNoiseValue(int x, int y, NoiseSettings noiseSettings)
+        public Color GetNoiseValue(int x, int y, NoiseSettings noiseSettings)
         {
             _domainWarping.noiseDomainX = noiseSettings;
             _domainWarping.noiseDomainY = noiseSettings;
             
-            return _domainWarping.GenerateDomainNoise(x, y, noiseSettings);
+            var noise =  _domainWarping.GenerateDomainNoise(x, y, noiseSettings);
+            return new Color(noise, noise, noise);
         }
     }
 }

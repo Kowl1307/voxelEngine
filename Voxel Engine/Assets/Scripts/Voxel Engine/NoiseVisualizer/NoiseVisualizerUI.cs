@@ -36,14 +36,14 @@ namespace Voxel_Engine.NoiseVisualizer
         [SerializeField] private TMP_InputField _lowerOffsetXInputField;
         [SerializeField] private TMP_InputField _lowerOffsetYInputField;
         
-        private NoiseSettings upperNoiseSettings;
-        private NoiseSettings lowerNoiseSettings;
+        private NoiseSettings _upperNoiseSettings;
+        private NoiseSettings _lowerNoiseSettings;
         
 
         private void Start()
         {
-            upperNoiseSettings = ScriptableObject.CreateInstance<NoiseSettings>();
-            lowerNoiseSettings = ScriptableObject.CreateInstance<NoiseSettings>();
+            _upperNoiseSettings = ScriptableObject.CreateInstance<NoiseSettings>();
+            _lowerNoiseSettings = ScriptableObject.CreateInstance<NoiseSettings>();
             
             foreach (var inputField in new[]
                      {
@@ -56,10 +56,10 @@ namespace Voxel_Engine.NoiseVisualizer
                 inputField.onEndEdit.AddListener(delegate { GenerateNoiseImages(); });
             }
 
-            _zoomInputField.text = upperNoiseSettings.NoiseZoom.ToString();
-            _octavesInputField.text = upperNoiseSettings.Octaves.ToString();
-            _redistributionInputField.text = upperNoiseSettings.RedistributionModifier.ToString();
-            _ExponentField.text = upperNoiseSettings.Exponent.ToString();
+            _zoomInputField.text = _upperNoiseSettings.NoiseZoom.ToString();
+            _octavesInputField.text = _upperNoiseSettings.Octaves.ToString();
+            _redistributionInputField.text = _upperNoiseSettings.RedistributionModifier.ToString();
+            _ExponentField.text = _upperNoiseSettings.Exponent.ToString();
 
             _upperOffsetXInputField.text = "0";
             _upperOffsetYInputField.text = "0";
@@ -92,8 +92,8 @@ namespace Voxel_Engine.NoiseVisualizer
             _seed = Random.Range(0, 100000);
             _seedInputField.text = _seed.ToString();
 
-            upperNoiseSettings.Seed = new Vector2Int(_seed, _seed);
-            lowerNoiseSettings.Seed = new Vector2Int(_seed, _seed);
+            _upperNoiseSettings.Seed = new Vector2Int(_seed, _seed);
+            _lowerNoiseSettings.Seed = new Vector2Int(_seed, _seed);
         }
 
         public void GenerateNoiseImages()
@@ -104,8 +104,8 @@ namespace Voxel_Engine.NoiseVisualizer
             var height = _size;
             
             Debug.Log("Started Generating Noise Images");
-            var upperNoise = _noiseProvider.GetNoiseValues(width, height, upperNoiseSettings);
-            var lowerNoise = _noiseProvider.GetNoiseValues(width, height, lowerNoiseSettings);
+            var upperNoise = _noiseProvider.GetNoiseValues(width, height, _upperNoiseSettings);
+            var lowerNoise = _noiseProvider.GetNoiseValues(width, height, _lowerNoiseSettings);
 
             var upperTexture = new Texture2D(width,height,TextureFormat.ARGB32, false)
             {
@@ -120,8 +120,8 @@ namespace Voxel_Engine.NoiseVisualizer
             {
                 for (var y = 0; y < height; y++)
                 {
-                    upperTexture.SetPixel(x,y, new Color(upperNoise[x,y], upperNoise[x,y], upperNoise[x,y]));
-                    lowerTexture.SetPixel(x,y, new Color(lowerNoise[x,y], lowerNoise[x,y], lowerNoise[x,y]));
+                    upperTexture.SetPixel(x,y, upperNoise[x,y]);
+                    lowerTexture.SetPixel(x,y, lowerNoise[x,y]);
                 }
             }
             
@@ -137,23 +137,23 @@ namespace Voxel_Engine.NoiseVisualizer
             _seed = Convert.ToInt32(_seedInputField.text);
             _size = Convert.ToInt32(_sizeInputField.text);
             
-            upperNoiseSettings.NoiseZoom = Convert.ToSingle(_zoomInputField.text);
-            upperNoiseSettings.Octaves = Convert.ToInt32(_octavesInputField.text);
-            upperNoiseSettings.RedistributionModifier = Convert.ToSingle(_redistributionInputField.text);
-            upperNoiseSettings.Exponent = Convert.ToSingle(_ExponentField.text);
+            _upperNoiseSettings.NoiseZoom = Convert.ToSingle(_zoomInputField.text);
+            _upperNoiseSettings.Octaves = Convert.ToInt32(_octavesInputField.text);
+            _upperNoiseSettings.RedistributionModifier = Convert.ToSingle(_redistributionInputField.text);
+            _upperNoiseSettings.Exponent = Convert.ToSingle(_ExponentField.text);
             
-            lowerNoiseSettings.NoiseZoom = upperNoiseSettings.NoiseZoom;
-            lowerNoiseSettings.Octaves = upperNoiseSettings.Octaves;
-            lowerNoiseSettings.RedistributionModifier = upperNoiseSettings.RedistributionModifier;
-            lowerNoiseSettings.Exponent = upperNoiseSettings.Exponent;
+            _lowerNoiseSettings.NoiseZoom = _upperNoiseSettings.NoiseZoom;
+            _lowerNoiseSettings.Octaves = _upperNoiseSettings.Octaves;
+            _lowerNoiseSettings.RedistributionModifier = _upperNoiseSettings.RedistributionModifier;
+            _lowerNoiseSettings.Exponent = _upperNoiseSettings.Exponent;
 
-            upperNoiseSettings.Offset.x = Convert.ToInt32(_upperOffsetXInputField.text);
-            upperNoiseSettings.Offset.y = Convert.ToInt32(_upperOffsetYInputField.text);
-            lowerNoiseSettings.Offset.x = Convert.ToInt32(_lowerOffsetXInputField.text);
-            lowerNoiseSettings.Offset.y = Convert.ToInt32(_lowerOffsetYInputField.text);
+            _upperNoiseSettings.Offset.x = Convert.ToInt32(_upperOffsetXInputField.text);
+            _upperNoiseSettings.Offset.y = Convert.ToInt32(_upperOffsetYInputField.text);
+            _lowerNoiseSettings.Offset.x = Convert.ToInt32(_lowerOffsetXInputField.text);
+            _lowerNoiseSettings.Offset.y = Convert.ToInt32(_lowerOffsetYInputField.text);
 
-            upperNoiseSettings.Seed = new Vector2Int(_seed, _seed);
-            lowerNoiseSettings.Seed = new Vector2Int(_seed, _seed);
+            _upperNoiseSettings.Seed = new Vector2Int(_seed, _seed);
+            _lowerNoiseSettings.Seed = new Vector2Int(_seed, _seed);
         }
     }
 }
