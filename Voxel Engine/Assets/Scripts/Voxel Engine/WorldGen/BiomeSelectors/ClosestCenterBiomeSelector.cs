@@ -62,12 +62,11 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
             
             var worthInterpolating = biomeGenerators.Any(gen => gen != biomeGenerators[0]);
             if (!doInterpolateBiomes || biomeSelectionHelpers[0].Distance == 0 || !worthInterpolating)
-                return new BiomeGeneratorSelection(closestBiomeGen,
-                    closestBiomeGen.GetSurfaceHeightNoise(voxelPos.x, voxelPos.z, chunkData.ChunkHeight, closestBiomeGen.BiomeSettings));
+                return new BiomeGeneratorSelection(closestBiomeGen);
             var interpolatedValue = CalculateInterpolatedHeight(voxelPos, chunkData, biomeSelectionHelpers);
 
             
-            return new BiomeGeneratorSelection(closestBiomeGen, Mathf.FloorToInt(interpolatedValue));
+            return new BiomeGeneratorSelection(closestBiomeGen);
             /*
             var blendStrength = blendFunctionType.Function()(distances.Min() / distances.Max());
 

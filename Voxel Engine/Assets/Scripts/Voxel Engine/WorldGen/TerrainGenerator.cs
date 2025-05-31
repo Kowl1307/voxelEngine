@@ -32,7 +32,7 @@ namespace Voxel_Engine.WorldGen
                     //Need to re-define as this the biomeSelection is out of scope for parallel
                     var biomeGeneratorSelection = _biomeSelector.GetBiomeSelection(new Vector3Int(chunkData.ChunkPositionInVoxel.x + x, 0, chunkData.ChunkPositionInVoxel.z + z), chunkData);
                     
-                    chunkData = biomeGeneratorSelection.BiomeGenerator.ProcessChunkColumn(chunkData, x, z, mapSeedOffset, biomeGeneratorSelection.TerrainSurfaceNoise);
+                    chunkData = biomeGeneratorSelection.BiomeGenerator.ProcessChunkColumn(chunkData, x, z, mapSeedOffset);
                 }
             });
             

@@ -30,11 +30,10 @@ namespace Voxel_Engine.WorldGen
             //StructureGenerators.AddRange(GetComponents<StructureGenerator>());
         }
 
-        public ChunkData ProcessChunkColumn(ChunkData chunkData, int x, int z, Vector2Int mapSeedOffset,
-            int? terrainHeightNoise)
+        public ChunkData ProcessChunkColumn(ChunkData chunkData, int x, int z, Vector2Int mapSeedOffset)
         {
             BiomeNoiseSettings.Seed = mapSeedOffset;
-            var groundPosition = terrainHeightNoise ?? GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.ChunkHeight, BiomeSettings);
+            var groundPosition = GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.ChunkHeight, BiomeSettings);
 
             //Fill the whole chunk with voxelType data
             /*for (var y = chunkData.ChunkPositionInVoxel.y; y < chunkData.ChunkHeight + chunkData.ChunkPositionInVoxel.y; y++)
