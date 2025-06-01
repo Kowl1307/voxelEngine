@@ -11,8 +11,10 @@ namespace Voxel_Engine
             var meshData = new MeshData(true);
 
             //Calculate meshData from each voxel
-            LoopThroughBlocks(chunkData, (x,y,z) => meshData = VoxelHelper.GetMeshData(chunkData, x,y,z,meshData,chunkData.Voxels[GetIndexFromPosition(chunkData, x,y,z)]));
-
+            //TODO: Replace this with Greedy Meshing to reduce vertex and face count 
+            // LoopThroughBlocks(chunkData, (x,y,z) => meshData = VoxelHelper.GetMeshData(chunkData, x,y,z,meshData,chunkData.Voxels[GetIndexFromPosition(chunkData, x,y,z)]));
+            meshData = VoxelHelper.GreedyMesh(chunkData, meshData);
+            
             return meshData;
         }
 
@@ -114,7 +116,7 @@ namespace Voxel_Engine
         {
             return yCoordinate >= 0 && yCoordinate < chunkData.ChunkHeight;
         }
-        private static int GetIndexFromPosition(ChunkData chunkData, int x, int y, int z)
+        public static int GetIndexFromPosition(ChunkData chunkData, int x, int y, int z)
         {
             return x + chunkData.ChunkSize * y + chunkData.ChunkSize * chunkData.ChunkHeight * z;
         }
