@@ -172,8 +172,25 @@ namespace Voxel_Engine
 
         public static MeshData GreedyMesh(ChunkData chunkData, MeshData meshData)
         {
-            //BUG: Geht bis Expanding new Quad, dann passiert nix mehr
-            Debug.Log("Generating xy slices");
+            FillMesh(chunkData, meshData, (currentType, neighbourType) => currentType is not (VoxelType.Air or VoxelType.Nothing) 
+                                                                          && neighbourType is not VoxelType.Nothing 
+                                                                          && !VoxelDataManager.VoxelTextureDataDictionary[neighbourType].IsSolid
+                                                                        && currentType is not VoxelType.Water);
+
+            //FillMesh(chunkData, meshData.WaterMesh, (currentType, neighbourType) => neighbourType == VoxelType.Air && currentType == VoxelType.Water);
+            
+            Debug.Log("Done greedy mesh");
+            return meshData;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="chunkData"></param>
+        /// <param name="meshData"></param>
+        /// <param name="shouldRenderBlock">(currentType, neighbourType) => true if should be rendered, false if not</param>
+        private static void FillMesh(ChunkData chunkData, MeshData meshData, Func<VoxelType, VoxelType, bool> shouldRenderBlock)
+        {
             //Loop through all xy,yz,xz slices and greedy mesh both sides
             for (var z = 0; z < chunkData.ChunkSize; z++)
             {
@@ -188,57 +205,93 @@ namespace Voxel_Engine
                         var neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Forward.GetVector3();
                         var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
 
-                        sliceDataForward[x, y] = neighbourBlockType == VoxelType.Nothing ||
-                                                 VoxelDataManager.VoxelTextureDataDictionary[neighbourBlockType].IsSolid ? chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)] : VoxelType.Nothing;
-                        
+                        var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
+
+                        sliceDataForward[x, y] = shouldRenderBlock(currentType, neighbourBlockType)
+                            ? currentType
+                            : VoxelType.Nothing;
+
                         neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Backwards.GetVector3();
                         neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
                         
-                        sliceDataBackward[x, y] = neighbourBlockType == VoxelType.Nothing ||
-                                                 VoxelDataManager.VoxelTextureDataDictionary[neighbourBlockType].IsSolid ? chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)] : VoxelType.Nothing;
-
+                        sliceDataBackward[x, y] = neighbourBlockType == VoxelType.Air &&
+                                                  VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
+                            ? currentType
+                            : VoxelType.Nothing;
                     }
                 }
                 
                 meshData = GenerateGreedyMesh(z, Direction.Forward, sliceDataForward, chunkData, meshData);
                 meshData = GenerateGreedyMesh(z, Direction.Backwards, sliceDataBackward, chunkData, meshData);
             }
-            /*
-            Debug.Log("Generating yz slices");
+            
+            
             for (var x = 0; x < chunkData.ChunkSize; x++)
             {
-                var sliceData = new VoxelType[chunkData.ChunkSize, chunkData.ChunkHeight];
-                for (var y = 0; x < chunkData.ChunkSize; x++)
+                //Precompute slice data
+                var sliceDataLeft = new VoxelType[chunkData.ChunkHeight, chunkData.ChunkSize];
+                var sliceDataRight = new VoxelType[chunkData.ChunkHeight, chunkData.ChunkSize];
+                for (var y = 0; y < chunkData.ChunkHeight; y++)
                 {
-                    for (var z = 0; y < chunkData.ChunkHeight; y++)
+                    for (var z = 0; z < chunkData.ChunkSize; z++)
                     {
-                        sliceData[y, z] = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
+                        //TODO: If neighbor in face direction is solid, set its type to nothing, so it won't get rendered
+                        var neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Left.GetVector3();
+                        var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+
+                        var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
+
+                        sliceDataLeft[y, z] = neighbourBlockType == VoxelType.Air &&
+                                              VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
+                            ? currentType
+                            : VoxelType.Nothing;
+
+                        neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Right.GetVector3();
+                        neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+                        
+                        sliceDataRight[y, z] = neighbourBlockType == VoxelType.Air &&
+                                               VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
+                            ? currentType
+                            : VoxelType.Nothing;
                     }
                 }
                 
-                meshData = GenerateGreedyMesh(x, Direction.Right, sliceData, chunkData, meshData);
-                meshData = GenerateGreedyMesh(x, Direction.Left, sliceData, chunkData, meshData);
+                meshData = GenerateGreedyMesh(x, Direction.Left, sliceDataRight, chunkData, meshData);
+                meshData = GenerateGreedyMesh(x, Direction.Right, sliceDataLeft, chunkData, meshData);
             }
             
-            Debug.Log("Generating xz slices");
-            for (var y = 0; y < chunkData.ChunkSize; y++)
+            for (var y = 0; y < chunkData.ChunkHeight; y++)
             {
-                var sliceData = new VoxelType[chunkData.ChunkSize, chunkData.ChunkHeight];
+                //Precompute slice data
+                var sliceDataUp = new VoxelType[chunkData.ChunkSize, chunkData.ChunkSize];
+                var sliceDataDown = new VoxelType[chunkData.ChunkSize, chunkData.ChunkSize];
                 for (var x = 0; x < chunkData.ChunkSize; x++)
                 {
-                    for (var z = 0; y < chunkData.ChunkHeight; y++)
+                    for (var z = 0; z < chunkData.ChunkSize; z++)
                     {
-                        sliceData[x, z] = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
+                        var neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Up.GetVector3();
+                        var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+
+                        var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
+
+                        sliceDataUp[x, z] = neighbourBlockType == VoxelType.Air &&
+                                            VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
+                            ? currentType
+                            : VoxelType.Nothing;
+
+                        neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Down.GetVector3();
+                        neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+                        
+                        sliceDataDown[x, z] = neighbourBlockType == VoxelType.Air &&
+                                              VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
+                            ? currentType
+                            : VoxelType.Nothing;
                     }
                 }
                 
-                meshData = GenerateGreedyMesh(y, Direction.Up, sliceData, chunkData, meshData);
-                meshData = GenerateGreedyMesh(y, Direction.Down, sliceData, chunkData, meshData);
+                meshData = GenerateGreedyMesh(y, Direction.Up, sliceDataUp, chunkData, meshData);
+                meshData = GenerateGreedyMesh(y, Direction.Down, sliceDataDown, chunkData, meshData);
             }
-            */
-            
-            Debug.Log("Done greedy mesh");
-            return meshData;
         }
 
         struct GreedyQuad
@@ -261,14 +314,13 @@ namespace Voxel_Engine
         private static MeshData GenerateGreedyMesh(int sliceRow, Direction faceNormalDirection, VoxelType[,] sliceData, ChunkData chunkData,
             MeshData meshData)
         {
-            for (var x = 0; x < sliceData.Length; x++)
+            for (var y = 0; y < sliceData.GetLength(1); y++)
             {
-                for (var y = 0; y < sliceData.GetLength(1); y++)
+                for (var x = 0; x < sliceData.GetLength(0); x++)
                 {
                     if (sliceData[x, y] == VoxelType.Nothing)
                         continue;
                     
-                    Debug.Log("Expanding new Quad");
                     var newQuad = GetNextGreedyQuad(sliceData, x, y);
                     
                     var voxelType = sliceData[newQuad.LowX, newQuad.LowY];
@@ -284,6 +336,8 @@ namespace Voxel_Engine
                             sliceData[i, j] = VoxelType.Nothing;
                         }
                     }
+
+                    x = newQuad.HighX - 1;
                 }
             }
             
@@ -294,43 +348,53 @@ namespace Voxel_Engine
 
         private static GreedyQuad GetNextGreedyQuad(VoxelType[,] sliceData, int xStart, int yStart)
         {
-            var quad = new GreedyQuad
+            var type = sliceData[xStart, yStart];
+            var maxX = sliceData.GetLength(0);
+            var maxY = sliceData.GetLength(1);
+
+            // Expand x
+            var width = 1;
+            for (var x = xStart + 1; x < maxX; x++)
+            {
+                if (sliceData[x, yStart] != type)
+                    break;
+                width++;
+            }
+
+            // Expand y
+            var height = 1;
+            for (var y = yStart + 1; y < maxY; y++)
+            {
+                var rowMatches = true;
+                for (var x = xStart; x < xStart + width; x++)
+                {
+                    if (sliceData[x, y] == type) continue;
+                    
+                    rowMatches = false;
+                    break;
+                }
+                
+                if (!rowMatches)
+                    break;
+                height++;
+            }
+
+            return new GreedyQuad
             {
                 LowX = xStart,
                 LowY = yStart,
-                HighX  = sliceData.GetLength(0),
-                HighY = sliceData.GetLength(1)
+                HighX = xStart + width,
+                HighY = yStart + height
             };
-
-            // Make the two for loops a function
-            //Expand X to max, then expand y as far as possible
-            for (var x = quad.LowX; x < sliceData.Length; x++)
-            {
-                if ((int)sliceData[quad.LowX, quad.LowY] == (int)sliceData[x, quad.LowY])
-                    continue;
-                
-                //Other type found
-                quad.HighX = x - 1;
-            }
-
-            var firstRow = sliceData.GetRow(quad.LowY);
-            
-            //Expand y as long as the types match in the whole row
-            for (var y = quad.LowY; y < sliceData.GetLength(1); y++)
-            {
-                if (firstRow.SequenceEqual(sliceData.GetRow(y)))
-                    continue;
-
-                quad.HighY = y - 1;
-            }
-
-            return quad;
         }
 
         private static MeshData CreateQuad(GreedyQuad quad, int sliceRow, Direction faceDirection, VoxelType voxelType, MeshData meshData, Vector3 voxelScale)
         {
             var generatesCollider = VoxelDataManager.VoxelTextureDataDictionary[voxelType].GeneratesCollider;
-            Debug.Log("Adding quad");
+
+            // High values are exclusive, so we need to subtract 1
+            quad.HighX -= 1;
+            quad.HighY -= 1;
             //order of vertices matters for the normals and how we render the mesh
             switch (faceDirection)
             {
@@ -342,23 +406,23 @@ namespace Voxel_Engine
                     meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, quad.LowY - 0.5f, sliceRow + 0.5f), voxelScale), generatesCollider);
                     break;
                 case Direction.Backwards:
-                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, quad.LowY - 0.5f, sliceRow + 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, quad.HighY + 0.5f, sliceRow + 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, quad.HighY + 0.5f, sliceRow + 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, quad.LowY - 0.5f, sliceRow + 0.5f), voxelScale), generatesCollider); 
-                    break;
-                case Direction.Right:
-                    // quad.x = global.z
-                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.LowY - 0.5f, quad.LowX - 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.HighY + 0.5f, quad.LowX - 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.HighY + 0.5f, quad.HighX + 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.LowY - 0.5f, quad.HighX + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, quad.LowY - 0.5f, sliceRow - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, quad.HighY + 0.5f, sliceRow - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, quad.HighY + 0.5f, sliceRow - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, quad.LowY - 0.5f, sliceRow - 0.5f), voxelScale), generatesCollider); 
                     break;
                 case Direction.Left:
-                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.LowY - 0.5f, quad.HighX + 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.HighY + 0.5f, quad.HighX + 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.HighY + 0.5f, quad.LowX - 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.LowY - 0.5f, quad.LowX - 0.5f), voxelScale), generatesCollider); 
+                    // quad.x = global.y
+                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.LowX - 0.5f, quad.LowY - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.HighX + 0.5f, quad.LowY - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.HighX + 0.5f, quad.HighY + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow + 0.5f, quad.LowX - 0.5f, quad.HighY + 0.5f), voxelScale), generatesCollider);
+                    break;
+                case Direction.Right:
+                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow - 0.5f, quad.LowX - 0.5f, quad.HighY + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow - 0.5f, quad.HighX + 0.5f, quad.HighY + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow - 0.5f, quad.HighX + 0.5f, quad.LowY - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(sliceRow - 0.5f, quad.LowX - 0.5f, quad.LowY - 0.5f), voxelScale), generatesCollider); 
                     break;
                 case Direction.Up:
                     // quad.y = global.z
@@ -368,10 +432,10 @@ namespace Voxel_Engine
                     meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, sliceRow + 0.5f, quad.LowY - 0.5f), voxelScale), generatesCollider);
                     break;
                 case Direction.Down:
-                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, sliceRow + 0.5f, quad.LowY - 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, sliceRow + 0.5f, quad.LowY - 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, sliceRow + 0.5f, quad.HighY + 0.5f), voxelScale), generatesCollider);
-                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, sliceRow + 0.5f, quad.HighY + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, sliceRow - 0.5f, quad.LowY - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, sliceRow - 0.5f, quad.LowY - 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, sliceRow - 0.5f, quad.HighY + 0.5f), voxelScale), generatesCollider);
+                    meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, sliceRow - 0.5f, quad.HighY + 0.5f), voxelScale), generatesCollider);
                     break;
                 default:
                     break;
