@@ -172,12 +172,18 @@ namespace Voxel_Engine
 
         public static MeshData GreedyMesh(ChunkData chunkData, MeshData meshData)
         {
-            FillMesh(chunkData, meshData, (currentType, neighbourType) => currentType is not (VoxelType.Air or VoxelType.Nothing) 
-                                                                          && neighbourType is not VoxelType.Nothing 
-                                                                          && !VoxelDataManager.VoxelTextureDataDictionary[neighbourType].IsSolid
-                                                                        && currentType is not VoxelType.Water);
+            FillMesh(chunkData, meshData, (currentType, neighbourType) => 
+                currentType is not (VoxelType.Air or VoxelType.Nothing) 
+                && neighbourType is not VoxelType.Nothing 
+                && !VoxelDataManager.VoxelTextureDataDictionary[neighbourType].IsSolid 
+                && currentType is not VoxelType.Water);
 
-            //FillMesh(chunkData, meshData.WaterMesh, (currentType, neighbourType) => neighbourType == VoxelType.Air && currentType == VoxelType.Water);
+            FillMesh(chunkData, meshData.WaterMesh, (currentType, neighbourType) => 
+                currentType is not  (VoxelType.Air or VoxelType.Nothing) 
+                && neighbourType is not VoxelType.Nothing
+                && !VoxelDataManager.VoxelTextureDataDictionary[neighbourType].IsSolid
+                && currentType is VoxelType.Water
+                && neighbourType == VoxelType.Air);
             
             Debug.Log("Done greedy mesh");
             return meshData;
@@ -201,23 +207,10 @@ namespace Voxel_Engine
                 {
                     for (var y = 0; y < chunkData.ChunkHeight; y++)
                     {
-                        //TODO: If neighbor in face direction is solid, set its type to nothing, so it won't get rendered
-                        var neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Forward.GetVector3();
-                        var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+                        sliceDataForward[x, y] =
+                            GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Forward, shouldRenderBlock);
 
-                        var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
-
-                        sliceDataForward[x, y] = shouldRenderBlock(currentType, neighbourBlockType)
-                            ? currentType
-                            : VoxelType.Nothing;
-
-                        neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Backwards.GetVector3();
-                        neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
-                        
-                        sliceDataBackward[x, y] = neighbourBlockType == VoxelType.Air &&
-                                                  VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
-                            ? currentType
-                            : VoxelType.Nothing;
+                        sliceDataBackward[x, y] = GetVoxelTypeOrNone(chunkData, x,y,z, Direction.Backwards, shouldRenderBlock);
                     }
                 }
                 
@@ -235,24 +228,9 @@ namespace Voxel_Engine
                 {
                     for (var z = 0; z < chunkData.ChunkSize; z++)
                     {
-                        //TODO: If neighbor in face direction is solid, set its type to nothing, so it won't get rendered
-                        var neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Left.GetVector3();
-                        var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+                        sliceDataLeft[y, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Left, shouldRenderBlock);
 
-                        var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
-
-                        sliceDataLeft[y, z] = neighbourBlockType == VoxelType.Air &&
-                                              VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
-                            ? currentType
-                            : VoxelType.Nothing;
-
-                        neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Right.GetVector3();
-                        neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
-                        
-                        sliceDataRight[y, z] = neighbourBlockType == VoxelType.Air &&
-                                               VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
-                            ? currentType
-                            : VoxelType.Nothing;
+                        sliceDataRight[y, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Right, shouldRenderBlock);
                     }
                 }
                 
@@ -269,29 +247,27 @@ namespace Voxel_Engine
                 {
                     for (var z = 0; z < chunkData.ChunkSize; z++)
                     {
-                        var neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Up.GetVector3();
-                        var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+                        sliceDataUp[x, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Up, shouldRenderBlock);
 
-                        var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
-
-                        sliceDataUp[x, z] = neighbourBlockType == VoxelType.Air &&
-                                            VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
-                            ? currentType
-                            : VoxelType.Nothing;
-
-                        neighbourBlockCoordinates = new Vector3Int(x, y, z) + Direction.Down.GetVector3();
-                        neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
-                        
-                        sliceDataDown[x, z] = neighbourBlockType == VoxelType.Air &&
-                                              VoxelDataManager.VoxelTextureDataDictionary[currentType].IsSolid
-                            ? currentType
-                            : VoxelType.Nothing;
+                        sliceDataDown[x, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Down, shouldRenderBlock);
                     }
                 }
                 
                 meshData = GenerateGreedyMesh(y, Direction.Up, sliceDataUp, chunkData, meshData);
                 meshData = GenerateGreedyMesh(y, Direction.Down, sliceDataDown, chunkData, meshData);
             }
+        }
+
+        private static VoxelType GetVoxelTypeOrNone(ChunkData chunkData, int x, int y, int z, Direction direction, Func<VoxelType, VoxelType, bool> shouldRenderBlock)
+        {
+            var neighbourBlockCoordinates = new Vector3Int(x, y, z) + direction.GetVector3();
+            var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+
+            var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
+
+            return shouldRenderBlock(currentType, neighbourBlockType)
+                ? currentType
+                : VoxelType.Nothing;
         }
 
         struct GreedyQuad
@@ -327,6 +303,7 @@ namespace Voxel_Engine
                     
                     meshData = CreateQuad(newQuad, sliceRow, faceNormalDirection, voxelType, meshData, chunkData.WorldReference.voxelScaling);
                     meshData.AddQuadTriangles(VoxelDataManager.VoxelTextureDataDictionary[voxelType].GeneratesCollider);
+                    meshData = GetFaceUVsGreedy(faceNormalDirection, voxelType, newQuad, meshData);
                     
                     //Remove the voxels from the slice, so they are not processed by several quads
                     for (var i = newQuad.LowX; i < newQuad.HighX; i++)
@@ -399,7 +376,7 @@ namespace Voxel_Engine
             switch (faceDirection)
             {
                 case Direction.Forward:
-                    // br, ur, ul, bl
+                    // bl, br, ur, ul
                     meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, quad.LowY - 0.5f, sliceRow + 0.5f), voxelScale), generatesCollider);
                     meshData.AddVertex(Vector3.Scale(new Vector3(quad.HighX + 0.5f, quad.HighY + 0.5f, sliceRow + 0.5f), voxelScale), generatesCollider);
                     meshData.AddVertex(Vector3.Scale(new Vector3(quad.LowX - 0.5f, quad.HighY + 0.5f, sliceRow + 0.5f), voxelScale), generatesCollider);
@@ -441,6 +418,49 @@ namespace Voxel_Engine
                     break;
             }
 
+            return meshData;
+        }
+        
+        private static MeshData GetFaceUVsGreedy(Direction direction, VoxelType voxelType, GreedyQuad quad, MeshData meshData)
+        {
+            var uvs = new Vector2[4];
+            var uv2s = new Vector2[4];
+            var uv3s = new Vector2[4];
+            var tilePos = TexturePosition(direction, voxelType);
+
+            var tileSizeX = VoxelDataManager.TileSizeX;
+            var tileSizeY = VoxelDataManager.TileSizeY;
+
+            var quadWidth = quad.HighX - quad.LowX;
+            var quadHeight = quad.HighY - quad.LowY;
+
+            uvs[0] = new Vector2(
+                tileSizeX * tilePos.x + tileSizeX - VoxelDataManager.TextureOffset,
+                tileSizeY * tilePos.y + VoxelDataManager.TextureOffset);
+            uvs[1] = new Vector2(
+                tileSizeX * tilePos.x + tileSizeX - VoxelDataManager.TextureOffset,
+                tileSizeY * tilePos.y + tileSizeY - VoxelDataManager.TextureOffset);
+            uvs[2] = new Vector2(
+                tileSizeX * tilePos.x + VoxelDataManager.TextureOffset,
+                tileSizeY * tilePos.y + tileSizeY - VoxelDataManager.TextureOffset);
+            uvs[3] = new Vector2(
+                tileSizeX * tilePos.x + VoxelDataManager.TextureOffset,
+                tileSizeY * tilePos.y + VoxelDataManager.TextureOffset);
+            
+            
+            // Offset und Skalierung für den Atlas im Shader!
+            // Im Mesh: Gib NUR die lokalen UVs weiter (wie oben)
+
+            meshData.UV.AddRange(uvs);
+            
+            var vector = (direction is Direction.Forward or Direction.Backwards) ? new Vector2(quadHeight, quadWidth) :  new Vector2(quadWidth, quadHeight);
+            uv2s[0] = vector;
+            uv2s[1] = vector;
+            uv2s[2] = vector;
+            uv2s[3] = vector;
+            
+            meshData.UV2.AddRange(uv2s);
+            
             return meshData;
         }
         
