@@ -185,7 +185,6 @@ namespace Voxel_Engine
                 && currentType is VoxelType.Water
                 && neighbourType == VoxelType.Air);
             
-            Debug.Log("Done greedy mesh");
             return meshData;
         }
 

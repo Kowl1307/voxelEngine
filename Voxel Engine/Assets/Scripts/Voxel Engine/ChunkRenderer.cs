@@ -70,7 +70,7 @@ namespace Voxel_Engine
 
         public async void UpdateChunk()
         {
-            var meshData = await Task.Run(() =>Chunk.GetChunkMeshData(ChunkData));
+            var meshData = await Task.Run(() => Chunk.GetChunkMeshData(ChunkData));
             RenderMesh(meshData);
         }
 

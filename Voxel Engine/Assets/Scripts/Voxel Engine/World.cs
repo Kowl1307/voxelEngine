@@ -37,7 +37,7 @@ namespace Voxel_Engine
         
         public bool IsWorldCreated { get; set; }
 
-        private CancellationTokenSource taskTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource _taskTokenSource = new CancellationTokenSource();
 
         private void Awake()
         {
@@ -54,25 +54,25 @@ namespace Voxel_Engine
 
         public void OnDisable()
         {
-            if(taskTokenSource.Token.CanBeCanceled)
-                taskTokenSource.Cancel();
+            if(_taskTokenSource.Token.CanBeCanceled)
+                _taskTokenSource.Cancel();
         }
 
         public async void GenerateWorld()
         {
             // Fill the Chunk Pool of the WorldRenderer
             WorldRenderer.FillChunkPool(ChunkDrawingRange);
-            
+
             await GenerateWorld(Vector3Int.zero);
         }
         
         private async Task GenerateWorld(Vector3Int worldPosition)
         {
             print("Starting generating World call");
-            var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(worldPosition), taskTokenSource.Token);
+            var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(worldPosition), _taskTokenSource.Token);
             terrainGenerator.InitBiomeSelector(this, worldPosition);
-            print("Deleting old Chunks..");
             
+            print("Deleting old Chunks..");
             //This cant be async because data is on main thread
             //Remove unneeded chunks
             foreach (var pos in worldGenerationData.ChunkPositionsToRemove)
@@ -86,7 +86,6 @@ namespace Voxel_Engine
             }
             
             print("Populating new world data..");
-
             ConcurrentDictionary<Vector3Int, ChunkData> dataDictionary = null;
             try
             {
@@ -98,7 +97,7 @@ namespace Voxel_Engine
                 return;
             }
             
-            //Create data for new chunks
+            // Insert new data into dictionary
             foreach (var calculatedData in dataDictionary)
             {
                 WorldData.ChunkDataDictionary.TryAdd(calculatedData.Key, calculatedData.Value);
@@ -110,8 +109,8 @@ namespace Voxel_Engine
             {
                 AddStructureVoxels(chunkData);
             }
-            //Load renderers for chunks with generated data in range
             
+            //Load renderers for chunks with generated data in range
             var dataToRender =
                 WorldData.ChunkDataDictionary.Where(kvp =>
                     worldGenerationData.ChunkPositionsToCreate.Contains(kvp.Key)).Select(kvp => kvp.Value).ToList();
@@ -140,41 +139,18 @@ namespace Voxel_Engine
                     Chunk.SetVoxel(chunkData, pos, voxelType);
                 }
             });
-            /*
-            foreach (var structureData in chunkData.Structures)
-            {
-                foreach(var (pos, voxelType) in structureData.StructureVoxels)
-                {
-                    Chunk.SetVoxel(chunkData, pos, voxelType);
-                }
-            }
-            */
         }
 
         private async Task<ConcurrentDictionary<Vector3Int, MeshData>> CreateMeshDataAsync(List<ChunkData> dataToRender)
         {
             var dictionary = new ConcurrentDictionary<Vector3Int, MeshData>();
 
-            /*
-            return await Task.Run(() =>
-            {
-                foreach (var data in dataToRender)
-                {
-                    if(taskTokenSource.Token.IsCancellationRequested)
-                        taskTokenSource.Token.ThrowIfCancellationRequested();
-
-                    var meshData = Chunk.GetChunkMeshData(data);
-                    dictionary.TryAdd(data.WorldPosition, meshData);
-                }
-
-                return dictionary;
-            }, taskTokenSource.Token);
-            */
             await Task.Run(() => Parallel.ForEach(dataToRender, data =>
             {
                 var meshData = Chunk.GetChunkMeshData(data);
+                if (_taskTokenSource.Token.IsCancellationRequested) _taskTokenSource.Token.ThrowIfCancellationRequested();;
                 dictionary.TryAdd(data.ChunkPositionInWorld, meshData);
-            }));
+            }), _taskTokenSource.Token);
             
             return dictionary;
         }
@@ -185,23 +161,24 @@ namespace Voxel_Engine
 
             return await Task.Run(() =>
             {
-                foreach (var pos in chunkDataPositionsToCreate)
+                Parallel.ForEach(chunkDataPositionsToCreate, pos =>
                 {
-                    if(taskTokenSource.Token.IsCancellationRequested)
-                        taskTokenSource.Token.ThrowIfCancellationRequested();
-                    
-                    var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, pos, WorldDataHelper.GetVoxelPositionFromWorldPosition(this, pos));
+                    if (_taskTokenSource.Token.IsCancellationRequested)
+                        _taskTokenSource.Token.ThrowIfCancellationRequested();
+
+                    var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, pos,
+                        WorldDataHelper.GetVoxelPositionFromWorldPosition(this, pos));
                     var newData = terrainGenerator.GenerateChunkData(data, MapSeedOffset);
                     dictionary.TryAdd(pos, newData);
-                }
+                });
+                
                 return dictionary;
-            }, taskTokenSource.Token);
+            }, _taskTokenSource.Token);
             
         }
 
         private IEnumerator ChunkCreationCoroutine(ConcurrentDictionary<Vector3Int, MeshData> meshData)
         {
-            print("Creating Chunks..");
             foreach (var item in meshData)
             {
                 //If the data is already gone or this function was called several times and already added the chunk, dont add the chunk

@@ -73,9 +73,9 @@ namespace Voxel_Engine.WorldGen
             return chunkData;
         }
 
-        public void InitBiomeSelector(World world, Vector3Int worldPosition)
+        public async void InitBiomeSelector(World world, Vector3Int worldPosition)
         {
-            biomeSelector.PrecomputeData(world, worldPosition);
+            await Task.Run(() => biomeSelector.PrecomputeData(world, worldPosition));
         }
     }
 }
