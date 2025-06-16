@@ -2081,6 +2081,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 7008819656052169534, guid: ac506374ef387744886efdb79201c71c,
     type: 3}
+  chunkMaterialPerVoxel: {fileID: 2100000, guid: fdd0278031be170479d5769502a77a09,
+    type: 2}
+  chunkMaterialGreedy: {fileID: 2100000, guid: f5d5772526d21ac47a64fc06e6909435, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

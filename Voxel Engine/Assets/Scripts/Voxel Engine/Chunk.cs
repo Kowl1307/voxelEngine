@@ -6,13 +6,29 @@ namespace Voxel_Engine
 {
     public static class Chunk
     {
+        public enum RenderMethod
+        {
+            PerVoxel,
+            Greedy
+        }
+        
         public static MeshData GetChunkMeshData(ChunkData chunkData)
         {
             var meshData = new MeshData(true);
-
-            //Calculate meshData from each voxel
-            // LoopThroughBlocks(chunkData, (x,y,z) => meshData = VoxelHelper.GetMeshData(chunkData, x,y,z,meshData,chunkData.Voxels[GetIndexFromPosition(chunkData, x,y,z)]));
-            meshData = VoxelHelper.GreedyMesh(chunkData, meshData);
+            
+            switch (chunkData.RenderMethod)
+            {
+                case RenderMethod.PerVoxel:
+                    meshData.Material = chunkData.WorldReference.WorldRenderer.chunkMaterialPerVoxel;
+                    LoopThroughBlocks(chunkData, (x,y,z) => meshData = VoxelHelper.GetMeshData(chunkData, x,y,z,meshData,chunkData.Voxels[GetIndexFromPosition(chunkData, x,y,z)]));
+                    break;
+                case RenderMethod.Greedy:
+                    meshData.Material = chunkData.WorldReference.WorldRenderer.chunkMaterialGreedy;
+                    meshData = VoxelHelper.GreedyMesh(chunkData, meshData);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             
             return meshData;
         }

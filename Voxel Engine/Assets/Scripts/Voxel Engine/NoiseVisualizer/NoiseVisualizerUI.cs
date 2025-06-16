@@ -82,7 +82,7 @@ namespace Voxel_Engine.NoiseVisualizer
             _noiseProvider = value switch
             {
                 0 => new DomainWarpingProviderWrapper(),
-                1 => new BiomeRefiningProvider(),
+                1 => new BiomeRefiningProvider(gameObject),
                 _ => _noiseProvider
             };
         }

@@ -14,6 +14,8 @@ namespace Voxel_Engine
         public List<Vector3> ColliderVertices = new List<Vector3>();
         public List<int> ColliderTriangles = new List<int>();
 
+        public Material Material;
+
         public MeshData WaterMesh;
         private bool isMainMesh = true;
 

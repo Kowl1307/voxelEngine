@@ -21,7 +21,7 @@ namespace Voxel_Engine
             for (var i = _objects.Count; i < capacity; i++)
             {
                 var newChunk = Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
-                newChunk.gameObject.SetActive(false);
+                //newChunk.gameObject.SetActive(false);
                 _objects.Enqueue(newChunk);
             }
         }

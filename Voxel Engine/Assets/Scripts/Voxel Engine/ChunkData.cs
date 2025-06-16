@@ -14,6 +14,8 @@ namespace Voxel_Engine
         public World WorldReference;
         public Vector3Int ChunkPositionInWorld; // Position of the transform in world space
         public Vector3Int ChunkPositionInVoxel; // Position of the chunk in voxel space
+        
+        public Chunk.RenderMethod RenderMethod;
 
         public bool ModifiedByPlayer = false;
         public List<StructureData> Structures = new List<StructureData>();
@@ -26,6 +28,8 @@ namespace Voxel_Engine
             ChunkPositionInWorld = chunkPositionInWorld;
             ChunkPositionInVoxel = chunkPositionInVoxel;
             Voxels = new VoxelType[ChunkSize * ChunkHeight * chunkSize];
+            //TODO: Make this dynamic
+            RenderMethod = Chunk.RenderMethod.Greedy;
         }
 
         public void AddStructureData(StructureData data)

@@ -65,7 +65,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining
                 { Map = new Color[startWidth, startHeight], Resolution = startResolution };
             
             // Pseudorandomly set land or water
-            var landProbabilty = 0.5;
+            var landProbabilty = 0.1;
             for (var x = 0; x < startWidth; x++)
             {
                 for (var y = 0; y < startHeight; y++)
@@ -88,8 +88,8 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining
 
         private float SamplePseudoRandom(int x, int y, NoiseSettings noiseSettings)
         {
-            var xMod = x ^ y + noiseSettings.Seed.x;
-            var yMod = x+5 ^ y + noiseSettings.Seed.y;
+            var xMod = x * noiseSettings.Seed.x / 2;
+            var yMod = y * noiseSettings.Seed.y / 2;
             
             return Mathf.PerlinNoise(xMod, yMod);
         }

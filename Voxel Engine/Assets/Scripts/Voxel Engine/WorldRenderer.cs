@@ -9,6 +9,10 @@ namespace Voxel_Engine
     public class WorldRenderer : MonoBehaviour
     {
         public ChunkRenderer chunkPrefab;
+        public Material chunkMaterialPerVoxel;
+        public Material chunkMaterialGreedy;
+        
+        
         private ObjectPool<ChunkRenderer> _chunkPool;
 
         private void Awake()
@@ -33,14 +37,14 @@ namespace Voxel_Engine
 
             newChunk.InitializeChunk(worldData.ChunkDataDictionary[position]);
             newChunk.UpdateChunk(meshData);
-            newChunk.gameObject.SetActive(true);
+            // newChunk.gameObject.SetActive(true);
 
             return newChunk;
         }
 
         public void RemoveChunk(ChunkRenderer chunk)
         {
-            chunk.gameObject.SetActive(false);
+            // chunk.gameObject.SetActive(false);
             _chunkPool.ReturnObject(chunk);
         }
 

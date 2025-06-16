@@ -31,6 +31,7 @@ namespace Voxel_Engine
         {
             _meshFilter = GetComponent<MeshFilter>();
             _meshCollider = GetComponent<MeshCollider>();
+            _meshRenderer = GetComponent<MeshRenderer>();
             _mesh = _meshFilter.mesh;
         }
 
@@ -66,6 +67,7 @@ namespace Voxel_Engine
             collisionMesh.RecalculateNormals();
 
             _meshCollider.sharedMesh = collisionMesh;
+            _meshRenderer.materials[0] = meshData.Material;
         }
 
         public async void UpdateChunk()
