@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Voxel_Engine.WorldGen.Noise;
 
-namespace Voxel_Engine.NoiseVisualizer
+namespace Voxel_Engine.BiomeRefiningVisualizer
 {
     public class DomainWarpingProviderWrapper : INoiseProvider
     {

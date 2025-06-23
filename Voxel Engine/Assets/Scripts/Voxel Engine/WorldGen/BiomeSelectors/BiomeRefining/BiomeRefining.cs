@@ -10,12 +10,6 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining
 {
     public class BiomeRefining : BiomeSelector
     {
-        struct ResolutionMap
-        {
-            public int Resolution;
-            public Color[,] Map;
-        }
-        
         private Dictionary<Color, BiomeType> _biomeColorDictionary = new Dictionary<Color, BiomeType>();
 
         /// <summary>
@@ -47,7 +41,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining
         public Color GetBiomeAt(int x, int y, NoiseSettings noiseSettings)
         {
             var creationHistory = CreateRefinedMap(4096, 200, 200, noiseSettings);
-            return creationHistory[^1][x,y];
+            return creationHistory[x, y];
         }
 
         /// <summary>
@@ -57,15 +51,22 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining
         /// <param name="startResolution">How many blocks one pixel refers to</param>
         /// <param name="startWidth">Width in pixels</param>
         /// <param name="startHeight">Height in pixels</param>
+        /// <param name="noiseSettings"></param>
         /// <returns>A list of the creation history</returns>
-        public List<Color[,]> CreateRefinedMap(int startResolution, int startWidth, int startHeight, NoiseSettings noiseSettings)
+        public Color[,] CreateRefinedMap(int startResolution, int startWidth, int startHeight, NoiseSettings noiseSettings)
         {
-            var history = new List<ResolutionMap>();
+            var history = CreateRefineHistory(startResolution, startWidth, startHeight, noiseSettings);
+            return history.GetResolutionMapByIndex(history.GetHistoryDepth() - 1).Map;
+        }
+
+        public BiomeRefiningHistory CreateRefineHistory(int startResolution, int startWidth, int startHeight, NoiseSettings noiseSettings)
+        {
+            var history = new BiomeRefiningHistory();
             var landOrOcean = new ResolutionMap()
                 { Map = new Color[startWidth, startHeight], Resolution = startResolution };
             
             // Pseudorandomly set land or water
-            var landProbabilty = 0.1;
+            var landProbabilty = 0.33;
             for (var x = 0; x < startWidth; x++)
             {
                 for (var y = 0; y < startHeight; y++)
@@ -81,22 +82,41 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining
                 }
             }
             
-            history.Add(landOrOcean);
+            history.AddResolutionMap(landOrOcean);
 
-            return history.ConvertAll(resMap => resMap.Map);
+            var zoomedMap = landOrOcean;
+            for (var i = 0; i < 12; i++)
+            {
+                zoomedMap = (i % 3) switch
+                {
+                    0 => zoomedMap.ImperfectZoom(2, noiseSettings),
+                    1 => zoomedMap.NearestNeighborZoom(2),
+                    2 => zoomedMap.IncreaseLandmass(),
+                    _ => zoomedMap
+                };
+                history.AddResolutionMap(zoomedMap);
+            }
+            return history;
         }
 
         private float SamplePseudoRandom(int x, int y, NoiseSettings noiseSettings)
         {
-            var xMod = x * noiseSettings.Seed.x / 2;
-            var yMod = y * noiseSettings.Seed.y / 2;
-            
-            return Mathf.PerlinNoise(xMod, yMod);
-        }
+            var combinedX = x * 73856093 ^ y * 19349663 ^ noiseSettings.Seed.x * 83492791 ^ noiseSettings.Seed.y * 49979539;
+            var combinedY = y * 19349663 ^ x * 73856093 ^ noiseSettings.Seed.y * 49979539 ^ noiseSettings.Seed.x * 83492791;
 
-        private Color[,] Zoom(Color[,] map, float zoom)
-        {
-            return map;
+            var randX = new Random(combinedX);
+            var randY = new Random(combinedY);
+
+            var xPrime = (float)randX.NextDouble();
+            var yPrime = (float)randY.NextDouble();
+            
+            return Mathf.PerlinNoise(xPrime, yPrime);
         }
+    }
+
+    public struct ResolutionMap
+    {
+        public int Resolution;
+        public Color[,] Map;
     }
 }

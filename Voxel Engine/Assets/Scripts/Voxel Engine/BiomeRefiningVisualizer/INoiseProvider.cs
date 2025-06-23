@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining;
 using Voxel_Engine.WorldGen.Noise;
 
-namespace Voxel_Engine.NoiseVisualizer
+namespace Voxel_Engine.BiomeRefiningVisualizer
 {
     public interface INoiseProvider
     {
@@ -20,5 +21,10 @@ namespace Voxel_Engine.NoiseVisualizer
 
             return noise;
         }
+    }
+
+    public interface IBiomeRefiningNoiseProvider : INoiseProvider
+    {
+        public BiomeRefiningHistory GetBiomeRefiningHistory(int resolution, int width, int height, NoiseSettings noiseSettings);
     }
 }

@@ -1,11 +1,10 @@
-﻿using Unity.Cinemachine;
-using UnityEngine;
+﻿using UnityEngine;
 using Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining;
 using NoiseSettings = Voxel_Engine.WorldGen.Noise.NoiseSettings;
 
-namespace Voxel_Engine.NoiseVisualizer
+namespace Voxel_Engine.BiomeRefiningVisualizer
 {
-    public class BiomeRefiningProvider : INoiseProvider
+    public class BiomeRefiningProvider : IBiomeRefiningNoiseProvider
     {
         private BiomeRefining _biomeRefining;
 
@@ -22,7 +21,12 @@ namespace Voxel_Engine.NoiseVisualizer
 
         public Color[,] GetNoiseValues(int width, int height, NoiseSettings noiseSettings)
         {
-            return _biomeRefining.CreateRefinedMap(200, 200, 200, noiseSettings)[0];
+            return _biomeRefining.CreateRefinedMap(4096, width, height, noiseSettings);
+        }
+
+        public BiomeRefiningHistory GetBiomeRefiningHistory(int resolution, int width, int height, NoiseSettings noiseSettings)
+        {
+            return _biomeRefining.CreateRefineHistory(resolution, width, height, noiseSettings);
         }
     }
 }

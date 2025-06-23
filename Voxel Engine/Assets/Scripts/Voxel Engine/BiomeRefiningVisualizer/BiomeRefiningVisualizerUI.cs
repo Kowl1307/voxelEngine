@@ -1,26 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining;
 using Voxel_Engine.WorldGen.Noise;
 using Random = UnityEngine.Random;
 
-namespace Voxel_Engine.NoiseVisualizer
+namespace Voxel_Engine.BiomeRefiningVisualizer
 {
-    public class NoiseVisualizerUI : MonoBehaviour
+    public class BiomeRefiningVisualizerUI : MonoBehaviour
     {
         [SerializeField] 
         private TMP_Dropdown _noiseSelectionDropdown;
         
-        private INoiseProvider _noiseProvider;
+        private IBiomeRefiningNoiseProvider _noiseProvider;
         
         [SerializeField] private TMP_InputField _seedInputField;
         private int _seed = 0;
 
         [SerializeField] private TMP_InputField _sizeInputField;
         private int _size;
+
+        [SerializeField] private TMP_Text _historyText;
+        private int _historyLevel;
         
         [SerializeField] private RawImage _upperNoiseImage;
         [SerializeField] private RawImage _lowerNoiseImage;
@@ -30,7 +33,6 @@ namespace Voxel_Engine.NoiseVisualizer
         [SerializeField] private TMP_InputField _redistributionInputField;
         [SerializeField] private TMP_InputField _ExponentField;
         
-        
         [SerializeField] private TMP_InputField _upperOffsetXInputField;
         [SerializeField] private TMP_InputField _upperOffsetYInputField;
         [SerializeField] private TMP_InputField _lowerOffsetXInputField;
@@ -38,7 +40,11 @@ namespace Voxel_Engine.NoiseVisualizer
         
         private NoiseSettings _upperNoiseSettings;
         private NoiseSettings _lowerNoiseSettings;
-        
+        private BiomeRefiningHistory _upperHistory;
+        private BiomeRefiningHistory _lowerHistory;
+        private Color[,] _upperNoise;
+        private Color[,] _lowerNoise;
+
 
         private void Start()
         {
@@ -53,7 +59,7 @@ namespace Voxel_Engine.NoiseVisualizer
                          _lowerOffsetXInputField, _lowerOffsetYInputField,
                      })
             {
-                inputField.onEndEdit.AddListener(delegate { GenerateNoiseImages(); });
+                inputField.onEndEdit.AddListener(delegate { GenerateNoise(); GenerateNoiseImages();});
             }
 
             _zoomInputField.text = _upperNoiseSettings.NoiseZoom.ToString();
@@ -61,19 +67,22 @@ namespace Voxel_Engine.NoiseVisualizer
             _redistributionInputField.text = _upperNoiseSettings.RedistributionModifier.ToString();
             _ExponentField.text = _upperNoiseSettings.Exponent.ToString();
 
+            _historyText.text = "0";
+
             _upperOffsetXInputField.text = "0";
             _upperOffsetYInputField.text = "0";
             _lowerOffsetXInputField.text = "0";
             _lowerOffsetYInputField.text = "0";
             
-            _noiseSelectionDropdown.options = new List<TMP_Dropdown.OptionData>(){new("Domain Warping"), new("Biome Refining")};
+            _noiseSelectionDropdown.options = new List<TMP_Dropdown.OptionData>(){new("Biome Refining")};
             _noiseSelectionDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
 
             _noiseSelectionDropdown.value = 0;
 
-            _sizeInputField.text = "200";
+            _sizeInputField.text = "8";
             OnDropdownValueChanged(_noiseSelectionDropdown.value);
             RerollSeed();
+            GenerateNoise();
             GenerateNoiseImages();
         }
 
@@ -81,8 +90,7 @@ namespace Voxel_Engine.NoiseVisualizer
         {
             _noiseProvider = value switch
             {
-                0 => new DomainWarpingProviderWrapper(),
-                1 => new BiomeRefiningProvider(gameObject),
+                0 => new BiomeRefiningProvider(gameObject),
                 _ => _noiseProvider
             };
         }
@@ -96,17 +104,44 @@ namespace Voxel_Engine.NoiseVisualizer
             _lowerNoiseSettings.Seed = new Vector2Int(_seed, _seed);
         }
 
-        public void GenerateNoiseImages()
+        public void IncreaseHistoryDepth()
+        {
+            if (_historyLevel + 1 >= _upperHistory.GetHistoryDepth())
+            {
+                return;
+            }
+            
+            _historyLevel++;
+            _historyText.text = _historyLevel.ToString();
+            GenerateNoiseImages();
+        }
+        
+        public void DecreaseHistoryDepth()
+        {
+            if (_historyLevel <= 0) return;
+            _historyLevel--;
+            _historyText.text = _historyLevel.ToString();
+            GenerateNoiseImages();
+        }
+
+        public void GenerateNoise()
         {
             LoadNoiseSettingsFromFields();
-
-            var width = _size;
-            var height = _size;
             
-            Debug.Log("Started Generating Noise Images");
-            var upperNoise = _noiseProvider.GetNoiseValues(width, height, _upperNoiseSettings);
-            var lowerNoise = _noiseProvider.GetNoiseValues(width, height, _lowerNoiseSettings);
+            _upperHistory = _noiseProvider.GetBiomeRefiningHistory(4096, _size, _size, _upperNoiseSettings);
+            _lowerHistory = _noiseProvider.GetBiomeRefiningHistory(4096, _size, _size, _lowerNoiseSettings);
+        }
+        
+        public void GenerateNoiseImages()
+        {
+            _upperNoise = _upperHistory.GetResolutionMapByIndex(_historyLevel).Map;
+            _lowerNoise = _lowerHistory.GetResolutionMapByIndex(_historyLevel).Map;
+            
+            print(_upperNoise.GetLength(0));
 
+            var width = _upperNoise.GetLength(0);
+            var height = _upperNoise.GetLength(1);
+            
             var upperTexture = new Texture2D(width,height,TextureFormat.ARGB32, false)
             {
                 filterMode = FilterMode.Point
@@ -120,8 +155,8 @@ namespace Voxel_Engine.NoiseVisualizer
             {
                 for (var y = 0; y < height; y++)
                 {
-                    upperTexture.SetPixel(x,y, upperNoise[x,y]);
-                    lowerTexture.SetPixel(x,y, lowerNoise[x,y]);
+                    upperTexture.SetPixel(x,y, _upperNoise[x,y]);
+                    lowerTexture.SetPixel(x,y, _lowerNoise[x,y]);
                 }
             }
             
@@ -146,6 +181,8 @@ namespace Voxel_Engine.NoiseVisualizer
             _lowerNoiseSettings.Octaves = _upperNoiseSettings.Octaves;
             _lowerNoiseSettings.RedistributionModifier = _upperNoiseSettings.RedistributionModifier;
             _lowerNoiseSettings.Exponent = _upperNoiseSettings.Exponent;
+
+            _historyLevel = Convert.ToInt32(_historyText.text);
 
             _upperNoiseSettings.Offset.x = Convert.ToInt32(_upperOffsetXInputField.text);
             _upperNoiseSettings.Offset.y = Convert.ToInt32(_upperOffsetYInputField.text);
