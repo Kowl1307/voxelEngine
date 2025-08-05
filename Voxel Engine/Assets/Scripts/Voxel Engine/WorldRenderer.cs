@@ -34,11 +34,8 @@ namespace Voxel_Engine
             var newChunk = _chunkPool.GetObject();
             
             newChunk.transform.position = position;
-
             newChunk.InitializeChunk(worldData.ChunkDataDictionary[position]);
             newChunk.UpdateChunk(meshData);
-            // newChunk.gameObject.SetActive(true);
-
             return newChunk;
         }
 

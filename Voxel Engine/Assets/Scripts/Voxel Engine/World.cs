@@ -24,7 +24,7 @@ namespace Voxel_Engine
         public int chunkHeightInVoxel = 100;
         public Vector3 voxelScaling = Vector3.one;
         
-        public ParallelOptions WorldParallelOptions = new ParallelOptions()
+        public readonly ParallelOptions WorldParallelOptions = new ParallelOptions()
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount-1
         };
@@ -268,11 +268,11 @@ namespace Voxel_Engine
                 {
                     var chunkToUpdate = WorldDataHelper.GetChunk(neighbourData.WorldReference, neighbourData.ChunkPositionInWorld);
                     if (chunkToUpdate != null)
-                        chunkToUpdate.UpdateChunk();
+                        chunkToUpdate.GetMeshDataAndUpdate();
                 }
             }
             
-            chunk.UpdateChunk();
+            chunk.GetMeshDataAndUpdate();
         }
 
         /*

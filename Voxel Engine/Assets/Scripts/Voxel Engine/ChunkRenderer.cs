@@ -40,15 +40,15 @@ namespace Voxel_Engine
         {
             ChunkData = data;
         }
-
+/*
         private void RenderMesh(MeshData meshData)
         {
             _mesh.Clear();
-            
+
             //2, one for opaque material one for transparent (water)
             _mesh.subMeshCount = 2;
             _mesh.vertices = meshData.Vertices.Concat(meshData.WaterMesh.Vertices).ToArray();
-            
+
             _mesh.SetTriangles(meshData.Triangles.ToArray(), 0);
             _mesh.SetTriangles(meshData.WaterMesh.Triangles.Select(val => val + meshData.Vertices.Count).ToArray(), 1);
 
@@ -58,21 +58,23 @@ namespace Voxel_Engine
             _mesh.RecalculateNormals();
 
             _meshCollider.sharedMesh = null;
-            
+
             var collisionMesh = new Mesh
             {
                 vertices = meshData.ColliderVertices.ToArray(),
                 triangles = meshData.ColliderTriangles.ToArray()
             };
-            
+
             collisionMesh.RecalculateNormals();
 
             _meshCollider.sharedMesh = collisionMesh;
             _meshRenderer.materials[0] = meshData.Material;
         }
-
+*/
         private IEnumerator RenderMeshCoroutine(MeshData meshData)
         {
+            _meshRenderer.enabled = false;
+            
             _mesh.Clear();
             yield return null;
             
@@ -114,9 +116,10 @@ namespace Voxel_Engine
             yield return null;
 
             _meshRenderer.materials[0] = meshData.Material;
+            _meshRenderer.enabled = true;
         }
 
-        public async void UpdateChunk()
+        public async void GetMeshDataAndUpdate()
         {
             var meshData = await Task.Run(() => Chunk.GetChunkMeshData(ChunkData));
             // RenderMesh(meshData);
