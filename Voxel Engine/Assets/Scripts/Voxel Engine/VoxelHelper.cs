@@ -196,71 +196,87 @@ namespace Voxel_Engine
         /// <param name="shouldRenderBlock">(currentType, neighbourType) => true if should be rendered, false if not</param>
         private static void FillMesh(ChunkData chunkData, MeshData meshData, Func<VoxelType, VoxelType, bool> shouldRenderBlock)
         {
+            //TOOD: This can be optimized. Probably smartly copy/strip data from chunkData.Voxels and check for the neighbor type faster
+            
             //Loop through all xy,yz,xz slices and greedy mesh both sides
+            var sliceDataFront = new VoxelType[chunkData.ChunkSize, chunkData.ChunkHeight];
+            var sliceDataBack = new VoxelType[chunkData.ChunkSize, chunkData.ChunkHeight];
             for (var z = 0; z < chunkData.ChunkSize; z++)
             {
                 //Precompute slice data
-                var sliceDataForward = new VoxelType[chunkData.ChunkSize, chunkData.ChunkHeight];
-                var sliceDataBackward = new VoxelType[chunkData.ChunkSize, chunkData.ChunkHeight];
                 for (var x = 0; x < chunkData.ChunkSize; x++)
                 {
                     for (var y = 0; y < chunkData.ChunkHeight; y++)
                     {
-                        sliceDataForward[x, y] =
+                        sliceDataFront[x, y] =
                             GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Forward, shouldRenderBlock);
 
-                        sliceDataBackward[x, y] = GetVoxelTypeOrNone(chunkData, x,y,z, Direction.Backwards, shouldRenderBlock);
+                        sliceDataBack[x, y] = GetVoxelTypeOrNone(chunkData, x,y,z, Direction.Backwards, shouldRenderBlock);
                     }
                 }
                 
-                meshData = GenerateGreedyMesh(z, Direction.Forward, sliceDataForward, chunkData, meshData);
-                meshData = GenerateGreedyMesh(z, Direction.Backwards, sliceDataBackward, chunkData, meshData);
+                meshData = GenerateGreedyMesh(z, Direction.Forward, sliceDataFront, chunkData, meshData);
+                meshData = GenerateGreedyMesh(z, Direction.Backwards, sliceDataBack, chunkData, meshData);
             }
             
             
+            sliceDataFront = new VoxelType[chunkData.ChunkHeight, chunkData.ChunkSize];
+            sliceDataBack = new VoxelType[chunkData.ChunkHeight, chunkData.ChunkSize];
             for (var x = 0; x < chunkData.ChunkSize; x++)
             {
                 //Precompute slice data
-                var sliceDataLeft = new VoxelType[chunkData.ChunkHeight, chunkData.ChunkSize];
-                var sliceDataRight = new VoxelType[chunkData.ChunkHeight, chunkData.ChunkSize];
                 for (var y = 0; y < chunkData.ChunkHeight; y++)
                 {
                     for (var z = 0; z < chunkData.ChunkSize; z++)
                     {
-                        sliceDataLeft[y, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Left, shouldRenderBlock);
+                        sliceDataFront[y, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Left, shouldRenderBlock);
 
-                        sliceDataRight[y, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Right, shouldRenderBlock);
+                        sliceDataBack[y, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Right, shouldRenderBlock);
                     }
                 }
                 
-                meshData = GenerateGreedyMesh(x, Direction.Left, sliceDataRight, chunkData, meshData);
-                meshData = GenerateGreedyMesh(x, Direction.Right, sliceDataLeft, chunkData, meshData);
+                meshData = GenerateGreedyMesh(x, Direction.Right, sliceDataFront, chunkData, meshData);
+                meshData = GenerateGreedyMesh(x, Direction.Left, sliceDataBack, chunkData, meshData);
             }
             
+            sliceDataFront = new VoxelType[chunkData.ChunkSize, chunkData.ChunkSize];
+            var sliceDataDown = new VoxelType[chunkData.ChunkSize, chunkData.ChunkSize];
             for (var y = 0; y < chunkData.ChunkHeight; y++)
             {
                 //Precompute slice data
-                var sliceDataUp = new VoxelType[chunkData.ChunkSize, chunkData.ChunkSize];
-                var sliceDataDown = new VoxelType[chunkData.ChunkSize, chunkData.ChunkSize];
                 for (var x = 0; x < chunkData.ChunkSize; x++)
                 {
                     for (var z = 0; z < chunkData.ChunkSize; z++)
                     {
-                        sliceDataUp[x, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Up, shouldRenderBlock);
+                        sliceDataFront[x, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Up, shouldRenderBlock);
 
                         sliceDataDown[x, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Down, shouldRenderBlock);
                     }
                 }
                 
-                meshData = GenerateGreedyMesh(y, Direction.Up, sliceDataUp, chunkData, meshData);
+                meshData = GenerateGreedyMesh(y, Direction.Up, sliceDataFront, chunkData, meshData);
                 meshData = GenerateGreedyMesh(y, Direction.Down, sliceDataDown, chunkData, meshData);
             }
         }
 
         private static VoxelType GetVoxelTypeOrNone(ChunkData chunkData, int x, int y, int z, Direction direction, Func<VoxelType, VoxelType, bool> shouldRenderBlock)
         {
-            var neighbourBlockCoordinates = new Vector3Int(x, y, z) + direction.GetVector3();
-            var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+            // var neighbourBlockCoordinates = new Vector3Int(x, y, z) + direction.GetVector3();
+            // var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
+            var directionVector = direction.GetVector3();
+            
+            VoxelType neighbourBlockType;
+            if(!Chunk.IsInsideChunkBounds(chunkData, new Vector3Int(x + directionVector.x, y + directionVector.y, z + directionVector.z)))
+            {
+                neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, x + directionVector.x, y + directionVector.y, z + directionVector.z);
+            }
+            else
+            {
+                neighbourBlockType =
+                    chunkData.Voxels[
+                        Chunk.GetIndexFromPosition(chunkData, x + directionVector.x, y + directionVector.y,
+                            z + directionVector.z)];
+            }
 
             var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
 

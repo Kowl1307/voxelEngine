@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Voxel_Engine
@@ -44,8 +45,7 @@ namespace Voxel_Engine
 
         public static void SetVoxel(ChunkData chunkData, Vector3Int chunkCoords, VoxelType voxel)
         {
-            if (InRange(chunkData, chunkCoords.x) && InRangeHeight(chunkData, chunkCoords.y) &&
-                InRange(chunkData, chunkCoords.z))
+            if (IsInsideChunkBounds(chunkData, chunkCoords))
             {
                 var index = GetIndexFromPosition(chunkData, chunkCoords.x, chunkCoords.y, chunkCoords.z);
                 chunkData.Voxels[index] = voxel;
@@ -56,6 +56,20 @@ namespace Voxel_Engine
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsInsideChunkBounds(ChunkData chunkData, Vector3Int chunkCoords)
+        {
+            return InRange(chunkData, chunkCoords.x) && InRangeHeight(chunkData, chunkCoords.y) &&
+                   InRange(chunkData, chunkCoords.z);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsInsideChunkBounds(ChunkData chunkData, int x, int y, int z)
+        {
+            return InRange(chunkData, x) && InRangeHeight(chunkData, y) &&
+                   InRange(chunkData, z);
+        }
+        
         /// <summary>
         /// Get VoxelType of the given local (in chunk coordinates) coordinates
         /// </summary>
@@ -66,15 +80,13 @@ namespace Voxel_Engine
         /// <returns></returns>
         public static VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int x, int y, int z)
         {
-            if (InRange(chunkData, x) && InRangeHeight(chunkData, y) &&
-                InRange(chunkData, z))
-            {
-                var index = GetIndexFromPosition(chunkData, x, y, z);
-                return chunkData.Voxels[index];
-            }
+            if (!InRange(chunkData, x) || !InRangeHeight(chunkData, y) ||
+                !InRange(chunkData, z))
+                return chunkData.WorldReference.GetVoxelFromChunkCoordinates(chunkData, x,
+                    y, z);
             
-            return chunkData.WorldReference.GetVoxelFromChunkCoordinates(chunkData, x,
-                y, z);
+            var index = GetIndexFromPosition(chunkData, x, y, z);
+            return chunkData.Voxels[index];
         }
         
         public static VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, Vector3Int chunkCoordinates)
@@ -122,20 +134,25 @@ namespace Voxel_Engine
             return new Vector3Int(x, y, z);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool InRange(ChunkData chunkData, int axisCoordinate)
         {
             return axisCoordinate >= 0 && axisCoordinate < chunkData.ChunkSize;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool InRangeHeight(ChunkData chunkData, int yCoordinate)
         {
             return yCoordinate >= 0 && yCoordinate < chunkData.ChunkHeight;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetIndexFromPosition(ChunkData chunkData, int x, int y, int z)
         {
             return x + chunkData.ChunkSize * y + chunkData.ChunkSize * chunkData.ChunkHeight * z;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsOnEdge(ChunkData chunkData, Vector3Int voxelPos)
         {
             var chunkPosition = GetChunkCoordinateOfVoxelPosition(chunkData, voxelPos);
