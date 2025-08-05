@@ -50,7 +50,7 @@ namespace Voxel_Engine.WorldGen
                 chunkData.AddStructureData(structureData);
             
             
-            Parallel.For(0, chunkData.ChunkSize, (x) =>
+            Parallel.For(0, chunkData.ChunkSize, chunkData.WorldReference.WorldParallelOptions, (x) =>
             {
                 for (var z = 0; z < chunkData.ChunkSize; z++)
                 {

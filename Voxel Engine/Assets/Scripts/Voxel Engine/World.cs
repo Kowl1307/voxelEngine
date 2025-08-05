@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
@@ -22,6 +23,11 @@ namespace Voxel_Engine
         public int chunkSizeInVoxel = 16;
         public int chunkHeightInVoxel = 100;
         public Vector3 voxelScaling = Vector3.one;
+        
+        public ParallelOptions WorldParallelOptions = new ParallelOptions()
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount-1
+        };
 
         public int chunkSizeInWorld => Mathf.FloorToInt(chunkSizeInVoxel * voxelScaling.x);
         public int chunkHeightInWorld => Mathf.FloorToInt(chunkHeightInVoxel * voxelScaling.y);
@@ -144,8 +150,8 @@ namespace Voxel_Engine
         private async Task<ConcurrentDictionary<Vector3Int, MeshData>> CreateMeshDataAsync(List<ChunkData> dataToRender)
         {
             var dictionary = new ConcurrentDictionary<Vector3Int, MeshData>();
-
-            await Task.Run(() => Parallel.ForEach(dataToRender, data =>
+            
+            await Task.Run(() => Parallel.ForEach(dataToRender, WorldParallelOptions, data =>
             {
                 var meshData = Chunk.GetChunkMeshData(data);
                 if (_taskTokenSource.Token.IsCancellationRequested) _taskTokenSource.Token.ThrowIfCancellationRequested();;
@@ -161,7 +167,7 @@ namespace Voxel_Engine
 
             return await Task.Run(() =>
             {
-                Parallel.ForEach(chunkDataPositionsToCreate, pos =>
+                Parallel.ForEach(chunkDataPositionsToCreate, WorldParallelOptions, pos =>
                 {
                     if (_taskTokenSource.Token.IsCancellationRequested)
                         _taskTokenSource.Token.ThrowIfCancellationRequested();
@@ -185,7 +191,7 @@ namespace Voxel_Engine
                 if (!WorldData.ChunkDataDictionary.ContainsKey(item.Key) || WorldData.ChunkDictionary.ContainsKey(item.Key))
                     continue;
                 CreateChunk(WorldData, item.Key, item.Value);
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
 
             if (IsWorldCreated) yield break;

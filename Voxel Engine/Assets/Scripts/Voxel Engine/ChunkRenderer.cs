@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
@@ -70,15 +71,62 @@ namespace Voxel_Engine
             _meshRenderer.materials[0] = meshData.Material;
         }
 
+        private IEnumerator RenderMeshCoroutine(MeshData meshData)
+        {
+            _mesh.Clear();
+            yield return null;
+            
+            //2, one for opaque material one for transparent (water)
+            _mesh.subMeshCount = 2;
+            yield return null;
+            
+            _mesh.vertices = meshData.Vertices.Concat(meshData.WaterMesh.Vertices).ToArray();
+            yield return null;
+            
+            _mesh.SetTriangles(meshData.Triangles.ToArray(), 0);
+            yield return null;
+            _mesh.SetTriangles(meshData.WaterMesh.Triangles.Select(val => val + meshData.Vertices.Count).ToArray(), 1);
+            yield return null;
+
+            _mesh.uv = meshData.UV.Concat(meshData.WaterMesh.UV).ToArray();
+            _mesh.SetUVs(1, meshData.UV2.Concat(meshData.WaterMesh.UV2).ToArray());
+            yield return null;
+            _mesh.SetUVs(2, meshData.UV3.Concat(meshData.WaterMesh.UV3).ToArray());
+            yield return null;
+
+            _mesh.RecalculateNormals();
+            yield return null;
+
+            _meshCollider.sharedMesh = null;
+            yield return null;
+
+            var collisionMesh = new Mesh
+            {
+                vertices = meshData.ColliderVertices.ToArray(),
+                triangles = meshData.ColliderTriangles.ToArray()
+            };
+            yield return null;
+
+            collisionMesh.RecalculateNormals();
+            yield return null;
+
+            _meshCollider.sharedMesh = collisionMesh;
+            yield return null;
+
+            _meshRenderer.materials[0] = meshData.Material;
+        }
+
         public async void UpdateChunk()
         {
             var meshData = await Task.Run(() => Chunk.GetChunkMeshData(ChunkData));
-            RenderMesh(meshData);
+            // RenderMesh(meshData);
+            StartCoroutine(RenderMeshCoroutine(meshData));
         }
 
         public void UpdateChunk(MeshData data)
         {
-            RenderMesh(data);
+            // RenderMesh(data);
+            StartCoroutine(RenderMeshCoroutine(data));
         }
 
         #if UNITY_EDITOR
