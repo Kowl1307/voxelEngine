@@ -24,7 +24,7 @@ namespace Voxel_Engine
         public int chunkHeightInVoxel = 100;
         public Vector3 voxelScaling = Vector3.one;
         
-        public readonly ParallelOptions WorldParallelOptions = new ParallelOptions()
+        public readonly ParallelOptions WorldParallelOptions = new()
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount-1
         };
@@ -44,15 +44,15 @@ namespace Voxel_Engine
         public bool IsWorldCreated { get; set; }
 
         private readonly CancellationTokenSource _taskTokenSource = new CancellationTokenSource();
-
+        
         private struct ChunkToCreate
         {
             public Vector3Int Position;
             public MeshData MeshData;
         }
         private readonly ConcurrentQueue<ChunkToCreate> _chunksToCreate = new();
-        private bool _IsProcessingChunkMeshData = false;
-
+        private bool _isProcessingChunkMeshData = false;
+        
         private void Awake()
         {
             WorldData = new WorldData
@@ -76,7 +76,7 @@ namespace Voxel_Engine
                 CreateChunk(WorldData, chunkToCreate.Position, chunkToCreate.MeshData);
             }
 
-            if (!_IsProcessingChunkMeshData)
+            if (!_isProcessingChunkMeshData)
             {
                 OnWorldCreated?.Invoke();
             }
@@ -190,15 +190,18 @@ namespace Voxel_Engine
 
         private async Task CreateMeshDataAsyncAddToQueue(List<ChunkData> dataToRender)
         {
-            _IsProcessingChunkMeshData = true;
-            await Task.Run(() =>
-                Parallel.ForEach(dataToRender, WorldParallelOptions, data =>
-                {
-                    var meshData = Chunk.GetChunkMeshData(data);
-                    _chunksToCreate.Enqueue(new ChunkToCreate() { Position = data.ChunkPositionInWorld, MeshData = meshData });
+            _isProcessingChunkMeshData = true;
+            await Task.Run(
+                () => {
+                    Parallel.ForEach(dataToRender, WorldParallelOptions, data =>
+                    {
+                        var meshData = Chunk.GetChunkMeshData(data);
+                        _chunksToCreate.Enqueue(new ChunkToCreate()
+                            { Position = data.ChunkPositionInWorld, MeshData = meshData });
+                    });
+                    _isProcessingChunkMeshData = false;
                 }
-            ));
-            _IsProcessingChunkMeshData = false;
+                , _taskTokenSource.Token);
         }
 
         private async Task<ConcurrentDictionary<Vector3Int, ChunkData>> CalculateWorldChunkData(List<Vector3Int> chunkDataPositionsToCreate)

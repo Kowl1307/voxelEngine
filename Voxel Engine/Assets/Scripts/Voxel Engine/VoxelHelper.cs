@@ -261,23 +261,21 @@ namespace Voxel_Engine
 
         private static VoxelType GetVoxelTypeOrNone(ChunkData chunkData, int x, int y, int z, Direction direction, Func<VoxelType, VoxelType, bool> shouldRenderBlock)
         {
-            // var neighbourBlockCoordinates = new Vector3Int(x, y, z) + direction.GetVector3();
-            // var neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, neighbourBlockCoordinates);
             var directionVector = direction.GetVector3();
-            
-            VoxelType neighbourBlockType;
-            if(!Chunk.IsInsideChunkBounds(chunkData, new Vector3Int(x + directionVector.x, y + directionVector.y, z + directionVector.z)))
-            {
-                neighbourBlockType = Chunk.GetVoxelFromChunkCoordinates(chunkData, x + directionVector.x, y + directionVector.y, z + directionVector.z);
-            }
-            else
-            {
-                neighbourBlockType =
-                    chunkData.Voxels[
-                        Chunk.GetIndexFromPosition(chunkData, x + directionVector.x, y + directionVector.y,
-                            z + directionVector.z)];
-            }
 
+            var neighbourBlockType =
+            //if(!Chunk.IsInsideChunkBounds(chunkData, new Vector3Int(x + directionVector.x, y + directionVector.y, z + directionVector.z)))
+            //{
+                Chunk.GetVoxelFromChunkCoordinates(chunkData, x + directionVector.x, y + directionVector.y, z + directionVector.z);
+
+            //}
+            //else
+            //{
+            //    neighbourBlockType =
+            //        chunkData.Voxels[
+            //            Chunk.GetIndexFromPosition(chunkData, x + directionVector.x, y + directionVector.y,
+            //                z + directionVector.z)];
+            //}
             var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
 
             return shouldRenderBlock(currentType, neighbourBlockType)
