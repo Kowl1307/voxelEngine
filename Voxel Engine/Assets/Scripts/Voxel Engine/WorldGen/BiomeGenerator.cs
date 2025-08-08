@@ -24,7 +24,7 @@ namespace Voxel_Engine.WorldGen
 
         public List<VoxelLayerHandler> additionalLayerHandlers;
 
-        [SerializeField] private List<StructureGenerator> StructureGenerators = new List<StructureGenerator>();
+        [SerializeField] private List<StructureGenerator> StructureGenerators = new();
 
         private void Awake()
         {
@@ -34,7 +34,7 @@ namespace Voxel_Engine.WorldGen
         public ChunkData ProcessChunkColumn(ChunkData chunkData, int x, int z, Vector2Int mapSeedOffset)
         {
             BiomeNoiseSettings.Seed = mapSeedOffset;
-            var groundPosition = GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.ChunkHeight / chunkData.WorldReference.voxelScaling.y, BiomeSettings, chunkData.WorldReference.voxelScaling);
+            var groundPosition = GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.ChunkHeight, BiomeSettings, chunkData.WorldReference.voxelScaling);
 
             //Fill the whole chunk with voxelType data
             /*for (var y = chunkData.ChunkPositionInVoxel.y; y < chunkData.ChunkHeight + chunkData.ChunkPositionInVoxel.y; y++)
@@ -68,7 +68,7 @@ namespace Voxel_Engine.WorldGen
             // terrainHeight /= voxelScale.y;
             //var terrainHeight = useDomainWarping ? MyNoise.OctaveSimplex(x,z,BiomeNoiseSettings) : MyNoise.SimplexNoise(x, z, BiomeNoiseSettings);
             terrainHeight = MyNoise.Redistribution(terrainHeight, BiomeNoiseSettings);
-            return MyNoise.RemapValue01ToInt(terrainHeight, 0, chunkHeight) + biomeSettings.MinimumHeight;
+            return MyNoise.RemapValue01ToInt(terrainHeight, 0, chunkHeight / voxelScale.y) + biomeSettings.MinimumHeight;
         }
 
         public List<StructureData> GetStructureData(ChunkData chunkData, Vector2Int mapSeedOffset)

@@ -18,7 +18,7 @@ namespace Voxel_Engine
         public Chunk.RenderMethod RenderMethod;
 
         public bool ModifiedByPlayer = false;
-        public List<StructureData> Structures = new List<StructureData>();
+        public List<StructureData> Structures = new();
 
         public ChunkData(int chunkSize, int chunkHeight, World world, Vector3Int chunkPositionInWorld, Vector3Int chunkPositionInVoxel)
         {

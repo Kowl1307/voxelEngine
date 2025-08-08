@@ -45,11 +45,6 @@ namespace Voxel_Engine.WorldGen
                 throw new Exception("Biome not found in dictionary!");
             }
             
-            var structureDataList = biomeGenerator.GetStructureData(chunkData, mapSeedOffset);
-            foreach(var structureData in structureDataList)
-                chunkData.AddStructureData(structureData);
-            
-            
             Parallel.For(0, chunkData.ChunkSize, chunkData.WorldReference.WorldParallelOptions, (x) =>
             {
                 for (var z = 0; z < chunkData.ChunkSize; z++)
@@ -58,18 +53,6 @@ namespace Voxel_Engine.WorldGen
                 }
             });
             
-            
-            /*
-            //Main Thread for loop
-            for (var x = 0; x < chunkData.ChunkSize; x++)
-            {
-                for (var z = 0; z < chunkData.ChunkSize; z++)
-                {
-                    chunkData = BiomeGenerator.ProcessChunkColumn(chunkData, x, z, mapSeedOffset);
-                }
-            }
-            */
-
             return chunkData;
         }
 

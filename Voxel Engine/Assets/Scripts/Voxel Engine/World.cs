@@ -133,12 +133,15 @@ namespace Voxel_Engine
                 WorldData.ChunkDataDictionary.TryAdd(calculatedData.Key, calculatedData.Value);
             }
 
+            //TODO: Move this to chunk creation
+            /*
             print("Adding structure voxels..");
             //Add structure blocks after initializing the chunks
             foreach (var chunkData in WorldData.ChunkDataDictionary.Values)
             {
                 AddStructureVoxels(chunkData);
             }
+            */
             
             //Load renderers for chunks with generated data in range
             var dataToRender =
@@ -146,20 +149,6 @@ namespace Voxel_Engine
                     worldGenerationData.ChunkPositionsToCreate.Contains(kvp.Key)).Select(kvp => kvp.Value).ToList();
 
             print("Creating mesh data..");
-            /*
-            ConcurrentDictionary<Vector3Int, MeshData> meshDataDictionary;
-            try
-            {
-                meshDataDictionary = await CreateMeshDataAsync(dataToRender);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return;
-            }
-
-            StartCoroutine(ChunkCreationCoroutine(meshDataDictionary));
-            */
             await CreateMeshDataAsyncAddToQueue(dataToRender);
         }
 
