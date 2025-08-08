@@ -10,9 +10,9 @@ namespace Voxel_Engine
         {
             return new Vector3Int
             {
-                x = Mathf.FloorToInt(voxelCoords.x / (float)world.chunkSizeInVoxel) * world.chunkSizeInVoxel,
-                y = Mathf.FloorToInt(voxelCoords.y / (float)world.chunkHeightInVoxel) * world.chunkHeightInVoxel,
-                z = Mathf.FloorToInt(voxelCoords.z / (float)world.chunkSizeInVoxel) * world.chunkSizeInVoxel
+                x = Mathf.FloorToInt(voxelCoords.x / (float)world.WorldData.ChunkSizeInVoxel) * world.WorldData.ChunkSizeInVoxel,
+                y = Mathf.FloorToInt(voxelCoords.y / (float)world.WorldData.ChunkHeightInVoxel) * world.WorldData.ChunkHeightInVoxel,
+                z = Mathf.FloorToInt(voxelCoords.z / (float)world.WorldData.ChunkSizeInVoxel) * world.WorldData.ChunkSizeInVoxel
             };
         }
 
@@ -32,9 +32,9 @@ namespace Voxel_Engine
         {
             return new Vector3Int
             {
-                x = Mathf.RoundToInt(worldCoords.x / (float)world.chunkSizeInWorld * world.chunkSizeInVoxel),
-                y = Mathf.RoundToInt(worldCoords.y / (float)world.chunkHeightInWorld * world.chunkHeightInVoxel),
-                z = Mathf.RoundToInt(worldCoords.z / (float)world.chunkSizeInWorld * world.chunkSizeInVoxel)
+                x = Mathf.RoundToInt(worldCoords.x / (float)world.chunkSizeInWorld * world.WorldData.ChunkSizeInVoxel),
+                y = Mathf.RoundToInt(worldCoords.y / (float)world.chunkHeightInWorld * world.WorldData.ChunkHeightInVoxel),
+                z = Mathf.RoundToInt(worldCoords.z / (float)world.chunkSizeInWorld * world.WorldData.ChunkSizeInVoxel)
             };
         }
         
@@ -42,9 +42,9 @@ namespace Voxel_Engine
         {
             return new Vector3Int
             {
-                x = Mathf.RoundToInt(voxelCoords.x / (float)world.chunkSizeInVoxel * world.chunkSizeInWorld),
-                y = Mathf.RoundToInt(voxelCoords.y / (float)world.chunkHeightInVoxel * world.chunkHeightInWorld),
-                z = Mathf.RoundToInt(voxelCoords.z / (float)world.chunkSizeInVoxel * world.chunkSizeInWorld)
+                x = Mathf.RoundToInt(voxelCoords.x / (float)world.WorldData.ChunkSizeInVoxel * world.chunkSizeInWorld),
+                y = Mathf.RoundToInt(voxelCoords.y / (float)world.WorldData.ChunkHeightInVoxel * world.chunkHeightInWorld),
+                z = Mathf.RoundToInt(voxelCoords.z / (float)world.WorldData.ChunkSizeInVoxel * world.chunkSizeInWorld)
             };
         }
         
@@ -54,9 +54,9 @@ namespace Voxel_Engine
         {
             var pos = new Vector3Int
             {
-                x = Mathf.FloorToInt(voxelPositionX / (float)world.chunkSizeInVoxel) * world.chunkSizeInWorld,
-                y = Mathf.FloorToInt(voxelPositionY / (float)world.chunkHeightInVoxel) * world.chunkHeightInWorld,
-                z = Mathf.FloorToInt(voxlePositionZ / (float)world.chunkSizeInVoxel) * world.chunkSizeInWorld
+                x = Mathf.FloorToInt(voxelPositionX / (float)world.WorldData.ChunkSizeInVoxel) * world.chunkSizeInWorld,
+                y = Mathf.FloorToInt(voxelPositionY / (float)world.WorldData.ChunkHeightInVoxel) * world.chunkHeightInWorld,
+                z = Mathf.FloorToInt(voxlePositionZ / (float)world.WorldData.ChunkSizeInVoxel) * world.chunkSizeInWorld
             };
             return pos;
         }

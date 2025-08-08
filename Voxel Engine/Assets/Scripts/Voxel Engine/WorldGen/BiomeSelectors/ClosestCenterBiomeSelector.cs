@@ -32,7 +32,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
 
         public override void PrecomputeData(World world, Vector3Int worldPosition)
         {
-            GenerateBiomePoints(worldPosition, world.ChunkDrawingRange, world.chunkSizeInVoxel, world.MapSeedOffset);
+            GenerateBiomePoints(worldPosition, world.ChunkDrawingRange, world.WorldData.ChunkSizeInVoxel, world.WorldData.WorldSeed);
         }
 
         public override BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, ChunkData chunkData)
@@ -169,8 +169,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
             var terrainHeights = biomeSelectionHelpers.Select(helper =>
             {
                 var biome = SelectBiome(helper.Index);
-                var floorHeight = biome.GetSurfaceHeightNoise(worldPos.x, worldPos.z, chunkData.ChunkHeight,
-                    biome.BiomeSettings, chunkData.WorldReference.voxelScaling);
+                var floorHeight = biome.GetSurfaceHeightNoise(worldPos.x, worldPos.z, chunkData);
                 return floorHeight < biome.BiomeSettings.WaterLevel ? biome.BiomeSettings.WaterLevel : floorHeight;
             }).ToList();
 

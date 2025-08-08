@@ -20,7 +20,7 @@ namespace Voxel_Engine.WorldGen.Noise
             new(-1,1), //NW
         };
 
-        public static List<Vector2Int> FindLocalMaxima(float[,] dataMatrix, int worldPositionX, int worldPositionZ, int range = 1)
+        public static List<Vector2Int> FindLocalMaxima(float[,] dataMatrix, int range = 1)
         {
             var maximums = new List<Vector2Int>();
             for (var x = 0; x < dataMatrix.GetLength(0); x++)
@@ -29,9 +29,8 @@ namespace Voxel_Engine.WorldGen.Noise
                 {
                     var noiseVal = dataMatrix[x, z];
                     if (CheckNeighbours(dataMatrix, x, z, range, (neighbourVal) => neighbourVal < noiseVal))
-                    //if (CheckNeighbours(dataMatrix, x, z, (neighbourVal) => neighbourVal < noiseVal))
                     {
-                        maximums.Add(new Vector2Int(worldPositionX + x, worldPositionZ + z));
+                        maximums.Add(new Vector2Int(x, z));
                     }
                 }                
             }

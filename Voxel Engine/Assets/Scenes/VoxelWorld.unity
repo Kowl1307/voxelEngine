@@ -625,6 +625,7 @@ GameObject:
   m_Component:
   - component: {fileID: 427497634}
   - component: {fileID: 427497635}
+  - component: {fileID: 427497636}
   m_Layer: 0
   m_Name: TreeLayer
   m_TagString: Untagged
@@ -663,6 +664,22 @@ MonoBehaviour:
   heightThreshold: 0
   heightLimit: 50
   allowedTreeGroundTypes: 02000000
+--- !u!114 &427497636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 427497633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caecf100a2ee238449311b3d3c473011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  treeNoiseSettings: {fileID: 11400000, guid: 04be14057e7778d449250ceb6a19948f, type: 2}
+  DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
+  closestTreeDistance: 5
+  UseOctaves: 0
 --- !u!1 &438640389
 GameObject:
   m_ObjectHideFlags: 0
@@ -923,7 +940,6 @@ MonoBehaviour:
   useDomainWarping: 1
   StartLayerHandler: {fileID: 2080080642}
   additionalLayerHandlers: []
-  StructureGenerators: []
 --- !u!4 &773299563
 Transform:
   m_ObjectHideFlags: 0
@@ -1441,7 +1457,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1728092375}
   - component: {fileID: 1728092374}
-  - component: {fileID: 1728092377}
   m_Layer: 0
   m_Name: WoodsBiomeGenerator
   m_TagString: Untagged
@@ -1467,9 +1482,8 @@ MonoBehaviour:
   DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
   StartLayerHandler: {fileID: 726806224}
-  additionalLayerHandlers: []
-  StructureGenerators:
-  - {fileID: 1728092377}
+  additionalLayerHandlers:
+  - {fileID: 427497635}
 --- !u!4 &1728092375
 Transform:
   m_ObjectHideFlags: 0
@@ -1490,22 +1504,6 @@ Transform:
   - {fileID: 924658648}
   m_Father: {fileID: 1098337748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1728092377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1728092373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caecf100a2ee238449311b3d3c473011, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  treeNoiseSettings: {fileID: 11400000, guid: 04be14057e7778d449250ceb6a19948f, type: 2}
-  DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
-  closestTreeDistance: 5
-  UseOctaves: 0
 --- !u!1 &1821623676
 GameObject:
   m_ObjectHideFlags: 0

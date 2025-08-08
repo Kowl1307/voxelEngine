@@ -28,7 +28,7 @@ namespace Player
 
             var raycastStartPosition = new Vector3Int(world.chunkSizeInWorld / 2, world.chunkHeightInWorld + 1, world.chunkSizeInWorld / 2);
             RaycastHit hit;
-            if (!Physics.Raycast(raycastStartPosition, Vector3.down, out hit, world.chunkHeightInVoxel * 2)) return;
+            if (!Physics.Raycast(raycastStartPosition, Vector3.down, out hit, world.WorldData.ChunkHeightInVoxel * 2)) return;
             player = Instantiate(playerPrefab, hit.point + Vector3.up * .5f, Quaternion.identity);
             cameraVm = player.GetComponentInChildren<CinemachineCamera>();
             //cameraVm.Follow = player.transform.GetChild(0);

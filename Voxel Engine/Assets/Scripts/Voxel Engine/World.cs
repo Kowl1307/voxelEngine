@@ -20,9 +20,10 @@ namespace Voxel_Engine
 {
     public class World : MonoBehaviour
     {
-        public int chunkSizeInVoxel = 16;
-        public int chunkHeightInVoxel = 100;
-        public Vector3 voxelScaling = Vector3.one;
+        [SerializeField] private int chunkSizeInVoxel = 16;
+        [SerializeField] private int chunkHeightInVoxel = 100;
+        [SerializeField] private Vector2Int worldSeed;
+        [SerializeField] private Vector3 voxelScaling = Vector3.one;
         
         public readonly ParallelOptions WorldParallelOptions = new()
         {
@@ -33,7 +34,6 @@ namespace Voxel_Engine
         public int chunkHeightInWorld => Mathf.FloorToInt(chunkHeightInVoxel * voxelScaling.y);
 
         public TerrainGenerator terrainGenerator;
-        public Vector2Int MapSeedOffset;
 
         public UnityEvent OnWorldCreated, OnNewChunksGenerated;
 
@@ -57,10 +57,12 @@ namespace Voxel_Engine
         {
             WorldData = new WorldData
             {
-                ChunkHeight = chunkHeightInVoxel,
-                ChunkSize = chunkSizeInVoxel,
+                ChunkHeightInVoxel = chunkHeightInVoxel,
+                ChunkSizeInVoxel = chunkSizeInVoxel,
                 ChunkDataDictionary = new ConcurrentDictionary<Vector3Int, ChunkData>(),
-                ChunkDictionary = new ConcurrentDictionary<Vector3Int, ChunkRenderer>()
+                ChunkDictionary = new ConcurrentDictionary<Vector3Int, ChunkRenderer>(),
+                WorldSeed = worldSeed,
+                VoxelScaling = voxelScaling
             };
 
             //MapSeedOffset = new Vector2Int(new Random().Next(10000), new Random().Next(10000));
@@ -152,17 +154,6 @@ namespace Voxel_Engine
             await CreateMeshDataAsyncAddToQueue(dataToRender);
         }
 
-        private void AddStructureVoxels(ChunkData chunkData)
-        {
-            Parallel.ForEach(chunkData.Structures, (structureData) =>
-            {
-                foreach(var (pos, voxelType) in structureData.StructureVoxels)
-                {
-                    Chunk.SetVoxel(chunkData, pos, voxelType);
-                }
-            });
-        }
-
         private async Task<ConcurrentDictionary<Vector3Int, MeshData>> CreateMeshDataAsync(List<ChunkData> dataToRender)
         {
             var dictionary = new ConcurrentDictionary<Vector3Int, MeshData>();
@@ -206,7 +197,7 @@ namespace Voxel_Engine
 
                     var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, pos,
                         WorldDataHelper.GetVoxelPositionFromWorldPosition(this, pos));
-                    var newData = terrainGenerator.GenerateChunkData(data, MapSeedOffset);
+                    var newData = terrainGenerator.GenerateChunkData(data, worldSeed);
                     dictionary.TryAdd(pos, newData);
                 });
                 
@@ -348,6 +339,8 @@ public struct WorldData
 {
     public ConcurrentDictionary<Vector3Int, ChunkData> ChunkDataDictionary;
     public ConcurrentDictionary<Vector3Int, ChunkRenderer> ChunkDictionary;
-    public int ChunkSize;
-    public int ChunkHeight;
+    public int ChunkSizeInVoxel;
+    public int ChunkHeightInVoxel;
+    public Vector2Int WorldSeed;
+    public Vector3 VoxelScaling;
 }

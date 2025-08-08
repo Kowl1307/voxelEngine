@@ -81,7 +81,7 @@ namespace Voxel_Engine
         private static MeshData GetFaceDataInDirection(Direction direction, ChunkData chunkData, int x, int y, int z,
             MeshData meshData, VoxelType voxelType)
         {
-            AddFaceVertices(direction, x, y, z, meshData, voxelType, chunkData.WorldReference.voxelScaling);
+            AddFaceVertices(direction, x, y, z, meshData, voxelType, chunkData.WorldReference.WorldData.VoxelScaling);
             
             meshData.AddQuadTriangles(VoxelDataManager.VoxelTextureDataDictionary[voxelType].GeneratesCollider);
             meshData.UV.AddRange(FaceUVs(direction,voxelType));
@@ -314,7 +314,7 @@ namespace Voxel_Engine
                     
                     var voxelType = sliceData[newQuad.LowX, newQuad.LowY];
                     
-                    meshData = CreateQuad(newQuad, sliceRow, faceNormalDirection, voxelType, meshData, chunkData.WorldReference.voxelScaling);
+                    meshData = CreateQuad(newQuad, sliceRow, faceNormalDirection, voxelType, meshData, chunkData.WorldReference.WorldData.VoxelScaling);
                     meshData.AddQuadTriangles(VoxelDataManager.VoxelTextureDataDictionary[voxelType].GeneratesCollider);
                     meshData = GetFaceUVsGreedy(faceNormalDirection, voxelType, newQuad, meshData);
                     

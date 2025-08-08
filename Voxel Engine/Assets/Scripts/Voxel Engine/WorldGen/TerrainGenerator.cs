@@ -37,13 +37,17 @@ namespace Voxel_Engine.WorldGen
             }
         }
 
+        /// <summary>
+        /// Generates the VoxelType data for the whole Chunk.
+        /// </summary>
+        /// <param name="chunkData">The chunkData that should be filled</param>
+        /// <param name="mapSeedOffset"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public ChunkData GenerateChunkData(ChunkData chunkData, Vector2Int mapSeedOffset)
         {
-            var biomeSelection = biomeSelector.GetBiomeTypeAt(chunkData.ChunkPositionInVoxel, chunkData);
-            if (!_biomeGenerators.TryGetValue(biomeSelection, out var biomeGenerator))
-            {
-                throw new Exception("Biome not found in dictionary!");
-            }
+            //TODO: Chunks are currently always having the same biome. The generator should be picked depending on the xyz coordinates. For this, we need to change the processing from per column to complete parallel.
+            var biomeGenerator = GetBiomeGeneratorAt(chunkData.ChunkPositionInVoxel, chunkData);
             
             Parallel.For(0, chunkData.ChunkSize, chunkData.WorldReference.WorldParallelOptions, (x) =>
             {
@@ -53,7 +57,24 @@ namespace Voxel_Engine.WorldGen
                 }
             });
             
+            // Generate biome-independent structures (i.e. villages). Biome dependent structures are already handled in the Layer system above.
+            
+            
+            
             return chunkData;
+        }
+        
+        //TODO This will be removed due to the TODO above.
+        public BiomeGenerator GetBiomeGeneratorAt(Vector3Int voxelPosition, ChunkData chunkData)
+        {
+            var biomeSelection = biomeSelector.GetBiomeTypeAt(voxelPosition, chunkData);
+            
+            if (!_biomeGenerators.TryGetValue(biomeSelection, out var biomeGenerator))
+            {
+                throw new Exception("Biome not found in dictionary!");
+            }
+
+            return biomeGenerator;
         }
 
         public async void InitBiomeSelector(World world, Vector3Int worldPosition)

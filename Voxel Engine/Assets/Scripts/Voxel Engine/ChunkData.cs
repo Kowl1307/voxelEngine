@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Voxel_Engine.WorldGen;
 using Voxel_Engine.WorldGen.Structures;
-using Voxel_Engine.WorldGen.Trees;
 
 namespace Voxel_Engine
 {
@@ -18,7 +17,6 @@ namespace Voxel_Engine
         public Chunk.RenderMethod RenderMethod;
 
         public bool ModifiedByPlayer = false;
-        public List<StructureData> Structures = new();
 
         public ChunkData(int chunkSize, int chunkHeight, World world, Vector3Int chunkPositionInWorld, Vector3Int chunkPositionInVoxel)
         {
@@ -30,11 +28,6 @@ namespace Voxel_Engine
             Voxels = new VoxelType[ChunkSize * ChunkHeight * chunkSize];
             //TODO: Make this dynamic
             RenderMethod = Chunk.RenderMethod.Greedy;
-        }
-
-        public void AddStructureData(StructureData data)
-        {
-            Structures.Add(data);
         }
     }
 }
