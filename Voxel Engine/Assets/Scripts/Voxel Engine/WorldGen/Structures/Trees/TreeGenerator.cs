@@ -28,6 +28,7 @@ namespace Voxel_Engine.WorldGen.Structures.Trees
             treePositions = treePositions.ConvertAll(position => position - new Vector2Int(chunkData.ChunkSize/2, chunkData.ChunkSize/2));
 
             // This is just for easier debugging.
+            /*
             treePositions = new();
             for (var x = -10; x < chunkData.ChunkSize+10; x++)
             {
@@ -40,6 +41,7 @@ namespace Voxel_Engine.WorldGen.Structures.Trees
                     }
                 }
             }
+            */
             
             foreach (var treePosition2D in treePositions)
             {
