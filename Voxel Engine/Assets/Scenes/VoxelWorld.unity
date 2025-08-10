@@ -494,6 +494,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextLayer: {fileID: 735345192}
   surfaceType: 2
+  underwaterSurfaceType: 10
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1488,6 +1489,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextLayer: {fileID: 872204463}
   surfaceType: 10
+  underwaterSurfaceType: 0
 --- !u!4 &2033556889
 Transform:
   m_ObjectHideFlags: 0

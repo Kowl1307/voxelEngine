@@ -41,8 +41,6 @@ namespace Voxel_Engine.WorldGen.Structures.Trees
                 }
             }
             
-            //BUG: Leaves generate when there is a potential tree in the neighboring chunk.
-            
             foreach (var treePosition2D in treePositions)
             {
                 var treePosition3DVoxel = treePosition2D.AsX0Z();

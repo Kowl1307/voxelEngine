@@ -15,11 +15,12 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
             var pos = new Vector3Int(x, y, z);
             
             Chunk.SetVoxel(chunkData, pos, VoxelType.Water);
-            
+            /*
             if (voxelY != surfaceHeightNoise + 1) return true;
             //Generate the sea floor
             pos.y -= 1;
             Chunk.SetVoxel(chunkData, pos, VoxelType.Sand);
+            */
             return true;
         }
     }
