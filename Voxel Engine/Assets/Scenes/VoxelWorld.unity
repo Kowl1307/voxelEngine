@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d31e4f70d2b147e6b86fbb68721dfcf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 381764383}
+  nextLayer: {fileID: 0}
 --- !u!1 &217456578
 GameObject:
   m_ObjectHideFlags: 0
@@ -792,7 +792,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c1d1a2c04714fc8b488561e06cd3d56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 160602071}
+  nextLayer: {fileID: 381764383}
 --- !u!1 &735345190
 GameObject:
   m_ObjectHideFlags: 0
@@ -837,7 +837,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9dac1a6170941f88e206aeba521f753, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 0}
+  nextLayer: {fileID: 160602071}
   undergroundType: 3
 --- !u!1 &773299560
 GameObject:
@@ -873,7 +873,7 @@ MonoBehaviour:
   BiomeNoiseSettings: {fileID: 11400000, guid: dd7aaf9260e2da344bddc812d70fd2aa, type: 2}
   DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
-  StartLayerHandler: {fileID: 2080080642}
+  StartLayerHandler: {fileID: 2033556888}
   structureGeneratorsHolder: {fileID: 1367074017}
 --- !u!4 &773299563
 Transform:
@@ -888,9 +888,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2080080643}
   - {fileID: 2033556889}
   - {fileID: 872204464}
+  - {fileID: 2080080643}
   - {fileID: 1367074018}
   m_Father: {fileID: 1098337748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -972,7 +972,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9dac1a6170941f88e206aeba521f753, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 0}
+  nextLayer: {fileID: 2080080642}
   undergroundType: 10
 --- !u!4 &872204464
 Transform:
@@ -1401,9 +1401,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 726806223}
-  - {fileID: 160602070}
   - {fileID: 381764382}
   - {fileID: 735345191}
+  - {fileID: 160602070}
   - {fileID: 924658648}
   m_Father: {fileID: 1098337748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1532,7 +1532,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d31e4f70d2b147e6b86fbb68721dfcf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 2033556888}
+  nextLayer: {fileID: 0}
 --- !u!4 &2080080643
 Transform:
   m_ObjectHideFlags: 0

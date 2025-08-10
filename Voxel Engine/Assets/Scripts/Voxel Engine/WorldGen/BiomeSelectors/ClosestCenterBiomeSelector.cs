@@ -37,7 +37,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
 
         public override BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, WorldData worldData)
         {
-            return SelectBiomeGenerator(voxelPosition, worldData, false).BiomeGenerator.biomeType;
+            return SelectBiomeGenerator(voxelPosition, worldData, false).biomeType;
         }
         
         /// <summary>
@@ -47,7 +47,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
         /// <param name="worldData"></param>
         /// <param name="useDomainWarping"></param>
         /// <returns></returns>
-        private BiomeGeneratorSelection SelectBiomeGenerator(Vector3Int voxelPos, WorldData worldData, bool useDomainWarping = true)
+        private BiomeGenerator SelectBiomeGenerator(Vector3Int voxelPos, WorldData worldData, bool useDomainWarping = true)
         {
             if (useDomainWarping)
             {
@@ -61,11 +61,11 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
             
             var worthInterpolating = biomeGenerators.Any(gen => gen != biomeGenerators[0]);
             if (!doInterpolateBiomes || biomeSelectionHelpers[0].Distance == 0 || !worthInterpolating)
-                return new BiomeGeneratorSelection(closestBiomeGen);
-            var interpolatedValue = CalculateInterpolatedHeight(voxelPos, worldData, biomeSelectionHelpers);
+                return closestBiomeGen;
+            //var interpolatedValue = CalculateInterpolatedHeight(voxelPos, worldData, biomeSelectionHelpers);
 
             
-            return new BiomeGeneratorSelection(closestBiomeGen);
+            return closestBiomeGen;
             /*
             var blendStrength = blendFunctionType.Function()(distances.Min() / distances.Max());
 

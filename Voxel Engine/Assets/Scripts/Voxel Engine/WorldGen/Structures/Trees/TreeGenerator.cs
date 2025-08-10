@@ -25,17 +25,35 @@ namespace Voxel_Engine.WorldGen.Structures.Trees
         {
             var noise = GenerateTreeNoise(chunkData, treeNoiseSettings);
             var treePositions = DataProcessing.FindLocalMaxima(noise, closestTreeDistance);
-            treePositions = treePositions.ConvertAll(position => position - new Vector2Int(chunkData.ChunkSize, chunkData.ChunkSize));
+            treePositions = treePositions.ConvertAll(position => position - new Vector2Int(chunkData.ChunkSize/2, chunkData.ChunkSize/2));
 
+            // This is just for easier debugging.
+            treePositions = new();
+            for (var x = -10; x < chunkData.ChunkSize+10; x++)
+            {
+                for (var z = -10; z < chunkData.ChunkSize+10; z++)
+                {
+                    var voxelPos = chunkData.ChunkPositionInVoxel + new Vector3Int(x, 0, z);
+                    if (voxelPos.x % 10 == 0 && voxelPos.z % 10 == 0)
+                    {
+                        treePositions.Add(new Vector2Int(x, z));
+                    }
+                }
+            }
+            
+            //BUG: Leaves generate when there is a potential tree in the neighboring chunk.
+            
             foreach (var treePosition2D in treePositions)
             {
                 var treePosition3DVoxel = treePosition2D.AsX0Z();
                 treePosition3DVoxel.y = Chunk.GetSurfaceHeight(chunkData, treePosition2D);
 
-                //if (allowedTreeGroundTypes.Contains(Chunk.GetVoxelTypeAt(chunkData, treePosition3DVoxel)))
-                //{
+                var groundVoxelType = Chunk.GetVoxelTypeAt(chunkData, treePosition3DVoxel);
+                
+                if (allowedTreeGroundTypes.Contains(groundVoxelType))
+                {
                     CreateTree(chunkData, treePosition3DVoxel);
-                //}
+                }
             }
         }
 
@@ -66,7 +84,7 @@ namespace Voxel_Engine.WorldGen.Structures.Trees
             var chunkSize = chunkData.ChunkSize;
             var voxelScale = chunkData.WorldReference.WorldData.VoxelScaling;
             
-            var noise = new float[chunkSize*2 +TreeHalfExtentsXZ.x, chunkSize*2 +TreeHalfExtentsXZ.y];
+            var noise = new float[chunkSize*2, chunkSize*2];
             var xMin = voxelPosition.x - chunkSize;
             var xMax = voxelPosition.x + chunkSize;
             var zMin = voxelPosition.z - chunkSize;
@@ -93,7 +111,6 @@ namespace Voxel_Engine.WorldGen.Structures.Trees
         
         private readonly List<Vector3Int> _trunkPositions = new List<Vector3Int>()
         {
-            new Vector3Int(0, 0, 0),
             new Vector3Int(0,1,0),
             new Vector3Int(0,2,0),
             new Vector3Int(0,3,0),

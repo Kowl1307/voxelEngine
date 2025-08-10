@@ -42,16 +42,39 @@ namespace Voxel_Engine.WorldGen
         public ChunkData ProcessChunkColumn(ChunkData chunkData, int x, int z, Vector2Int mapSeedOffset)
         {
             BiomeNoiseSettings.Seed = mapSeedOffset;
-            var groundPosition = GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.WorldReference.WorldData);
-            chunkData.HeightMap[x,z] = groundPosition;
+            var surfaceHeight = GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.WorldReference.WorldData);
+            chunkData.HeightMap[x,z] = surfaceHeight;
             
             //Fill the whole chunk with voxelType data
             for (var y = 0; y < chunkData.ChunkHeight; y++)
             {
-                StartLayerHandler.Handle(chunkData, x, y, z, groundPosition, mapSeedOffset, BiomeSettings);
+                StartLayerHandler.Handle(chunkData, x, y, z, surfaceHeight, mapSeedOffset, BiomeSettings);
             }
 
             return chunkData;
+        }
+
+        /// <summary>
+        /// Calculates the VoxelType of a single voxel. This should be used for non-generated chunks only!
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="x">Voxel Coords</param>
+        /// <param name="y">Voxel Coords</param>
+        /// <param name="z">Voxel Coords</param>
+        /// <param name="mapSeedOffset"></param>
+        /// <returns></returns>
+        public VoxelType ProcessVoxel(World world, int x, int y, int z, Vector2Int mapSeedOffset)
+        {
+            //Create a temporary chunkData so we can use it to set the voxel
+            var voxelCoords = new Vector3Int(x, y, z);
+            var chunkData = new ChunkData(world.WorldData.ChunkSizeInVoxel, world.WorldData.ChunkHeightInVoxel, world, WorldDataHelper.GetChunkWorldPositionFromVoxelCoords(world, voxelCoords),
+                WorldDataHelper.GetChunkPositionFromVoxelCoords(world, voxelCoords));
+            var voxelInChunkCoord = Chunk.GetChunkCoordinateOfVoxelPosition(chunkData, voxelCoords);
+            
+            var surfaceHeight = GetSurfaceHeightNoise(x, z, chunkData.WorldReference.WorldData);
+            StartLayerHandler.Handle(chunkData, voxelInChunkCoord.x, voxelInChunkCoord.y, voxelInChunkCoord.z, surfaceHeight, mapSeedOffset, BiomeSettings);
+            
+            return chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, voxelInChunkCoord.x, voxelInChunkCoord.y, voxelInChunkCoord.z)];
         }
 
         public ChunkData GenerateStructures(ChunkData chunkData)
@@ -60,6 +83,23 @@ namespace Voxel_Engine.WorldGen
             {
                 structureGenerator.Handle(chunkData);
             }
+            
+            //Also check for other generators of the neighboring chunks, as structures can go over biome boundaries.
+            var adjacentChunkPositionsInVoxel = WorldDataHelper.GetAdjacentChunkPositionsInVoxel(chunkData.WorldReference, chunkData.ChunkPositionInVoxel);
+            var structureTypes = _structureGenerators.ConvertAll(generator => generator.GetType());
+            
+            foreach (var adjacentChunkPosition in adjacentChunkPositionsInVoxel)
+            {
+                var adjacentStructureGenerators =
+                    chunkData.WorldReference.terrainGenerator.GetBiomeGeneratorAt(chunkData.WorldReference.WorldData,
+                        adjacentChunkPosition)._structureGenerators;
+                
+                foreach (var adjacentGenerator in adjacentStructureGenerators.Where(adjacentGenerator => !structureTypes.Contains(adjacentGenerator.GetType())))
+                {
+                    adjacentGenerator.Handle(chunkData);
+                }
+            }
+            
             return chunkData;
         }
 

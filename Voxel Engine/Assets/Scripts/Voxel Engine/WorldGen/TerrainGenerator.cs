@@ -77,6 +77,18 @@ namespace Voxel_Engine.WorldGen
             return biomeGenerator;
         }
 
+        public VoxelType ProcessVoxelAt(World world, Vector3Int voxelPosition)
+        {
+            return GetBiomeGeneratorAt(world.WorldData, WorldDataHelper.GetChunkPositionFromVoxelCoords(world, voxelPosition))
+                .ProcessVoxel(world, voxelPosition.x, voxelPosition.y, voxelPosition.z, world.WorldData.WorldSeed);
+        }
+
+        public int GetSurfaceHeightAt(World world, Vector3Int voxelPosition)
+        {
+            return GetBiomeGeneratorAt(world.WorldData, WorldDataHelper.GetChunkPositionFromVoxelCoords(world, voxelPosition))
+                .GetSurfaceHeightNoise(voxelPosition.x, voxelPosition.z, world.WorldData);
+        }
+
         public async void InitBiomeSelector(World world, Vector3Int worldPosition)
         {
             await Task.Run(() => biomeSelector.PrecomputeData(world, worldPosition));
