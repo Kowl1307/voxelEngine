@@ -71,9 +71,10 @@ namespace Voxel_Engine
             _meshRenderer.materials[0] = meshData.Material;
         }
 */
-        private IEnumerator RenderMeshCoroutine(MeshData meshData)
+        private IEnumerator RenderMeshCoroutine(MeshData meshData, bool hideMeshDuringUpdate = false)
         {
-            _meshRenderer.enabled = false;
+            if(hideMeshDuringUpdate)
+                _meshRenderer.enabled = false;
             
             _mesh.Clear();
             yield return null;
@@ -116,7 +117,9 @@ namespace Voxel_Engine
             yield return null;
 
             _meshRenderer.materials[0] = meshData.Material;
-            _meshRenderer.enabled = true;
+            
+            if(hideMeshDuringUpdate)
+                _meshRenderer.enabled = true;
         }
 
         public async void GetMeshDataAndUpdate()
@@ -129,7 +132,7 @@ namespace Voxel_Engine
         public void UpdateChunk(MeshData data)
         {
             // RenderMesh(data);
-            StartCoroutine(RenderMeshCoroutine(data));
+            StartCoroutine(RenderMeshCoroutine(data, true));
         }
 
         #if UNITY_EDITOR
