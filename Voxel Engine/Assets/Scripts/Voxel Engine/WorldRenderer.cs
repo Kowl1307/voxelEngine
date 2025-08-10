@@ -9,6 +9,10 @@ namespace Voxel_Engine
     public class WorldRenderer : MonoBehaviour
     {
         public ChunkRenderer chunkPrefab;
+        public Material chunkMaterialPerVoxel;
+        public Material chunkMaterialGreedy;
+        
+        
         private ObjectPool<ChunkRenderer> _chunkPool;
 
         private void Awake()
@@ -30,24 +34,23 @@ namespace Voxel_Engine
             var newChunk = _chunkPool.GetObject();
             
             newChunk.transform.position = position;
-
             newChunk.InitializeChunk(worldData.ChunkDataDictionary[position]);
             newChunk.UpdateChunk(meshData);
-            newChunk.gameObject.SetActive(true);
-
             return newChunk;
         }
 
         public void RemoveChunk(ChunkRenderer chunk)
         {
-            chunk.gameObject.SetActive(false);
+            // chunk.gameObject.SetActive(false);
             _chunkPool.ReturnObject(chunk);
         }
 
         public void FillChunkPool(int chunkDrawingRange)
         {
             // Whole area + surrounding edges
-            _chunkPool.FillTo(chunkDrawingRange * chunkDrawingRange + chunkDrawingRange * 4);
+            var maxNumberOfChunks = chunkDrawingRange * chunkDrawingRange + chunkDrawingRange * 4;
+            _chunkPool.FillTo(maxNumberOfChunks);
+            _chunkPool.SetRefillAmount(chunkDrawingRange * 4);
         }
     }
 }

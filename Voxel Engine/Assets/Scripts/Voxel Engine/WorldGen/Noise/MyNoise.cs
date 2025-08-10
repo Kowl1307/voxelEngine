@@ -40,7 +40,7 @@ namespace Voxel_Engine.WorldGen.Noise
             float amplitudeSum = 0;  // Used for normalizing result to 0.0 - 1.0 range
             for (var i = 0; i < settings.Octaves; i++)
             {
-                total += Mathf.PerlinNoise((settings.Offset.x + settings.WorldOffset.x + x) * frequency, (settings.Offset.y + settings.WorldOffset.y + z) * frequency) * amplitude;
+                total += Mathf.PerlinNoise((settings.Offset.x + settings.Seed.x + x) * frequency, (settings.Offset.y + settings.Seed.y + z) * frequency) * amplitude;
 
                 amplitudeSum += amplitude;
 
@@ -53,8 +53,8 @@ namespace Voxel_Engine.WorldGen.Noise
 
         public static float SimplexNoise(float x, float z, NoiseSettings settings)
         {
-            return RemapValue(noise.snoise(new float2((settings.Offset.x + settings.WorldOffset.x + x),
-                (settings.Offset.y + settings.WorldOffset.y + z))), -1, 1, 0, 1);
+            return RemapValue(noise.snoise(new float2((settings.Offset.x + settings.Seed.x + x),
+                (settings.Offset.y + settings.Seed.y + z))), -1, 1, 0, 1);
         }
 
         public static float OctaveSimplex(float x, float z, NoiseSettings settings)

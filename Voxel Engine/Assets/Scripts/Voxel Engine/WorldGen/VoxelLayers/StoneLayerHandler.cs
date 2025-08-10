@@ -19,7 +19,7 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
             if (voxelY > surfaceHeightNoise)
                 return false;
 
-            stoneNoiseSettings.WorldOffset = mapSeedOffset;
+            stoneNoiseSettings.Seed = mapSeedOffset;
             //var stoneNoise = MyNoise.OctavePerlin(chunkData.WorldPosition.x + x, chunkData.WorldPosition.z + z, stoneNoiseSettings);
             var stoneNoise = DomainWarping.GenerateDomainNoise(chunkData.ChunkPositionInVoxel.x + x, chunkData.ChunkPositionInVoxel.z + z, stoneNoiseSettings);
 

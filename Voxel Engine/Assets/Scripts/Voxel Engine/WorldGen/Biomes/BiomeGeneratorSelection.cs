@@ -3,12 +3,10 @@
     public class BiomeGeneratorSelection
     {
         public BiomeGenerator BiomeGenerator = null;
-        public int? TerrainSurfaceNoise = null;
 
-        public BiomeGeneratorSelection(BiomeGenerator biomeGenerator, int? terrainSurfaceNoise = null)
+        public BiomeGeneratorSelection(BiomeGenerator biomeGenerator)
         {
             BiomeGenerator = biomeGenerator;
-            TerrainSurfaceNoise = terrainSurfaceNoise;
         }
     }
 }

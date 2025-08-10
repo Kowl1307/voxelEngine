@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d31e4f70d2b147e6b86fbb68721dfcf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 381764383}
+  nextLayer: {fileID: 0}
 --- !u!1 &217456578
 GameObject:
   m_ObjectHideFlags: 0
@@ -494,6 +494,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextLayer: {fileID: 735345192}
   surfaceType: 2
+  underwaterSurfaceType: 10
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -615,54 +616,6 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
---- !u!1 &427497633
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 427497634}
-  - component: {fileID: 427497635}
-  m_Layer: 0
-  m_Name: TreeLayer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &427497634
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 427497633}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 924658648}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &427497635
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 427497633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3f6cf441a1047759dc71b83cb7f84db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nextLayer: {fileID: 0}
-  heightThreshold: 0
-  heightLimit: 50
-  allowedTreeGroundTypes: 02000000
 --- !u!1 &438640389
 GameObject:
   m_ObjectHideFlags: 0
@@ -840,7 +793,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c1d1a2c04714fc8b488561e06cd3d56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 160602071}
+  nextLayer: {fileID: 381764383}
 --- !u!1 &735345190
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,7 +838,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9dac1a6170941f88e206aeba521f753, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 0}
+  nextLayer: {fileID: 160602071}
   undergroundType: 3
 --- !u!1 &773299560
 GameObject:
@@ -916,13 +869,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8ca6b05692808f40ad0b1603032e741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  biomeType: 2
   BiomeSettings: {fileID: 11400000, guid: 74f0d0be22c8c324da0139c3a0edb128, type: 2}
   BiomeNoiseSettings: {fileID: 11400000, guid: dd7aaf9260e2da344bddc812d70fd2aa, type: 2}
   DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
-  StartLayerHandler: {fileID: 2080080642}
-  additionalLayerHandlers: []
-  StructureGenerators: []
+  StartLayerHandler: {fileID: 2033556888}
+  structureGeneratorsHolder: {fileID: 1367074017}
 --- !u!4 &773299563
 Transform:
   m_ObjectHideFlags: 0
@@ -936,9 +889,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2080080643}
   - {fileID: 2033556889}
   - {fileID: 872204464}
+  - {fileID: 2080080643}
   - {fileID: 1367074018}
   m_Father: {fileID: 1098337748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1020,7 +973,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9dac1a6170941f88e206aeba521f753, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 0}
+  nextLayer: {fileID: 2080080642}
   undergroundType: 10
 --- !u!4 &872204464
 Transform:
@@ -1046,8 +999,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 924658648}
+  - component: {fileID: 924658649}
   m_Layer: 0
-  m_Name: AdditionalLayers
+  m_Name: StructureGenerators
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1065,11 +1019,27 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1134856901}
-  - {fileID: 427497634}
+  m_Children: []
   m_Father: {fileID: 1728092375}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &924658649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924658647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caecf100a2ee238449311b3d3c473011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  treeNoiseSettings: {fileID: 11400000, guid: 04be14057e7778d449250ceb6a19948f, type: 2}
+  DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
+  closestTreeDistance: 5
+  heightThreshold: 0
+  heightLimit: 25
+  allowedTreeGroundTypes: 02000000
 --- !u!1 &1098337746
 GameObject:
   m_ObjectHideFlags: 0
@@ -1100,7 +1070,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1c93be52f8d5e545bb4fe61cdd5cbdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _biomeSelector: {fileID: 1098337750}
+  biomeSelector: {fileID: 1098337750}
+  biomeTypeGeneratorPairs:
+  - type: 1
+    generator: {fileID: 1728092374}
+  - type: 2
+    generator: {fileID: 773299561}
 --- !u!4 &1098337748
 Transform:
   m_ObjectHideFlags: 0
@@ -1210,54 +1185,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1134856900
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1134856901}
-  - component: {fileID: 1134856902}
-  m_Layer: 0
-  m_Name: StoneLayer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1134856901
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1134856900}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 924658648}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1134856902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1134856900}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a8c5658047cf7bc48bda4fc3bb4a96bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nextLayer: {fileID: 0}
-  stoneThreshold: 0.5
-  stoneNoiseSettings: {fileID: 11400000, guid: 93b5831eee30690488885cd4fd15c822, type: 2}
-  DomainWarping: {fileID: 0}
 --- !u!1 &1152699746
 GameObject:
   m_ObjectHideFlags: 0
@@ -1404,7 +1331,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1367074018}
   m_Layer: 0
-  m_Name: AdditionalLayers
+  m_Name: StructureGenerators
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1435,7 +1362,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1728092375}
   - component: {fileID: 1728092374}
-  - component: {fileID: 1728092377}
   m_Layer: 0
   m_Name: WoodsBiomeGenerator
   m_TagString: Untagged
@@ -1455,15 +1381,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8ca6b05692808f40ad0b1603032e741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  biomeType: 1
   BiomeSettings: {fileID: 11400000, guid: 43a06bc04fb45cd458fb101162d9f1e5, type: 2}
   BiomeNoiseSettings: {fileID: 11400000, guid: ab39431b3e5ba8c419c79e7677f14461, type: 2}
   DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
   StartLayerHandler: {fileID: 726806224}
-  additionalLayerHandlers:
-  - {fileID: 427497635}
-  StructureGenerators:
-  - {fileID: 1728092377}
+  structureGeneratorsHolder: {fileID: 924658647}
 --- !u!4 &1728092375
 Transform:
   m_ObjectHideFlags: 0
@@ -1478,28 +1402,12 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 726806223}
-  - {fileID: 160602070}
   - {fileID: 381764382}
   - {fileID: 735345191}
+  - {fileID: 160602070}
   - {fileID: 924658648}
   m_Father: {fileID: 1098337748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1728092377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1728092373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caecf100a2ee238449311b3d3c473011, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  treeNoiseSettings: {fileID: 11400000, guid: 04be14057e7778d449250ceb6a19948f, type: 2}
-  DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
-  closestTreeDistance: 5
-  UseOctaves: 0
 --- !u!1 &1821623676
 GameObject:
   m_ObjectHideFlags: 0
@@ -1581,6 +1489,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextLayer: {fileID: 872204463}
   surfaceType: 10
+  underwaterSurfaceType: 0
 --- !u!4 &2033556889
 Transform:
   m_ObjectHideFlags: 0
@@ -1625,7 +1534,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d31e4f70d2b147e6b86fbb68721dfcf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLayer: {fileID: 2033556888}
+  nextLayer: {fileID: 0}
 --- !u!4 &2080080643
 Transform:
   m_ObjectHideFlags: 0
@@ -1850,6 +1759,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: World
       objectReference: {fileID: 0}
+    - target: {fileID: 5353300478322915642, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: voxelScale.x
@@ -1873,27 +1787,32 @@ PrefabInstance:
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: voxelScaling.x
-      value: 0.75
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: voxelScaling.y
-      value: 0.75
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: voxelScaling.z
-      value: 0.75
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: MapSeedOffset.x
-      value: 6165111
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: MapSeedOffset.y
-      value: 14195169
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
+        type: 3}
+      propertyPath: chunkSizeInVoxel
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
@@ -1904,6 +1823,11 @@ PrefabInstance:
         type: 3}
       propertyPath: ChunkDrawingRange
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
+        type: 3}
+      propertyPath: chunkHeightInVoxel
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
@@ -2060,6 +1984,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 7008819656052169534, guid: ac506374ef387744886efdb79201c71c,
     type: 3}
+  chunkMaterialPerVoxel: {fileID: 2100000, guid: fdd0278031be170479d5769502a77a09,
+    type: 2}
+  chunkMaterialGreedy: {fileID: 2100000, guid: f5d5772526d21ac47a64fc06e6909435, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
