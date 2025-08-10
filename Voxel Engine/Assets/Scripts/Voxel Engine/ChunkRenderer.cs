@@ -40,7 +40,7 @@ namespace Voxel_Engine
         {
             ChunkData = data;
         }
-/*
+
         private void RenderMesh(MeshData meshData)
         {
             _mesh.Clear();
@@ -70,11 +70,10 @@ namespace Voxel_Engine
             _meshCollider.sharedMesh = collisionMesh;
             _meshRenderer.materials[0] = meshData.Material;
         }
-*/
-        private IEnumerator RenderMeshCoroutine(MeshData meshData, bool hideMeshDuringUpdate = false)
+
+        private IEnumerator RenderMeshCoroutine(MeshData meshData)
         {
-            if(hideMeshDuringUpdate)
-                _meshRenderer.enabled = false;
+            _meshRenderer.enabled = false;
             
             _mesh.Clear();
             yield return null;
@@ -118,21 +117,20 @@ namespace Voxel_Engine
 
             _meshRenderer.materials[0] = meshData.Material;
             
-            if(hideMeshDuringUpdate)
-                _meshRenderer.enabled = true;
+            _meshRenderer.enabled = true;
         }
 
         public async void GetMeshDataAndUpdate()
         {
             var meshData = await Task.Run(() => Chunk.GetChunkMeshData(ChunkData));
-            // RenderMesh(meshData);
-            StartCoroutine(RenderMeshCoroutine(meshData));
+            RenderMesh(meshData);
+            // StartCoroutine(RenderMeshCoroutine(meshData));
         }
 
         public void UpdateChunk(MeshData data)
         {
             // RenderMesh(data);
-            StartCoroutine(RenderMeshCoroutine(data, true));
+            StartCoroutine(RenderMeshCoroutine(data));
         }
 
         #if UNITY_EDITOR
