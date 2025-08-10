@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics.Geometry;
 using UnityEngine;
+using Math = System.Math;
 
 namespace Voxel_Engine
 {
@@ -183,20 +185,31 @@ namespace Voxel_Engine
 
         public static ChunkData GetChunkDataFromVoxelCoords(World world, Vector3Int voxelCoords)
          {
-            //var chunkPos = GetChunkWorldPositionFromWorldCoords(world, GetWorldPositionFromVoxelPosition(world, voxelCoords));
             var chunkPos = GetChunkWorldPositionFromVoxelCoords(world, voxelCoords);
-            ChunkData containerChunk = null;
 
-            world.WorldData.ChunkDataDictionary.TryGetValue(chunkPos, out containerChunk);
+            world.WorldData.ChunkDataDictionary.TryGetValue(chunkPos, out var containerChunk);
 
             return containerChunk;
         }
 
         public static ChunkRenderer GetChunk(World worldReference, Vector3Int worldPosition)
         {
-            return worldReference.WorldData.ChunkDictionary.ContainsKey(worldPosition) ? worldReference.WorldData.ChunkDictionary[worldPosition] : null;
+            return worldReference.WorldData.ChunkDictionary.GetValueOrDefault(worldPosition);
         }
 
-        
+
+        public static VoxelType GetVoxelTypeAt(World world, Vector3Int voxelPosition)
+        {
+            var chunkData = GetChunkDataFromVoxelCoords(world, voxelPosition);
+            return chunkData == null ? VoxelType.Nothing : Chunk.GetVoxelTypeAt(chunkData, voxelPosition);
+        }
+
+        public static int GetSurfaceHeightAt(World world, Vector3Int voxelPosition)
+        {
+            var chunkData = GetChunkDataFromVoxelCoords(world, voxelPosition);
+            return chunkData == null ? 
+                world.terrainGenerator.GetBiomeGeneratorAt(world.WorldData, voxelPosition).GetSurfaceHeightNoise(voxelPosition.x, voxelPosition.z, world.WorldData) :
+                Chunk.GetSurfaceHeight(chunkData, voxelPosition.XZ());
+        }
     }
 }

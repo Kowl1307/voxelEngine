@@ -615,71 +615,6 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
---- !u!1 &427497633
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 427497634}
-  - component: {fileID: 427497635}
-  - component: {fileID: 427497636}
-  m_Layer: 0
-  m_Name: TreeLayer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &427497634
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 427497633}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 924658648}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &427497635
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 427497633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3f6cf441a1047759dc71b83cb7f84db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nextLayer: {fileID: 0}
-  heightThreshold: 0
-  heightLimit: 50
-  allowedTreeGroundTypes: 02000000
---- !u!114 &427497636
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 427497633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caecf100a2ee238449311b3d3c473011, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  treeNoiseSettings: {fileID: 11400000, guid: 04be14057e7778d449250ceb6a19948f, type: 2}
-  DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
-  closestTreeDistance: 5
-  UseOctaves: 0
 --- !u!1 &438640389
 GameObject:
   m_ObjectHideFlags: 0
@@ -939,7 +874,7 @@ MonoBehaviour:
   DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
   StartLayerHandler: {fileID: 2080080642}
-  additionalLayerHandlers: []
+  structureGeneratorsHolder: {fileID: 1367074017}
 --- !u!4 &773299563
 Transform:
   m_ObjectHideFlags: 0
@@ -1063,8 +998,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 924658648}
+  - component: {fileID: 924658649}
   m_Layer: 0
-  m_Name: AdditionalLayers
+  m_Name: StructureGenerators
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1082,11 +1018,27 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1134856901}
-  - {fileID: 427497634}
+  m_Children: []
   m_Father: {fileID: 1728092375}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &924658649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924658647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caecf100a2ee238449311b3d3c473011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  treeNoiseSettings: {fileID: 11400000, guid: 04be14057e7778d449250ceb6a19948f, type: 2}
+  DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
+  closestTreeDistance: 5
+  heightThreshold: 0
+  heightLimit: 25
+  allowedTreeGroundTypes: 02000000
 --- !u!1 &1098337746
 GameObject:
   m_ObjectHideFlags: 0
@@ -1232,54 +1184,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1134856900
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1134856901}
-  - component: {fileID: 1134856902}
-  m_Layer: 0
-  m_Name: StoneLayer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1134856901
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1134856900}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 924658648}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1134856902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1134856900}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a8c5658047cf7bc48bda4fc3bb4a96bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nextLayer: {fileID: 0}
-  stoneThreshold: 0.5
-  stoneNoiseSettings: {fileID: 11400000, guid: 93b5831eee30690488885cd4fd15c822, type: 2}
-  DomainWarping: {fileID: 0}
 --- !u!1 &1152699746
 GameObject:
   m_ObjectHideFlags: 0
@@ -1426,7 +1330,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1367074018}
   m_Layer: 0
-  m_Name: AdditionalLayers
+  m_Name: StructureGenerators
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1482,8 +1386,7 @@ MonoBehaviour:
   DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
   StartLayerHandler: {fileID: 726806224}
-  additionalLayerHandlers:
-  - {fileID: 427497635}
+  structureGeneratorsHolder: {fileID: 924658647}
 --- !u!4 &1728092375
 Transform:
   m_ObjectHideFlags: 0

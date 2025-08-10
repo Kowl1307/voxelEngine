@@ -8,6 +8,7 @@ namespace Voxel_Engine
     public class ChunkData
     {
         public VoxelType[] Voxels;
+        public int[,] HeightMap; // indices x,z, value = y
         public int ChunkSize = 16;
         public int ChunkHeight = 100;
         public World WorldReference;
@@ -28,6 +29,8 @@ namespace Voxel_Engine
             Voxels = new VoxelType[ChunkSize * ChunkHeight * chunkSize];
             //TODO: Make this dynamic
             RenderMethod = Chunk.RenderMethod.Greedy;
+            
+            HeightMap = new int[ChunkSize,ChunkSize];
         }
     }
 }

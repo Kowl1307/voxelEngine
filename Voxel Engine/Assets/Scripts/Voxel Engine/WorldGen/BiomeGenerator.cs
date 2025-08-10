@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Voxel_Engine.WorldGen.Biomes;
 using Voxel_Engine.WorldGen.Noise;
 using Voxel_Engine.WorldGen.Structures;
@@ -21,8 +22,15 @@ namespace Voxel_Engine.WorldGen
 
         public VoxelLayerHandler StartLayerHandler;
 
-        public List<VoxelLayerHandler> additionalLayerHandlers;
-        
+        [SerializeField] private GameObject structureGeneratorsHolder;
+        private List<StructureGenerator> _structureGenerators = new();
+
+        private void Awake()
+        {
+            if(structureGeneratorsHolder != null)
+                _structureGenerators = structureGeneratorsHolder.GetComponents<StructureGenerator>().ToList();
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -34,20 +42,29 @@ namespace Voxel_Engine.WorldGen
         public ChunkData ProcessChunkColumn(ChunkData chunkData, int x, int z, Vector2Int mapSeedOffset)
         {
             BiomeNoiseSettings.Seed = mapSeedOffset;
-            var groundPosition = GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData);
-
+            var groundPosition = GetSurfaceHeightNoise(chunkData.ChunkPositionInVoxel.x + x,chunkData.ChunkPositionInVoxel.z + z, chunkData.WorldReference.WorldData);
+            chunkData.HeightMap[x,z] = groundPosition;
+            
             //Fill the whole chunk with voxelType data
             for (var y = 0; y < chunkData.ChunkHeight; y++)
             {
                 StartLayerHandler.Handle(chunkData, x, y, z, groundPosition, mapSeedOffset, BiomeSettings);
             }
-            
-            /*
-            foreach (var layer in additionalLayerHandlers)
+
+            return chunkData;
+        }
+
+        public ChunkData GenerateStructures(ChunkData chunkData)
+        {
+            foreach (var structureGenerator in _structureGenerators)
             {
-                layer.Handle(chunkData, x, 0, z, groundPosition, mapSeedOffset, BiomeSettings);
+                structureGenerator.Handle(chunkData);
             }
-            */
+            return chunkData;
+        }
+
+        public ChunkData GenerateDecorations(ChunkData chunkData)
+        {
 
             return chunkData;
         }
@@ -58,12 +75,12 @@ namespace Voxel_Engine.WorldGen
         /// </summary>
         /// <param name="x">Voxel Coord</param>
         /// <param name="z">Voxel Coord</param>
-        /// <param name="chunkData"></param>
+        /// <param name="worldData"></param>
         /// <returns></returns>
-        public int GetSurfaceHeightNoise(int x, int z, ChunkData chunkData)
+        public int GetSurfaceHeightNoise(int x, int z, WorldData worldData)
         {
-            var voxelScale = chunkData.WorldReference.WorldData.VoxelScaling;
-            var chunkHeight = chunkData.ChunkHeight;
+            var voxelScale = worldData.VoxelScaling;
+            var chunkHeight = worldData.ChunkHeightInVoxel;
             
             var terrainHeight = useDomainWarping ? DomainWarping.GenerateDomainNoise(x * voxelScale.x, z * voxelScale.z, BiomeNoiseSettings) : MyNoise.OctavePerlin(x * voxelScale.x, z * voxelScale.z, BiomeNoiseSettings);
             // terrainHeight /= voxelScale.y;

@@ -1,4 +1,6 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Voxel_Engine.WorldGen.Noise;
 
@@ -14,93 +16,71 @@ namespace Voxel_Engine.WorldGen.Structures.Trees
         public float heightLimit = 25f;
         
         [SerializeField]
-        private List<VoxelType> allowedTreeGroundTypes = new List<VoxelType> { VoxelType.GrassDirt };
+        private List<VoxelType> allowedTreeGroundTypes = new() { VoxelType.GrassDirt };
         
-        
-        private List<Vector3Int> _cachedTreePositions;
+        private readonly Vector2Int _treeExtentsXZ = new Vector2Int(6, 6);
+        private Vector2Int TreeHalfExtentsXZ => _treeExtentsXZ / 2;
 
-
-        public override Vector3Int GetClosestPointOfInterest(Vector3Int voxelPosition, World world)
+        public override void Handle(ChunkData chunkData)
         {
-            var closestDistance = Mathf.Infinity;
-            var closestPosition = Vector3Int.zero;
-            foreach (var treePos in _cachedTreePositions)
+            var noise = GenerateTreeNoise(chunkData, treeNoiseSettings);
+            var treePositions = DataProcessing.FindLocalMaxima(noise, closestTreeDistance);
+            treePositions = treePositions.ConvertAll(position => position - new Vector2Int(chunkData.ChunkSize, chunkData.ChunkSize));
+
+            foreach (var treePosition2D in treePositions)
             {
-                var distance = Vector3Int.Distance(treePos, voxelPosition);
-                if (!(distance <= closestDistance)) continue;
+                var treePosition3DVoxel = treePosition2D.AsX0Z();
+                treePosition3DVoxel.y = Chunk.GetSurfaceHeight(chunkData, treePosition2D);
+
+                //if (allowedTreeGroundTypes.Contains(Chunk.GetVoxelTypeAt(chunkData, treePosition3DVoxel)))
+                //{
+                    CreateTree(chunkData, treePosition3DVoxel);
+                //}
+            }
+        }
+
+        private void CreateTree(ChunkData chunkData, Vector3Int treePosition3D)
+        {
+            foreach (var trunkOffset in _trunkPositions)
+            {
+                var trunkPosition = treePosition3D + trunkOffset;
+                if (!Chunk.IsInsideChunkBounds(chunkData, trunkPosition))
+                    continue;
                 
-                closestDistance = distance;
-                closestPosition = treePos;
+                Chunk.SetVoxel(chunkData, trunkPosition, VoxelType.TreeTrunk);
             }
 
-            return closestPosition;
-        }
-
-        protected override List<Vector3Int> GetClosePointsOfInterest(Vector3Int voxelPosition, World world)
-        {
-            treeNoiseSettings.Seed = world.WorldData.WorldSeed;
-            
-            var noiseData = GenerateTreeNoise(voxelPosition, treeNoiseSettings);
-            var positions =
-                DataProcessing.FindLocalMaxima(noiseData, closestTreeDistance);
-            
-            var voxelPositionPois = positions.ConvertAll(localPos =>
+            foreach (var leafOffset in _treeLeavesStaticLayout)
             {
-                var voxelXZ = (localPos - structureExtents.XZ() / 2) + voxelPosition.XZ();
-                var chunkData = WorldDataHelper.GetChunkDataFromVoxelCoords(world, voxelXZ.AsX0Z());
-                var biomeGen = world.terrainGenerator.GetBiomeGeneratorAt(voxelXZ.AsX0Z(), chunkData);
-                var surfaceHeight = biomeGen.GetSurfaceHeightNoise(voxelXZ.x, voxelXZ.y, chunkData);
-                return new Vector3Int(voxelXZ.x, surfaceHeight, voxelXZ.y);
-            });
-            
-            foreach (var worldPositionPoi in voxelPositionPois)
-            {
-                CachedBounds.Add(new Bounds(worldPositionPoi, structureExtents));
-            }
-            
-            _cachedTreePositions.AddRange(voxelPositionPois);
-
-            return voxelPositionPois;
-        }
-
-        public override VoxelType GetStructureVoxelAt(Vector3Int voxelPosition, World world)
-        {
-            foreach (var treeCandidatePoi in _cachedTreePositions)
-            {
-                var worldPositionInLocalSpace = voxelPosition - treeCandidatePoi;
+                var leafPosition = leafOffset + treePosition3D;
+                if (!Chunk.IsInsideChunkBounds(chunkData, leafPosition))
+                    continue;
                 
-                if (_trunkPositions.Contains(worldPositionInLocalSpace))
-                    return VoxelType.TreeTrunk;
-
-                if (_treeLeavesStaticLayout.Contains(worldPositionInLocalSpace))
-                    return VoxelType.TreeLeafesTransparent;
+                Chunk.SetVoxel(chunkData, leafPosition, VoxelType.TreeLeafesTransparent);
             }
-
-            return VoxelType.Nothing;
         }
 
-        /// <summary>
-        /// Generates a 2D array of noise with the worldPosition represented by the center pixel.
-        /// </summary>
-        /// <param name="voxelPosition"></param>
-        /// <param name="noiseSettings"></param>
-        /// <returns></returns>
-        private float[,] GenerateTreeNoise(Vector3Int voxelPosition, NoiseSettings noiseSettings)
+        private float[,] GenerateTreeNoise(ChunkData chunkData, NoiseSettings noiseSettings)
         {
-            var noise = new float[structureExtents.x, structureExtents.z];
-            var xMin = voxelPosition.x - structureExtents.x;
-            var xMax = voxelPosition.x + structureExtents.x;
-            var zMin = voxelPosition.z - structureExtents.z;
-            var zMax = voxelPosition.z + structureExtents.z;
+            var voxelPosition = chunkData.ChunkPositionInVoxel;
+            var chunkSize = chunkData.ChunkSize;
+            var voxelScale = chunkData.WorldReference.WorldData.VoxelScaling;
+            
+            var noise = new float[chunkSize*2 +TreeHalfExtentsXZ.x, chunkSize*2 +TreeHalfExtentsXZ.y];
+            var xMin = voxelPosition.x - chunkSize;
+            var xMax = voxelPosition.x + chunkSize;
+            var zMin = voxelPosition.z - chunkSize;
+            var zMax = voxelPosition.z + chunkSize;
+            
             var xIndex = 0;
             var zIndex = 0;
-
-            for (var x = xMin; x < xMax; x++)
+            for (var xInVoxel = xMin; xInVoxel < xMax; xInVoxel++)
             {
-                for (var z = zMin; z < zMax; z++)
+                for (var zInVoxel = zMin; zInVoxel < zMax; zInVoxel++)
                 {
                     //noiseMax[xIndex, zIndex] = UseOctaves ? MyNoise.OctaveSimplex(x,z, noiseSettings) : MyNoise.SimplexNoise(x, z, noiseSettings);
-                    noise[xIndex, zIndex] = DomainWarping.GenerateDomainNoise(x, z, noiseSettings);
+                    //noise[xIndex, zIndex] = DomainWarping.GenerateDomainNoise(x * voxelScale.x, z * voxelScale.y, noiseSettings);
+                    noise[xIndex, zIndex] = MyNoise.SimplexNoise(xInVoxel * voxelScale.x, zInVoxel * voxelScale.y, noiseSettings);
                     zIndex++;
                 }
 
@@ -111,7 +91,7 @@ namespace Voxel_Engine.WorldGen.Structures.Trees
             return noise;
         }
         
-        private List<Vector3Int> _trunkPositions = new List<Vector3Int>()
+        private readonly List<Vector3Int> _trunkPositions = new List<Vector3Int>()
         {
             new Vector3Int(0, 0, 0),
             new Vector3Int(0,1,0),
@@ -119,7 +99,7 @@ namespace Voxel_Engine.WorldGen.Structures.Trees
             new Vector3Int(0,3,0),
             new Vector3Int(0,4,0),
         };
-        private List<Vector3Int> _treeLeavesStaticLayout = new List<Vector3Int>
+        private readonly List<Vector3Int> _treeLeavesStaticLayout = new List<Vector3Int>
         {
             new(-2, 5, -2),
             new(-2, 5, -1),

@@ -56,6 +56,24 @@ namespace Voxel_Engine
             }
         }
 
+        public static VoxelType GetVoxelTypeAt(ChunkData chunkData, Vector3Int chunkCoords)
+        {
+            return IsInsideChunkBounds(chunkData, chunkCoords) ?
+                chunkData.Voxels[GetIndexFromPosition(chunkData, chunkCoords.x, chunkCoords.y, chunkCoords.z)] : 
+                WorldDataHelper.GetVoxelTypeAt(chunkData.WorldReference, chunkCoords + chunkData.ChunkPositionInVoxel);
+        }
+
+        public static int GetSurfaceHeight(ChunkData chunkData, Vector2Int chunkCoordsXZ)
+        {
+            if (IsInsideChunkBounds(chunkData, chunkCoordsXZ.x, 0, chunkCoordsXZ.y))
+            {
+                return chunkData.HeightMap[chunkCoordsXZ.x, chunkCoordsXZ.y];
+            }
+
+            return WorldDataHelper.GetSurfaceHeightAt(chunkData.WorldReference,
+                chunkCoordsXZ.AsX0Z() + chunkData.ChunkPositionInVoxel);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsInsideChunkBounds(ChunkData chunkData, Vector3Int chunkCoords)
         {
@@ -146,6 +164,14 @@ namespace Voxel_Engine
             return yCoordinate >= 0 && yCoordinate < chunkData.ChunkHeight;
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="chunkData"></param>
+        /// <param name="x">chunkCoord</param>
+        /// <param name="y">chunkCoord</param>
+        /// <param name="z">chunkCoord</param>
+        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetIndexFromPosition(ChunkData chunkData, int x, int y, int z)
         {

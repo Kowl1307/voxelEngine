@@ -35,19 +35,19 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
             GenerateBiomePoints(worldPosition, world.ChunkDrawingRange, world.WorldData.ChunkSizeInVoxel, world.WorldData.WorldSeed);
         }
 
-        public override BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, ChunkData chunkData)
+        public override BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, WorldData worldData)
         {
-            return SelectBiomeGenerator(voxelPosition, chunkData, false).BiomeGenerator.biomeType;
+            return SelectBiomeGenerator(voxelPosition, worldData, false).BiomeGenerator.biomeType;
         }
         
         /// <summary>
         /// Selects the biome Generator for the given world position.
         /// </summary>
         /// <param name="voxelPos"></param>
-        /// <param name="chunkData"></param>
+        /// <param name="worldData"></param>
         /// <param name="useDomainWarping"></param>
         /// <returns></returns>
-        private BiomeGeneratorSelection SelectBiomeGenerator(Vector3Int voxelPos, ChunkData chunkData, bool useDomainWarping = true)
+        private BiomeGeneratorSelection SelectBiomeGenerator(Vector3Int voxelPos, WorldData worldData, bool useDomainWarping = true)
         {
             if (useDomainWarping)
             {
@@ -62,7 +62,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
             var worthInterpolating = biomeGenerators.Any(gen => gen != biomeGenerators[0]);
             if (!doInterpolateBiomes || biomeSelectionHelpers[0].Distance == 0 || !worthInterpolating)
                 return new BiomeGeneratorSelection(closestBiomeGen);
-            var interpolatedValue = CalculateInterpolatedHeight(voxelPos, chunkData, biomeSelectionHelpers);
+            var interpolatedValue = CalculateInterpolatedHeight(voxelPos, worldData, biomeSelectionHelpers);
 
             
             return new BiomeGeneratorSelection(closestBiomeGen);
@@ -152,24 +152,24 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
         /// Calculates the list of noise values for the given positions
         /// </summary>
         /// <param name="centers"></param>
-        /// <param name="mapSeedOffset"></param>
+        /// <param name="worldSeed"></param>
         /// <returns></returns>
-        private void CalculateBiomeNoise(List<BiomeCenter> centers, Vector2Int mapSeedOffset)
+        private void CalculateBiomeNoise(List<BiomeCenter> centers, Vector2Int worldSeed)
         {
-            biomeNoiseSettings.Seed = mapSeedOffset;
+            biomeNoiseSettings.Seed = worldSeed;
             foreach(var center in centers)
             {
                 center.Temperature = MyNoise.OctavePerlin(center.Position.x, center.Position.y, biomeNoiseSettings);
             }
         }
         
-        private float CalculateInterpolatedHeight(Vector3Int worldPos, ChunkData chunkData, List<BiomeSelectionHelper> biomeSelectionHelpers)
+        private float CalculateInterpolatedHeight(Vector3Int voxelPos, WorldData worldData, List<BiomeSelectionHelper> biomeSelectionHelpers)
         {
             //General interpolation with Inverse Distance Weighting
             var terrainHeights = biomeSelectionHelpers.Select(helper =>
             {
                 var biome = SelectBiome(helper.Index);
-                var floorHeight = biome.GetSurfaceHeightNoise(worldPos.x, worldPos.z, chunkData);
+                var floorHeight = biome.GetSurfaceHeightNoise(voxelPos.x, voxelPos.z, worldData);
                 return floorHeight < biome.BiomeSettings.WaterLevel ? biome.BiomeSettings.WaterLevel : floorHeight;
             }).ToList();
 
