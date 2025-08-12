@@ -4,8 +4,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Voxel_Engine.WorldGen.Biomes;
+using Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations;
+using Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures;
 using Voxel_Engine.WorldGen.Noise;
-using Voxel_Engine.WorldGen.Structures;
 using Voxel_Engine.WorldGen.VoxelLayers;
 
 namespace Voxel_Engine.WorldGen
@@ -25,10 +26,16 @@ namespace Voxel_Engine.WorldGen
         [SerializeField] private GameObject structureGeneratorsHolder;
         private List<StructureGenerator> _structureGenerators = new();
 
+        [SerializeField] private GameObject decorationGeneratorsHolder;
+        private List<DecorationGenerator> _decorationGenerators = new();
+
         private void Awake()
         {
             if(structureGeneratorsHolder != null)
                 _structureGenerators = structureGeneratorsHolder.GetComponents<StructureGenerator>().ToList();
+            
+            if(decorationGeneratorsHolder != null)
+                _decorationGenerators = decorationGeneratorsHolder.GetComponents<DecorationGenerator>().ToList();
         }
 
         /// <summary>
@@ -103,9 +110,15 @@ namespace Voxel_Engine.WorldGen
             return chunkData;
         }
 
+        // TODO: Would be better if decorations are also voxels but are rendered differently. Creating all these objects or having insanely large objectPools seems very inefficient..
         public ChunkData GenerateDecorations(ChunkData chunkData)
         {
-
+            /*
+            foreach (var decorationGenerator in _decorationGenerators)
+            {
+                decorationGenerator.Handle(chunkData);
+            }
+            */
             return chunkData;
         }
 

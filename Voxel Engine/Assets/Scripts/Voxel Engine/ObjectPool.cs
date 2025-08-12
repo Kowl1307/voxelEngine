@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Voxel_Engine
 {
-    public class ObjectPool<T> : Object where T : MonoBehaviour
+    public class ObjectPool<T> : Object where T : UnityEngine.Object
     {
         private readonly Queue<T> _objects;
         private readonly T _objectPrefab;

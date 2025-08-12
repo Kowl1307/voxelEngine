@@ -1,11 +1,9 @@
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using Voxel_Engine.WorldGen.Noise;
 
-namespace Voxel_Engine.WorldGen.Structures.Trees
+namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures.Trees
 {
     public class TreeGenerator : StructureGenerator
     {

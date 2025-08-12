@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Voxel_Engine.WorldGen;
-using Voxel_Engine.WorldGen.Structures;
 
 namespace Voxel_Engine
 {
     public class ChunkData
     {
         public VoxelType[] Voxels;
+        public readonly List<GameObject> ChunkDecorations = new();
         public int[,] HeightMap; // indices x,z, value = y
         public int ChunkSize = 16;
         public int ChunkHeight = 100;
