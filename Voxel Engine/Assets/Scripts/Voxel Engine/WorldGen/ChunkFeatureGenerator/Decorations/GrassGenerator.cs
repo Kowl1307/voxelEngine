@@ -33,13 +33,14 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
 
                     var voxelPosition = chunkData.ChunkPositionInVoxel + new Vector3Int(x, chunkData.HeightMap[x,z]+1, z);
                     var position =
-                        WorldDataHelper.GetWorldPositionFromVoxelPosition(chunkData.WorldReference, voxelPosition);
+                        WorldDataHelper.GetWorldPositionFromVoxelPosition(chunkData.WorldReference, voxelPosition) + Vector3.down * chunkData.WorldReference.WorldData.VoxelScaling.y/2;
                     
                     var instantiatedObject = UnityMainThreadDispatcher.Instance().EnqueueAsync(() =>
                     {
                         var instantiatedObject = _grassPool.GetObject();
                         instantiatedObject.transform.position = position;
                         instantiatedObject.transform.rotation = Quaternion.identity;
+                        instantiatedObject.transform.localScale = chunkData.WorldReference.WorldData.VoxelScaling;
                         return instantiatedObject;
                     }).Result;
                     // var instantiatedObject = InstantiateGameObjectOnMainThread(grassPrefab, position, new Quaternion());
