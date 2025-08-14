@@ -9,8 +9,10 @@ Current Features:
   - multithreaded to improve performance and maintain playable state
 - Chunk pooling
 - Rough Biome generation based on temperature (with Perlin Noise)
-- Structure generation (general framework exists)
+- Structure generation (examples below)
   - Trees
+- Decoration (/GameObject) generation (examples below)
+  - Grass
 - Modular list of Voxel Types
 - Voxel Scaling
   - (There are rounding errors with some fractions like 2/5)
@@ -28,4 +30,5 @@ Current Features:
 16 Chunk Render-Distance from player
 ![grafik](https://github.com/user-attachments/assets/f3f5afc4-bbf8-45c5-aa1a-1d6cf17dc594)
 ![grafik](https://github.com/user-attachments/assets/e1dc57fc-9876-4cbb-9399-cec3341ec0f6)
+
 
