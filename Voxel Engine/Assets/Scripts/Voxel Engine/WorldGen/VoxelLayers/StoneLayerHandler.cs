@@ -27,7 +27,7 @@ namespace Voxel_Engine.WorldGen.VoxelLayers
             
             if (chunkData.ChunkPositionInVoxel.y < 0)
             {
-                endPos = chunkData.ChunkPositionInVoxel.y + chunkData.ChunkHeight;
+                endPos = chunkData.ChunkPositionInVoxel.y + chunkData.ChunkHeightInVoxel;
             }
 
             if (!(stoneNoise > stoneThreshold)) return false;

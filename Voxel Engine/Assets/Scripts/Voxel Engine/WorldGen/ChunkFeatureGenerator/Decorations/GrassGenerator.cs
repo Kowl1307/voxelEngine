@@ -18,14 +18,16 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
 
         public override void Handle(ChunkData chunkData)
         {
-            UnityMainThreadDispatcher.Instance().Enqueue(() => _grassPool.FillTo(chunkData.ChunkSize*chunkData.ChunkSize));
+            if (chunkData.ChunkPositionInVoxel.y+chunkData.ChunkHeightInVoxel < 0) return;
+            
+            UnityMainThreadDispatcher.Instance().Enqueue(() => _grassPool.FillTo(chunkData.ChunkSizeInVoxel*chunkData.ChunkSizeInVoxel));
             
             var randomSeed = (uint)chunkData.ChunkPositionInVoxel.sqrMagnitude;
             if (randomSeed == 0) randomSeed = 40; // Avoid 0-seed
             var random = new Random(randomSeed);
-            for (var x = 0; x < chunkData.ChunkSize; x++)
+            for (var x = 0; x < chunkData.ChunkSizeInVoxel; x++)
             {
-                for (var z = 0; z < chunkData.ChunkSize; z++)
+                for (var z = 0; z < chunkData.ChunkSizeInVoxel; z++)
                 {
                     if (!(random.NextFloat() < .1)) continue;
 

@@ -152,6 +152,7 @@ namespace Voxel_Engine
 
             print("Creating mesh data..");
             await CreateMeshDataAsyncAddToQueue(dataToRender);
+            print("Finished World Generation.");
         }
 
         private async Task<ConcurrentDictionary<Vector3Int, MeshData>> CreateMeshDataAsync(List<ChunkData> dataToRender)

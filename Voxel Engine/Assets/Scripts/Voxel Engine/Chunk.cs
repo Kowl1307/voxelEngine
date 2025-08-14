@@ -146,22 +146,22 @@ namespace Voxel_Engine
         /// <returns></returns>
         private static Vector3Int GetPositionFromIndex(ChunkData chunkData, int index)
         {
-            var x = index % chunkData.ChunkSize;
-            var y = (index / chunkData.ChunkSize) % chunkData.ChunkHeight;
-            var z = index / (chunkData.ChunkSize * chunkData.ChunkHeight);
+            var x = index % chunkData.ChunkSizeInVoxel;
+            var y = (index / chunkData.ChunkSizeInVoxel) % chunkData.ChunkHeightInVoxel;
+            var z = index / (chunkData.ChunkSizeInVoxel * chunkData.ChunkHeightInVoxel);
             return new Vector3Int(x, y, z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool InRange(ChunkData chunkData, int axisCoordinate)
         {
-            return axisCoordinate >= 0 && axisCoordinate < chunkData.ChunkSize;
+            return axisCoordinate >= 0 && axisCoordinate < chunkData.ChunkSizeInVoxel;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool InRangeHeight(ChunkData chunkData, int yCoordinate)
         {
-            return yCoordinate >= 0 && yCoordinate < chunkData.ChunkHeight;
+            return yCoordinate >= 0 && yCoordinate < chunkData.ChunkHeightInVoxel;
         }
         
         /// <summary>
@@ -175,16 +175,16 @@ namespace Voxel_Engine
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetIndexFromPosition(ChunkData chunkData, int x, int y, int z)
         {
-            return x + chunkData.ChunkSize * y + chunkData.ChunkSize * chunkData.ChunkHeight * z;
+            return x + chunkData.ChunkSizeInVoxel * y + chunkData.ChunkSizeInVoxel * chunkData.ChunkHeightInVoxel * z;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsOnEdge(ChunkData chunkData, Vector3Int voxelPos)
         {
             var chunkPosition = GetChunkCoordinateOfVoxelPosition(chunkData, voxelPos);
-            return chunkPosition.x == 0 || chunkPosition.x == chunkData.ChunkSize - 1 ||
-                   chunkPosition.y == 0 || chunkPosition.y == chunkData.ChunkHeight - 1 ||
-                   chunkPosition.z == 0 || chunkPosition.z == chunkData.ChunkSize - 1;
+            return chunkPosition.x == 0 || chunkPosition.x == chunkData.ChunkSizeInVoxel - 1 ||
+                   chunkPosition.y == 0 || chunkPosition.y == chunkData.ChunkHeightInVoxel - 1 ||
+                   chunkPosition.z == 0 || chunkPosition.z == chunkData.ChunkSizeInVoxel - 1;
         }
 
         public static List<ChunkData> GetEdgeNeighbourChunk(ChunkData chunkData, Vector3Int voxelPos)
@@ -195,7 +195,7 @@ namespace Voxel_Engine
             {
                 neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos - Vector3Int.right));
             }
-            if (chunkPosition.x == chunkData.ChunkSize - 1)
+            if (chunkPosition.x == chunkData.ChunkSizeInVoxel - 1)
             {
                 neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos + Vector3Int.right));
             }
@@ -203,7 +203,7 @@ namespace Voxel_Engine
             {
                 neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos - Vector3Int.up));
             }
-            if (chunkPosition.y == chunkData.ChunkHeight - 1)
+            if (chunkPosition.y == chunkData.ChunkHeightInVoxel - 1)
             {
                 neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos + Vector3Int.up));
             }
@@ -211,7 +211,7 @@ namespace Voxel_Engine
             {
                 neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos - Vector3Int.forward));
             }
-            if (chunkPosition.z == chunkData.ChunkSize - 1)
+            if (chunkPosition.z == chunkData.ChunkSizeInVoxel - 1)
             {
                 neighboursToUpdate.Add(WorldDataHelper.GetChunkDataFromVoxelCoords(chunkData.WorldReference, voxelPos + Vector3Int.forward));
             }

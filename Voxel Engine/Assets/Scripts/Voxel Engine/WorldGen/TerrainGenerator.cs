@@ -49,16 +49,16 @@ namespace Voxel_Engine.WorldGen
             //TODO: Chunks are currently always having the same biome. The generator should be picked depending on the xyz coordinates. For this, we need to change the processing from per column to complete parallel.
             var biomeGenerator = GetBiomeGeneratorAt(chunkData.WorldReference.WorldData, chunkData.ChunkPositionInVoxel);
             
-            Parallel.For(0, chunkData.ChunkSize, chunkData.WorldReference.WorldParallelOptions, (x) =>
+            Parallel.For(0, chunkData.ChunkSizeInVoxel, chunkData.WorldReference.WorldParallelOptions, (x) =>
             {
-                for (var z = 0; z < chunkData.ChunkSize; z++)
+                for (var z = 0; z < chunkData.ChunkSizeInVoxel; z++)
                 {
                     chunkData = biomeGenerator.ProcessChunkColumn(chunkData, x, z, mapSeedOffset);
                 }
             });
             
             chunkData = biomeGenerator.GenerateStructures(chunkData);
-            chunkData = biomeGenerator.GenerateDecorations(chunkData);
+            biomeGenerator.GenerateDecorations(chunkData);
             // Generate biome-independent structures (i.e. villages). Biome dependent structures are already handled in the Layer system above.
             
             return chunkData;

@@ -199,14 +199,14 @@ namespace Voxel_Engine
             //TOOD: This can be optimized. Probably smartly copy/strip data from chunkData.Voxels and check for the neighbor type faster
             
             //Loop through all xy,yz,xz slices and greedy mesh both sides
-            var sliceDataFront = new VoxelType[chunkData.ChunkSize, chunkData.ChunkHeight];
-            var sliceDataBack = new VoxelType[chunkData.ChunkSize, chunkData.ChunkHeight];
-            for (var z = 0; z < chunkData.ChunkSize; z++)
+            var sliceDataFront = new VoxelType[chunkData.ChunkSizeInVoxel, chunkData.ChunkHeightInVoxel];
+            var sliceDataBack = new VoxelType[chunkData.ChunkSizeInVoxel, chunkData.ChunkHeightInVoxel];
+            for (var z = 0; z < chunkData.ChunkSizeInVoxel; z++)
             {
                 //Precompute slice data
-                for (var x = 0; x < chunkData.ChunkSize; x++)
+                for (var x = 0; x < chunkData.ChunkSizeInVoxel; x++)
                 {
-                    for (var y = 0; y < chunkData.ChunkHeight; y++)
+                    for (var y = 0; y < chunkData.ChunkHeightInVoxel; y++)
                     {
                         sliceDataFront[x, y] =
                             GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Forward, shouldRenderBlock);
@@ -220,14 +220,14 @@ namespace Voxel_Engine
             }
             
             
-            sliceDataFront = new VoxelType[chunkData.ChunkHeight, chunkData.ChunkSize];
-            sliceDataBack = new VoxelType[chunkData.ChunkHeight, chunkData.ChunkSize];
-            for (var x = 0; x < chunkData.ChunkSize; x++)
+            sliceDataFront = new VoxelType[chunkData.ChunkHeightInVoxel, chunkData.ChunkSizeInVoxel];
+            sliceDataBack = new VoxelType[chunkData.ChunkHeightInVoxel, chunkData.ChunkSizeInVoxel];
+            for (var x = 0; x < chunkData.ChunkSizeInVoxel; x++)
             {
                 //Precompute slice data
-                for (var y = 0; y < chunkData.ChunkHeight; y++)
+                for (var y = 0; y < chunkData.ChunkHeightInVoxel; y++)
                 {
-                    for (var z = 0; z < chunkData.ChunkSize; z++)
+                    for (var z = 0; z < chunkData.ChunkSizeInVoxel; z++)
                     {
                         sliceDataFront[y, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Left, shouldRenderBlock);
 
@@ -239,14 +239,14 @@ namespace Voxel_Engine
                 meshData = GenerateGreedyMesh(x, Direction.Left, sliceDataBack, chunkData, meshData);
             }
             
-            sliceDataFront = new VoxelType[chunkData.ChunkSize, chunkData.ChunkSize];
-            var sliceDataDown = new VoxelType[chunkData.ChunkSize, chunkData.ChunkSize];
-            for (var y = 0; y < chunkData.ChunkHeight; y++)
+            sliceDataFront = new VoxelType[chunkData.ChunkSizeInVoxel, chunkData.ChunkSizeInVoxel];
+            var sliceDataDown = new VoxelType[chunkData.ChunkSizeInVoxel, chunkData.ChunkSizeInVoxel];
+            for (var y = 0; y < chunkData.ChunkHeightInVoxel; y++)
             {
                 //Precompute slice data
-                for (var x = 0; x < chunkData.ChunkSize; x++)
+                for (var x = 0; x < chunkData.ChunkSizeInVoxel; x++)
                 {
-                    for (var z = 0; z < chunkData.ChunkSize; z++)
+                    for (var z = 0; z < chunkData.ChunkSizeInVoxel; z++)
                     {
                         sliceDataFront[x, z] = GetVoxelTypeOrNone(chunkData, x, y, z, Direction.Up, shouldRenderBlock);
 

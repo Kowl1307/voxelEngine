@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Voxel_Engine.WorldGen.Biomes;
@@ -8,6 +10,7 @@ using Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations;
 using Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures;
 using Voxel_Engine.WorldGen.Noise;
 using Voxel_Engine.WorldGen.VoxelLayers;
+using Task = System.Threading.Tasks.Task;
 
 namespace Voxel_Engine.WorldGen
 {
@@ -53,7 +56,7 @@ namespace Voxel_Engine.WorldGen
             chunkData.HeightMap[x,z] = surfaceHeight;
             
             //Fill the whole chunk with voxelType data
-            for (var y = 0; y < chunkData.ChunkHeight; y++)
+            for (var y = 0; y < chunkData.ChunkHeightInVoxel; y++)
             {
                 StartLayerHandler.Handle(chunkData, x, y, z, surfaceHeight, mapSeedOffset, BiomeSettings);
             }
@@ -111,15 +114,23 @@ namespace Voxel_Engine.WorldGen
         }
 
         // TODO: Would be better if decorations are also voxels but are rendered differently. Creating all these objects or having insanely large objectPools seems very inefficient..
-        public ChunkData GenerateDecorations(ChunkData chunkData)
+        public void GenerateDecorations(ChunkData chunkData)
         {
+            Task.Run( () =>
+            {
+                Parallel.ForEach(_decorationGenerators, chunkData.WorldReference.WorldParallelOptions,
+                    decorationGenerator =>
+                    {
+                        decorationGenerator.Handle(chunkData);
+                    });
+            });
             /*
             foreach (var decorationGenerator in _decorationGenerators)
             {
                 decorationGenerator.Handle(chunkData);
             }
             */
-            return chunkData;
+            
         }
 
         /// <summary>

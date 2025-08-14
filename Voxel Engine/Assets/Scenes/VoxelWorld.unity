@@ -1059,7 +1059,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &1051201740
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1776,7 +1776,7 @@ MonoBehaviour:
   DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
   StartLayerHandler: {fileID: 726806224}
-  structureGeneratorsHolder: {fileID: 924658647}
+  structureGeneratorsHolder: {fileID: 0}
   decorationGeneratorsHolder: {fileID: 1318398890}
 --- !u!4 &1728092375
 Transform:

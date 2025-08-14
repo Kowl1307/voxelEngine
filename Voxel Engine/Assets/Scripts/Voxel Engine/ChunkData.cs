@@ -9,28 +9,32 @@ namespace Voxel_Engine
         public VoxelType[] Voxels;
         public readonly List<GameObject> ChunkDecorations = new();
         public int[,] HeightMap; // indices x,z, value = y
-        public int ChunkSize = 16;
-        public int ChunkHeight = 100;
+        public int ChunkSizeInVoxel = 16;
+        public int ChunkHeightInVoxel = 100;
         public World WorldReference;
         public Vector3Int ChunkPositionInWorld; // Position of the transform in world space
         public Vector3Int ChunkPositionInVoxel; // Position of the chunk in voxel space
+
+        public readonly int ChunkHeightInWorld;
         
         public Chunk.RenderMethod RenderMethod;
 
         public bool ModifiedByPlayer = false;
 
-        public ChunkData(int chunkSize, int chunkHeight, World world, Vector3Int chunkPositionInWorld, Vector3Int chunkPositionInVoxel)
+        public ChunkData(int chunkSizeInVoxel, int chunkHeightInVoxel, World world, Vector3Int chunkPositionInWorld, Vector3Int chunkPositionInVoxel)
         {
-            ChunkSize = chunkSize;
-            ChunkHeight = chunkHeight;
+            ChunkSizeInVoxel = chunkSizeInVoxel;
+            ChunkHeightInVoxel = chunkHeightInVoxel;
             WorldReference = world;
             ChunkPositionInWorld = chunkPositionInWorld;
             ChunkPositionInVoxel = chunkPositionInVoxel;
-            Voxels = new VoxelType[ChunkSize * ChunkHeight * chunkSize];
+            Voxels = new VoxelType[ChunkSizeInVoxel * ChunkHeightInVoxel * chunkSizeInVoxel];
             //TODO: Make this dynamic
             RenderMethod = Chunk.RenderMethod.Greedy;
             
-            HeightMap = new int[ChunkSize,ChunkSize];
+            HeightMap = new int[ChunkSizeInVoxel,ChunkSizeInVoxel];
+
+            ChunkHeightInWorld = Mathf.RoundToInt(ChunkHeightInVoxel * WorldReference.WorldData.VoxelScaling.y);
         }
     }
 }

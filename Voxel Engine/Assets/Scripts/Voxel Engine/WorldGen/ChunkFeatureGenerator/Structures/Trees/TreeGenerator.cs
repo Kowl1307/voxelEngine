@@ -24,7 +24,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures.Trees
         {
             var noise = GenerateTreeNoise(chunkData, treeNoiseSettings);
             var treePositions = DataProcessing.FindLocalMaxima(noise, closestTreeDistance);
-            treePositions = treePositions.ConvertAll(position => position - new Vector2Int(chunkData.ChunkSize/2, chunkData.ChunkSize/2));
+            treePositions = treePositions.ConvertAll(position => position - new Vector2Int(chunkData.ChunkSizeInVoxel/2, chunkData.ChunkSizeInVoxel/2));
 
             // This is just for easier debugging.
             /*
@@ -90,7 +90,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures.Trees
         private float[,] GenerateTreeNoise(ChunkData chunkData, NoiseSettings noiseSettings)
         {
             var voxelPosition = chunkData.ChunkPositionInVoxel;
-            var chunkSize = chunkData.ChunkSize;
+            var chunkSize = chunkData.ChunkSizeInVoxel;
             var voxelScale = chunkData.WorldReference.WorldData.VoxelScaling;
             
             var noise = new float[chunkSize*2, chunkSize*2];
