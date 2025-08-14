@@ -1601,6 +1601,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c45c054c0b74a98a6d7cbf43a6b6c7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allowedGroundTypes: 02000000
   grassPrefab: {fileID: 919132149155446097, guid: 8f9356c58a417cf408fdc4269575dcd8,
     type: 3}
 --- !u!1 &1367074017
@@ -1669,7 +1670,7 @@ MonoBehaviour:
   DomainWarping: {fileID: 11400000, guid: 0ca60278a5069564d83ec843693b3433, type: 2}
   useDomainWarping: 1
   StartLayerHandler: {fileID: 726806224}
-  structureGeneratorsHolder: {fileID: 0}
+  structureGeneratorsHolder: {fileID: 924658647}
   decorationGeneratorsHolder: {fileID: 1318398890}
 --- !u!4 &1728092375
 Transform:
