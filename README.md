@@ -18,6 +18,9 @@ Current Features:
 
 ## Screenshots
 
+<img width="1919" height="1079" alt="grafik" src="https://github.com/user-attachments/assets/bef53a45-56d0-408a-8eb2-ddffc7fb3b70" />
+
+
 8 Chunk Render-Distance from player
 ![grafik](https://github.com/user-attachments/assets/5d43855c-08c5-448b-85a2-75b1a3aea2be)
 ![grafik](https://github.com/user-attachments/assets/9eb26f02-0ce4-4b53-9020-fdf501f2fc3c)
@@ -25,3 +28,4 @@ Current Features:
 16 Chunk Render-Distance from player
 ![grafik](https://github.com/user-attachments/assets/f3f5afc4-bbf8-45c5-aa1a-1d6cf17dc594)
 ![grafik](https://github.com/user-attachments/assets/e1dc57fc-9876-4cbb-9399-cec3341ec0f6)
+
