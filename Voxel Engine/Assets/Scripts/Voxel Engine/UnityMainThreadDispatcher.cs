@@ -11,12 +11,32 @@ namespace Voxel_Engine
 	    private static UnityMainThreadDispatcher _instance = null;
 		private static readonly Queue<Action> ExecutionQueue = new Queue<Action>();
 
+		private const int MaxProcessMilliseconds = 5;
+
+		private Coroutine _processCoroutine;
+
 		public void Update() {
-			lock(ExecutionQueue) {
-				while (ExecutionQueue.Count > 0) {
-					ExecutionQueue.Dequeue().Invoke();
-				}
+			lock(ExecutionQueue)
+			{
+				if (_processCoroutine == null && ExecutionQueue.Count > 0)
+					_processCoroutine = StartCoroutine(ProcessQueueCoroutine());
 			}
+		}
+
+		private IEnumerator ProcessQueueCoroutine()
+		{
+			while (ExecutionQueue.Count > 0)
+			{
+				var startTime = Time.realtimeSinceStartup;
+				while (ExecutionQueue.Count > 0 && (Time.realtimeSinceStartup - startTime) * 1000f < MaxProcessMilliseconds)
+				{
+					var func = ExecutionQueue.Dequeue();
+					func.Invoke();
+					//ExecutionQueue.Dequeue().Invoke();
+				}
+				yield return null;
+			}
+			_processCoroutine = null;
 		}
 
 		/// <summary>
