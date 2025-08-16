@@ -7,11 +7,13 @@ using Voxel_Engine.WorldGen.Biomes;
 using Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations;
 using Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures;
 using Voxel_Engine.WorldGen.Noise;
+using Voxel_Engine.WorldGen.SurfaceHeightGenerators;
 using Voxel_Engine.WorldGen.VoxelLayers;
 using Task = System.Threading.Tasks.Task;
 
 namespace Voxel_Engine.WorldGen
 {
+    [RequireComponent(typeof(SurfaceHeightGenerator))]
     public class BiomeGenerator : MonoBehaviour
     {
         public BiomeType biomeType = BiomeType.Undefined;
@@ -29,6 +31,8 @@ namespace Voxel_Engine.WorldGen
 
         [SerializeField] private GameObject decorationGeneratorsHolder;
         private List<DecorationGenerator> _decorationGenerators = new();
+        
+        private SurfaceHeightGenerator _surfaceHeightGenerator;
 
         private void Awake()
         {
@@ -37,6 +41,8 @@ namespace Voxel_Engine.WorldGen
             
             if(decorationGeneratorsHolder != null)
                 _decorationGenerators = decorationGeneratorsHolder.GetComponents<DecorationGenerator>().ToList();
+            
+            _surfaceHeightGenerator = GetComponent<SurfaceHeightGenerator>();
         }
 
         /// <summary>
@@ -122,13 +128,6 @@ namespace Voxel_Engine.WorldGen
                         decorationGenerator.Handle(chunkData);
                     });
             });
-            /*
-            foreach (var decorationGenerator in _decorationGenerators)
-            {
-                decorationGenerator.Handle(chunkData);
-            }
-            */
-            
         }
 
         /// <summary>
@@ -141,14 +140,8 @@ namespace Voxel_Engine.WorldGen
         /// <returns></returns>
         public int GetSurfaceHeightNoise(int x, int z, WorldData worldData)
         {
-            var voxelScale = worldData.VoxelScaling;
             var chunkHeight = worldData.ChunkHeightInVoxel;
-            
-            var terrainHeight = useDomainWarping ? DomainWarping.GenerateDomainNoise(x * voxelScale.x, z * voxelScale.z, BiomeNoiseSettings) : MyNoise.OctavePerlin(x * voxelScale.x, z * voxelScale.z, BiomeNoiseSettings);
-            // terrainHeight /= voxelScale.y;
-            //var terrainHeight = useDomainWarping ? MyNoise.OctaveSimplex(x,z,BiomeNoiseSettings) : MyNoise.SimplexNoise(x, z, BiomeNoiseSettings);
-            terrainHeight = MyNoise.Redistribution(terrainHeight, BiomeNoiseSettings);
-            return MyNoise.RemapValue01ToInt(terrainHeight, 0, chunkHeight / voxelScale.y) + BiomeSettings.MinimumHeight;
+            return _surfaceHeightGenerator.GetSurfaceHeight(x, z, BiomeSettings.MinimumHeight, chunkHeight, BiomeNoiseSettings, worldData);
         }
     }
 }
