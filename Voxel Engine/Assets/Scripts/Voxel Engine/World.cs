@@ -27,7 +27,7 @@ namespace Voxel_Engine
         
         public readonly ParallelOptions WorldParallelOptions = new()
         {
-            MaxDegreeOfParallelism = Environment.ProcessorCount-1
+            MaxDegreeOfParallelism = Environment.ProcessorCount-3
         };
 
         public int chunkSizeInWorld => Mathf.FloorToInt(chunkSizeInVoxel * voxelScaling.x);

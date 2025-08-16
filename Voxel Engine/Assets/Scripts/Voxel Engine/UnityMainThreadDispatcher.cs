@@ -31,7 +31,8 @@ namespace Voxel_Engine
 				while (ExecutionQueue.Count > 0 && (Time.realtimeSinceStartup - startTime) * 1000f < MaxProcessMilliseconds)
 				{
 					var func = ExecutionQueue.Dequeue();
-					func.Invoke();
+					//TODO: This is sometimes null. I don't know why but nothing seems to be missing ;(
+					func?.Invoke();
 					//ExecutionQueue.Dequeue().Invoke();
 				}
 				yield return null;

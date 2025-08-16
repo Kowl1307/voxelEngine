@@ -20,9 +20,18 @@ namespace Voxel_Engine
         {
             for (var i = _objects.Count; i < capacity; i++)
             {
-                var newChunk = Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
+                var newObject = Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
                 //newChunk.gameObject.SetActive(false);
-                _objects.Enqueue(newChunk);
+                _objects.Enqueue(newObject);
+            }
+        }
+
+        public void AddAmount(int amount)
+        {
+            for (var i = 0; i < amount; i++)
+            {
+                var newObject = Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
+                _objects.Enqueue(newObject);
             }
         }
 

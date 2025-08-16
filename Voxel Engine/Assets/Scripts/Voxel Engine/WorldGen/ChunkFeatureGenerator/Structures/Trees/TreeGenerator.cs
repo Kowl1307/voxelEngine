@@ -58,15 +58,15 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures.Trees
 
         private void CreateTree(ChunkData chunkData, Vector3Int treePosition3D)
         {
-            Parallel.ForEach(_trunkPositions, chunkData.WorldReference.WorldParallelOptions, trunkOffset =>
+            /*Parallel.ForEach(_trunkPositions, chunkData.WorldReference.WorldParallelOptions, trunkOffset =>
             {
                 var trunkPosition = treePosition3D + trunkOffset;
                 if (!Chunk.IsInsideChunkBounds(chunkData, trunkPosition))
                     return;
                 
                 Chunk.SetVoxel(chunkData, trunkPosition, VoxelType.TreeTrunk);
-            });
-            /*
+            });*/
+            
             foreach (var trunkOffset in _trunkPositions)
             {
                 var trunkPosition = treePosition3D + trunkOffset;
@@ -75,16 +75,17 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures.Trees
                 
                 Chunk.SetVoxel(chunkData, trunkPosition, VoxelType.TreeTrunk);
             }
-            */
-            Parallel.ForEach(_treeLeavesStaticLayout, chunkData.WorldReference.WorldParallelOptions, leafOffset =>
-                //foreach (var leafOffset in _treeLeavesStaticLayout)
+            
+            //Parallel.ForEach(_treeLeavesStaticLayout, chunkData.WorldReference.WorldParallelOptions, leafOffset =>
+                
+            foreach (var leafOffset in _treeLeavesStaticLayout)
             {
                 var leafPosition = leafOffset + treePosition3D;
                 if (!Chunk.IsInsideChunkBounds(chunkData, leafPosition))
                     return;
 
                 Chunk.SetVoxel(chunkData, leafPosition, VoxelType.TreeLeafesTransparent);
-            });
+            };
         }
 
         private float[,] GenerateTreeNoise(ChunkData chunkData, NoiseSettings noiseSettings)

@@ -25,7 +25,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
         {
             if (chunkData.ChunkPositionInVoxel.y+chunkData.ChunkHeightInVoxel < 0) return;
             
-            UnityMainThreadDispatcher.Instance().Enqueue(() => _grassPool.FillTo(chunkData.ChunkSizeInVoxel*chunkData.ChunkSizeInVoxel));
+            UnityMainThreadDispatcher.Instance().Enqueue(() => _grassPool.AddAmount(chunkData.ChunkSizeInVoxel*chunkData.ChunkSizeInVoxel));
             
             var randomSeed = (uint)chunkData.ChunkPositionInVoxel.sqrMagnitude;
             if (randomSeed == 0) randomSeed = 40; // Avoid 0-seed
