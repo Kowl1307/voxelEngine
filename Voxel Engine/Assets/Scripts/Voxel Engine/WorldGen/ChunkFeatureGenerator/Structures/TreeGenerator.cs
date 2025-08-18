@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using Voxel_Engine.WorldGen.Noise;
 
-namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures.Trees
+namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
 {
     public class TreeGenerator : StructureGenerator
     {
@@ -82,7 +81,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures.Trees
             {
                 var leafPosition = leafOffset + treePosition3D;
                 if (!Chunk.IsInsideChunkBounds(chunkData, leafPosition))
-                    return;
+                    continue;
 
                 Chunk.SetVoxel(chunkData, leafPosition, VoxelType.TreeLeafesTransparent);
             };
