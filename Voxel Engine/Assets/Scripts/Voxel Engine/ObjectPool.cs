@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Voxel_Engine
 {
     public class ObjectPool<T> : Object where T : UnityEngine.Object
     {
+        private readonly object _lock = new object();
+        
         private readonly Queue<T> _objects;
         private readonly T _objectPrefab;
 
@@ -18,11 +21,33 @@ namespace Voxel_Engine
 
         public void FillTo(int capacity)
         {
-            for (var i = _objects.Count; i < capacity; i++)
+            lock (_lock)
             {
-                var newObject = Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
-                //newChunk.gameObject.SetActive(false);
-                _objects.Enqueue(newObject);
+                for (var i = _objects.Count; i < capacity; i++)
+                {
+                    var newObject = Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
+                    _objects.Enqueue(newObject);
+                }
+            }
+        }
+
+        public async Task FillToAsync(int capacity)
+        {
+            var refillAmount = 0;
+            lock (_lock)
+            {
+                refillAmount = capacity - _objects.Count;
+            }
+            
+            for (var i = 0; i < refillAmount; i++)
+            {
+                var newObject = await UnityMainThreadDispatcher.Instance()
+                    .EnqueueAsync(() => Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity));
+
+                lock (_lock)
+                {
+                    _objects.Enqueue(newObject);
+                }
             }
         }
 
@@ -31,28 +56,59 @@ namespace Voxel_Engine
             for (var i = 0; i < amount; i++)
             {
                 var newObject = Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
-                _objects.Enqueue(newObject);
+                lock (_lock)
+                {
+                    _objects.Enqueue(newObject);
+                }
             }
         }
 
         public T GetObject()
         {
-            if (_objects.Count <= 0)
+            lock (_lock)
             {
-                FillTo(_refillAmount);
+                if (_objects.Count <= 0)
+                {
+                    FillTo(_refillAmount);
+                }
+                
+                return _objects.Dequeue();
             }
-            
-            return _objects.Dequeue();
+        }
+
+        public async Task<T> GetObjectAsync()
+        {
+            var count = 0;
+            lock (_lock)
+            {
+                count = _objects.Count;
+            }
+    
+            if (count <= 0)
+            {
+                await FillToAsync(_refillAmount);
+            }
+
+            lock (_lock)
+            {
+                return _objects.Dequeue();
+            }
         }
 
         public void ReturnObject(T obj)
         {
-            _objects.Enqueue(obj);
+            lock (_lock)
+            {
+                _objects.Enqueue(obj);
+            }
         }
 
         public void Clear()
         {
-            _objects.Clear();
+            lock (_lock)
+            {
+                _objects.Clear();
+            }
         }
 
         public void SetRefillAmount(int amount)

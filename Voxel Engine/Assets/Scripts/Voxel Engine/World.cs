@@ -27,7 +27,7 @@ namespace Voxel_Engine
         
         public readonly ParallelOptions WorldParallelOptions = new()
         {
-            MaxDegreeOfParallelism = Environment.ProcessorCount-3
+            MaxDegreeOfParallelism = Environment.ProcessorCount-1
         };
 
         public int chunkSizeInWorld => Mathf.FloorToInt(chunkSizeInVoxel * voxelScaling.x);
@@ -134,16 +134,6 @@ namespace Voxel_Engine
             {
                 WorldData.ChunkDataDictionary.TryAdd(calculatedData.Key, calculatedData.Value);
             }
-
-            //TODO: Move this to chunk creation
-            /*
-            print("Adding structure voxels..");
-            //Add structure blocks after initializing the chunks
-            foreach (var chunkData in WorldData.ChunkDataDictionary.Values)
-            {
-                AddStructureVoxels(chunkData);
-            }
-            */
             
             //Load renderers for chunks with generated data in range
             var dataToRender =
@@ -299,16 +289,6 @@ namespace Voxel_Engine
             chunk.GetMeshDataAndUpdate();
         }
 
-        /*
-        private Vector3Int GetVoxelPos(RaycastHit hit)
-        {
-            var pos = new Vector3(GetVoxelPosIn(hit.point.x, hit.normal.x), GetVoxelPosIn(hit.point.y, hit.normal.y),
-                GetVoxelPosIn(hit.point.z, hit.normal.z));
-            var voxelCoords = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, Vector3Int.RoundToInt(pos));
-            return voxelCoords;
-        }
-        */
-        
         public Vector3Int GetVoxelPosOfRaycastHit(RaycastHit hit)
         {
             var hitPos = hit.point;

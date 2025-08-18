@@ -122,11 +122,16 @@ namespace Voxel_Engine.WorldGen
         {
             Task.Run( () =>
             {
-                Parallel.ForEach(_decorationGenerators, chunkData.WorldReference.WorldParallelOptions,
+                /*Parallel.ForEach(_decorationGenerators, chunkData.WorldReference.WorldParallelOptions,
                     decorationGenerator =>
                     {
                         decorationGenerator.Handle(chunkData);
                     });
+                */
+                foreach (var decorationGenerator in _decorationGenerators)
+                {
+                    decorationGenerator.Handle(chunkData);
+                }
             });
         }
 

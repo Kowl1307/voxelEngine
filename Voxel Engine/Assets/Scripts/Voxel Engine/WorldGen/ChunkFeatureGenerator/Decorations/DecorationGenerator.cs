@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
 {
@@ -9,9 +11,21 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
     {
         public abstract void Handle(ChunkData chunkData);
 
-        protected static GameObject InstantiateGameObjectOnMainThread(GameObject goToCreate, Vector3 position, Quaternion rotation)
+        protected static async Task<DecorationObject> InstantiateDecorationOnMainThread(GameObject objectToCreate, Vector3 position, Quaternion rotation, bool isStatic = true, Action<DecorationObject> disposeOperation = null)
         {
-            return UnityMainThreadDispatcher.Instance().EnqueueAsync(() => Instantiate(goToCreate, position, rotation)).Result;
+            var go = await UnityMainThreadDispatcher.Instance().EnqueueAsync(() => Instantiate(objectToCreate, position, rotation));
+            go.isStatic = isStatic;
+
+            return await SetupDecorationObject(go, disposeOperation);
+        }
+
+        protected static async Task<DecorationObject> SetupDecorationObject(GameObject objectToSetup, Action<DecorationObject> disposeOperation = null)
+        {
+            var decorationObject = await UnityMainThreadDispatcher.Instance().EnqueueAsync(objectToSetup.AddComponent<DecorationObject>);
+            if(disposeOperation != null)
+                decorationObject.SetDisposeOperation(disposeOperation);
+            
+            return decorationObject;
         }
     }
 }

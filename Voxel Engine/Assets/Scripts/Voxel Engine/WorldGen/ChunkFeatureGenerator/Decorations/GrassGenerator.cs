@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
@@ -21,11 +22,11 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
                 _grassPool = new ObjectPool<GameObject>(grassPrefab);
         }
 
-        public override void Handle(ChunkData chunkData)
+        public override async void Handle(ChunkData chunkData)
         {
             if (chunkData.ChunkPositionInVoxel.y+chunkData.ChunkHeightInVoxel < 0) return;
             
-            UnityMainThreadDispatcher.Instance().Enqueue(() => _grassPool.AddAmount(chunkData.ChunkSizeInVoxel*chunkData.ChunkSizeInVoxel));
+            await UnityMainThreadDispatcher.Instance().EnqueueAsync(() => _grassPool.FillTo(chunkData.ChunkSizeInVoxel*chunkData.ChunkSizeInVoxel));
             
             var randomSeed = (uint)chunkData.ChunkPositionInVoxel.sqrMagnitude;
             if (randomSeed == 0) randomSeed = 40; // Avoid 0-seed
@@ -44,21 +45,32 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
                     
                     var position =
                         WorldDataHelper.GetWorldPositionFromVoxelPosition(chunkData.WorldReference, voxelPosition) + Vector3.down * chunkData.WorldReference.WorldData.VoxelScaling.y/2;
-                    
-                    var instantiatedObject = UnityMainThreadDispatcher.Instance().EnqueueAsync(() =>
-                    {
-                        var instantiatedObject = _grassPool.GetObject();
-                        instantiatedObject.transform.position = position;
-                        instantiatedObject.transform.rotation = Quaternion.identity;
-                        instantiatedObject.transform.localScale = chunkData.WorldReference.WorldData.VoxelScaling;
-                        instantiatedObject.isStatic = true;
-                        return instantiatedObject;
-                    }).Result;
-                    // var instantiatedObject = InstantiateGameObjectOnMainThread(grassPrefab, position, new Quaternion());
 
-                    chunkData.ChunkDecorations.Add(instantiatedObject);
+                    var grassDecoration = await SetupGrassDecoration(position, Quaternion.identity);
+                    chunkData.ChunkDecorations.Add(grassDecoration);
                 }
+
             }
+        }
+
+        private void DisposeDecoration(DecorationObject decorationObject)
+        {
+            decorationObject.gameObject.SetActive(false);
+            _grassPool.ReturnObject(decorationObject.gameObject);
+        }
+
+        private async Task<DecorationObject> SetupGrassDecoration(Vector3 position, Quaternion rotation)
+        {
+            var grassDecorationObject = await _grassPool.GetObjectAsync();
+            var grassDecoration = await SetupDecorationObject(grassDecorationObject, DisposeDecoration);
+            
+            await UnityMainThreadDispatcher.Instance().EnqueueAsync(() =>
+            {
+                grassDecorationObject.transform.position = position;
+                grassDecorationObject.transform.rotation = rotation;
+            });
+
+            return grassDecoration;
         }
     }
 }

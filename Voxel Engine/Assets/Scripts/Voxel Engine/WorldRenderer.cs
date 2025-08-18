@@ -44,8 +44,9 @@ namespace Voxel_Engine
             // chunk.gameObject.SetActive(false);
             foreach (var chunkDecorationObject in chunk.ChunkData.ChunkDecorations)
             {
-                Destroy(chunkDecorationObject.gameObject);
+                chunkDecorationObject.Dispose();
             }
+            
             _chunkPool.ReturnObject(chunk);
         }
 

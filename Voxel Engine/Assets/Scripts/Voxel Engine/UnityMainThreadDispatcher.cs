@@ -11,7 +11,7 @@ namespace Voxel_Engine
 	    private static UnityMainThreadDispatcher _instance = null;
 		private static readonly Queue<Action> ExecutionQueue = new Queue<Action>();
 
-		private const int MaxProcessMilliseconds = 5;
+		private const int MaxProcessMilliseconds = 1;
 
 		private Coroutine _processCoroutine;
 
@@ -33,7 +33,6 @@ namespace Voxel_Engine
 					var func = ExecutionQueue.Dequeue();
 					//TODO: This is sometimes null. I don't know why but nothing seems to be missing ;(
 					func?.Invoke();
-					//ExecutionQueue.Dequeue().Invoke();
 				}
 				yield return null;
 			}
