@@ -19,7 +19,9 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
         private void Awake()
         {
             if (_grassPool == null)
+            {
                 _grassPool = new ObjectPool<GameObject>(grassPrefab);
+            }
         }
 
         public override async void Handle(ChunkData chunkData)
@@ -53,7 +55,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
             }
         }
 
-        private void DisposeDecoration(DecorationObject decorationObject)
+        private static void DisposeDecoration(DecorationObject decorationObject)
         {
             decorationObject.gameObject.SetActive(false);
             _grassPool.ReturnObject(decorationObject.gameObject);
@@ -68,6 +70,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
             {
                 grassDecorationObject.transform.position = position;
                 grassDecorationObject.transform.rotation = rotation;
+                grassDecorationObject.SetActive(true);
             });
 
             return grassDecoration;

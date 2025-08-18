@@ -78,16 +78,13 @@ namespace Voxel_Engine
 
         public async Task<T> GetObjectAsync()
         {
-            var count = 0;
             lock (_lock)
             {
-                count = _objects.Count;
+                if(_objects.Count > 0)
+                    return _objects.Dequeue();
             }
-    
-            if (count <= 0)
-            {
-                await FillToAsync(_refillAmount);
-            }
+
+            await FillToAsync(_refillAmount);
 
             lock (_lock)
             {
