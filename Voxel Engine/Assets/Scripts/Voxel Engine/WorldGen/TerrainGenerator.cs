@@ -67,7 +67,7 @@ namespace Voxel_Engine.WorldGen
         //TODO This will be removed due to the TODO above.
         public BiomeGenerator GetBiomeGeneratorAt(WorldData worldData, Vector3Int voxelPosition)
         {
-            var biomeSelection = biomeSelector.GetBiomeTypeAt(voxelPosition, worldData);
+            var biomeSelection = biomeSelector.GetBiomeTypeAt(worldData, voxelPosition);
             
             if (!_biomeGenerators.TryGetValue(biomeSelection, out var biomeGenerator))
             {
@@ -79,7 +79,8 @@ namespace Voxel_Engine.WorldGen
 
         public VoxelType ProcessVoxelAt(World world, Vector3Int voxelPosition)
         {
-            return GetBiomeGeneratorAt(world.WorldData, WorldDataHelper.GetChunkPositionFromVoxelCoords(world, voxelPosition))
+            return GetBiomeGeneratorAt(world.WorldData, voxelPosition)
+            //return GetBiomeGeneratorAt(world.WorldData, WorldDataHelper.GetChunkPositionFromVoxelCoords(world, voxelPosition))
                 .ProcessVoxel(world, voxelPosition.x, voxelPosition.y, voxelPosition.z, world.WorldData.WorldSeed);
         }
 

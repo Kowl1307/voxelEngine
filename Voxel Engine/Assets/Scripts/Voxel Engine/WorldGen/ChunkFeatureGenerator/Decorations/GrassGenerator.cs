@@ -61,7 +61,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
             _grassPool.ReturnObject(decorationObject.gameObject);
         }
 
-        private async Task<DecorationObject> SetupGrassDecoration(Vector3 position, Quaternion rotation, Vector3 scale)
+        private static async Task<DecorationObject> SetupGrassDecoration(Vector3 position, Quaternion rotation, Vector3 scale)
         {
             var grassDecorationObject = await _grassPool.GetObjectAsync();
             var grassDecoration = await SetupDecorationObject(grassDecorationObject, DisposeDecoration);

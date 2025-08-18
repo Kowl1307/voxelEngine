@@ -26,11 +26,11 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
             treePositions = treePositions.ConvertAll(position => position - new Vector2Int(chunkData.ChunkSizeInVoxel/2, chunkData.ChunkSizeInVoxel/2));
 
             // This is just for easier debugging.
-            /*
+            
             treePositions = new();
-            for (var x = -10; x < chunkData.ChunkSize+10; x++)
+            for (var x = -10; x < chunkData.ChunkSizeInVoxel+10; x++)
             {
-                for (var z = -10; z < chunkData.ChunkSize+10; z++)
+                for (var z = -10; z < chunkData.ChunkSizeInVoxel+10; z++)
                 {
                     var voxelPos = chunkData.ChunkPositionInVoxel + new Vector3Int(x, 0, z);
                     if (voxelPos.x % 10 == 0 && voxelPos.z % 10 == 0)
@@ -39,7 +39,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
                     }
                 }
             }
-            */
+            
             
             foreach (var treePosition2D in treePositions)
             {

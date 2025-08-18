@@ -5,12 +5,12 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
 {
     public interface IBiomeProvider
     {
-        public BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, WorldData worldData);
+        public BiomeType GetBiomeTypeAt(WorldData worldData, Vector3Int voxelPosition);
     }
     
     public abstract class BiomeSelector : MonoBehaviour, IBiomeProvider
     {
-        public abstract BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, WorldData worldData);
+        public abstract BiomeType GetBiomeTypeAt(WorldData worldData, Vector3Int voxelPosition);
 
         public abstract void PrecomputeData(World world, Vector3Int worldPosition);
     }

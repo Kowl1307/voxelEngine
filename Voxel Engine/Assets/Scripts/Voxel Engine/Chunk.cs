@@ -60,7 +60,7 @@ namespace Voxel_Engine
         {
             return IsInsideChunkBounds(chunkData, chunkCoords) ?
                 chunkData.Voxels[GetIndexFromPosition(chunkData, chunkCoords.x, chunkCoords.y, chunkCoords.z)] : 
-                WorldDataHelper.GetVoxelTypeAt(chunkData.WorldReference, chunkCoords + chunkData.ChunkPositionInVoxel);
+                WorldDataHelper.GetVoxelTypeAt(chunkData.WorldReference, GetVoxelCoordsFromChunkCoords(chunkData, chunkCoords.x, chunkCoords.y, chunkCoords.z));
         }
 
         public static int GetSurfaceHeight(ChunkData chunkData, Vector2Int chunkCoordsXZ)

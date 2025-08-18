@@ -98,6 +98,7 @@ namespace Voxel_Engine.WorldGen
                 structureGenerator.Handle(chunkData);
             }
             
+            //TODO: This seems to be broken (leaves of trees are not spawned in deserts)
             //Also check for other generators of the neighboring chunks, as structures can go over biome boundaries.
             var adjacentChunkPositionsInVoxel = WorldDataHelper.GetAdjacentChunkPositionsInVoxel(chunkData.WorldReference, chunkData.ChunkPositionInVoxel);
             var structureTypes = _structureGenerators.ConvertAll(generator => generator.GetType());

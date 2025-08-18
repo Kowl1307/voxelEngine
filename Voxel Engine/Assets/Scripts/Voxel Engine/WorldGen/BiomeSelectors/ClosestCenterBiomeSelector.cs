@@ -35,7 +35,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
             GenerateBiomePoints(worldPosition, world.ChunkDrawingRange, world.WorldData.ChunkSizeInVoxel, world.WorldData.WorldSeed);
         }
 
-        public override BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, WorldData worldData)
+        public override BiomeType GetBiomeTypeAt(WorldData worldData, Vector3Int voxelPosition)
         {
             return SelectBiomeGenerator(voxelPosition, worldData, false).biomeType;
         }

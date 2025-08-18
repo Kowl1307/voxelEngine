@@ -17,7 +17,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining
         /// </summary>
         [SerializeField] private NoiseSettings _randomNoiseSettings;
         
-        public override BiomeType GetBiomeTypeAt(Vector3Int voxelPosition, WorldData worldData)
+        public override BiomeType GetBiomeTypeAt(WorldData worldData, Vector3Int voxelPosition)
         {
             var biomeColor = GetBiomeAt(voxelPosition.x, voxelPosition.y, _randomNoiseSettings);
             if(_biomeColorDictionary.TryGetValue(biomeColor, out var biomeType))
