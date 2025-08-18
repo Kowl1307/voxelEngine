@@ -70,8 +70,8 @@ namespace Voxel_Engine
                 return chunkData.HeightMap[chunkCoordsXZ.x, chunkCoordsXZ.y];
             }
 
-            return WorldDataHelper.GetSurfaceHeightAt(chunkData.WorldReference,
-                chunkCoordsXZ.AsX0Z() + chunkData.ChunkPositionInVoxel);
+            var voxelCoords = GetVoxelCoordsFromChunkCoords(chunkData, chunkCoordsXZ.x, 0, chunkCoordsXZ.y);
+            return WorldDataHelper.GetSurfaceHeightAt(chunkData.WorldReference, voxelCoords);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

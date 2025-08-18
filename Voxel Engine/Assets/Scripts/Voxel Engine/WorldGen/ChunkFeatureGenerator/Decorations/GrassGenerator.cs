@@ -48,7 +48,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
                     var position =
                         WorldDataHelper.GetWorldPositionFromVoxelPosition(chunkData.WorldReference, voxelPosition) + Vector3.down * chunkData.WorldReference.WorldData.VoxelScaling.y/2;
 
-                    var grassDecoration = await SetupGrassDecoration(position, Quaternion.identity);
+                    var grassDecoration = await SetupGrassDecoration(position, Quaternion.identity, chunkData.WorldReference.WorldData.VoxelScaling);
                     chunkData.ChunkDecorations.Add(grassDecoration);
                 }
 
@@ -61,7 +61,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
             _grassPool.ReturnObject(decorationObject.gameObject);
         }
 
-        private async Task<DecorationObject> SetupGrassDecoration(Vector3 position, Quaternion rotation)
+        private async Task<DecorationObject> SetupGrassDecoration(Vector3 position, Quaternion rotation, Vector3 scale)
         {
             var grassDecorationObject = await _grassPool.GetObjectAsync();
             var grassDecoration = await SetupDecorationObject(grassDecorationObject, DisposeDecoration);
@@ -70,6 +70,8 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
             {
                 grassDecorationObject.transform.position = position;
                 grassDecorationObject.transform.rotation = rotation;
+                grassDecorationObject.transform.localScale = scale;
+                grassDecorationObject.isStatic = true;
                 grassDecorationObject.SetActive(true);
             });
 

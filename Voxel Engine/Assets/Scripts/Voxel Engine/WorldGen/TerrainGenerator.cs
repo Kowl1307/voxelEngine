@@ -85,7 +85,8 @@ namespace Voxel_Engine.WorldGen
 
         public int GetSurfaceHeightAt(World world, Vector3Int voxelPosition)
         {
-            return GetBiomeGeneratorAt(world.WorldData, WorldDataHelper.GetChunkPositionFromVoxelCoords(world, voxelPosition))
+            return GetBiomeGeneratorAt(world.WorldData, voxelPosition)
+            //return GetBiomeGeneratorAt(world.WorldData, WorldDataHelper.GetChunkPositionFromVoxelCoords(world, voxelPosition))
                 .GetSurfaceHeightNoise(voxelPosition.x, voxelPosition.z, world.WorldData);
         }
 

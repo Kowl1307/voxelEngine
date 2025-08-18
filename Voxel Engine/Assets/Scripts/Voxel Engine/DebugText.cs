@@ -1,3 +1,4 @@
+using System;
 using Player;
 using TMPro;
 using UnityEngine;
@@ -21,14 +22,16 @@ namespace Voxel_Engine
         private void Awake()
         {
             _textComponent = GetComponent<TMP_Text>();
-            _playerTransform = FindFirstObjectByType<Character>().transform;
             _world = FindFirstObjectByType<World>();
+        }
+
+        private void OnEnable()
+        {
+            _playerTransform = FindFirstObjectByType<Character>().transform;
         }
 
         private void LateUpdate()
         {
-            if (!_world.IsWorldCreated)
-                return;
             var worldPos = _playerTransform.position;
             var voxelPos = WorldDataHelper.GetVoxelPositionFromWorldPosition(_world, _playerTransform.position);
 
