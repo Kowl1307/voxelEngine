@@ -272,7 +272,11 @@ namespace Voxel_Engine
 
             var pos = GetVoxelPosOfRaycastHit(hit);
 
-            WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference,pos, voxelType);
+            WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference, pos, voxelType);
+            //TODO: This should be a function of some sort
+            var chunkPos = Chunk.GetChunkCoordinateOfVoxelPosition(chunk.ChunkData, pos);
+            var index = Chunk.GetIndexFromPosition(chunk.ChunkData, chunkPos.x, chunkPos.y, chunkPos.z);
+            chunk.ChunkData.MarkDirty(index, voxelType);
             chunk.ModifiedByPlayer = true;
             
             //If block is on edge, update neighbour chunk

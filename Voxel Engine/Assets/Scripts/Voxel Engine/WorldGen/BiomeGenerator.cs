@@ -75,7 +75,7 @@ namespace Voxel_Engine.WorldGen
             var surfaceHeight = GetSurfaceHeightNoise(x, z, chunkData.WorldReference.WorldData);
             StartLayerHandler.Handle(chunkData, voxelInChunkCoord.x, voxelInChunkCoord.y, voxelInChunkCoord.z, surfaceHeight, world.WorldData.WorldSeed, BiomeSettings);
             
-            return chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, voxelInChunkCoord.x, voxelInChunkCoord.y, voxelInChunkCoord.z)];
+            return chunkData.GetVoxel(voxelInChunkCoord);
         }
 
         /// <summary>

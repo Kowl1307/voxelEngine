@@ -276,7 +276,7 @@ namespace Voxel_Engine
             //            Chunk.GetIndexFromPosition(chunkData, x + directionVector.x, y + directionVector.y,
             //                z + directionVector.z)];
             //}
-            var currentType = chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, x, y, z)];
+            var currentType = chunkData.GetVoxel(Chunk.GetIndexFromPosition(chunkData, x, y, z));
 
             return shouldRenderBlock(currentType, neighbourBlockType)
                 ? currentType

@@ -21,7 +21,7 @@ namespace Voxel_Engine
             {
                 case RenderMethod.PerVoxel:
                     meshData.Material = chunkData.WorldReference.WorldRenderer.chunkMaterialPerVoxel;
-                    LoopThroughBlocks(chunkData, (x,y,z) => meshData = VoxelHelper.GetMeshData(chunkData, x,y,z,meshData,chunkData.Voxels[GetIndexFromPosition(chunkData, x,y,z)]));
+                    LoopThroughBlocks(chunkData, (x,y,z) => meshData = VoxelHelper.GetMeshData(chunkData, x,y,z,meshData,chunkData.GetVoxel(GetIndexFromPosition(chunkData, x,y,z))));
                     break;
                 case RenderMethod.Greedy:
                     meshData.Material = chunkData.WorldReference.WorldRenderer.chunkMaterialGreedy;
@@ -36,7 +36,7 @@ namespace Voxel_Engine
 
         public static void LoopThroughBlocks(ChunkData chunkData, Action<int, int, int> actionToPerform)
         {
-            for (var i = 0; i < chunkData.Voxels.Length; i++)
+            for (var i = 0; i < chunkData.GetNumberOfVoxels(); i++)
             {
                 var position = GetPositionFromIndex(chunkData, i);
                 actionToPerform(position.x, position.y, position.z);
@@ -48,7 +48,7 @@ namespace Voxel_Engine
             if (IsInsideChunkBounds(chunkData, chunkCoords))
             {
                 var index = GetIndexFromPosition(chunkData, chunkCoords.x, chunkCoords.y, chunkCoords.z);
-                chunkData.Voxels[index] = voxel;
+                chunkData.SetVoxel(index, voxel);
             }
             else
             {
@@ -59,7 +59,7 @@ namespace Voxel_Engine
         public static VoxelType GetVoxelTypeAt(ChunkData chunkData, Vector3Int chunkCoords)
         {
             return IsInsideChunkBounds(chunkData, chunkCoords) ?
-                chunkData.Voxels[GetIndexFromPosition(chunkData, chunkCoords.x, chunkCoords.y, chunkCoords.z)] : 
+                chunkData.GetVoxel(chunkCoords) : 
                 WorldDataHelper.GetVoxelTypeAt(chunkData.WorldReference, GetVoxelCoordsFromChunkCoords(chunkData, chunkCoords.x, chunkCoords.y, chunkCoords.z));
         }
 
@@ -104,7 +104,7 @@ namespace Voxel_Engine
                     y, z);
             
             var index = GetIndexFromPosition(chunkData, x, y, z);
-            return chunkData.Voxels[index];
+            return chunkData.GetVoxel(index);
         }
         
         public static VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, Vector3Int chunkCoordinates)
