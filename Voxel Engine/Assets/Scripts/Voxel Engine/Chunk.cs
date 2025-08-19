@@ -70,7 +70,7 @@ namespace Voxel_Engine
                 return chunkData.HeightMap[chunkCoordsXZ.x, chunkCoordsXZ.y];
             }
 
-            var voxelCoords = GetVoxelCoordsFromChunkCoords(chunkData, chunkCoordsXZ.x, 0, chunkCoordsXZ.y);
+            var voxelCoords = GetVoxelCoordsFromChunkCoords(chunkData, chunkCoordsXZ.x, chunkData.ChunkPositionInVoxel.y, chunkCoordsXZ.y);
             return WorldDataHelper.GetSurfaceHeightAt(chunkData.WorldReference, voxelCoords);
         }
 
@@ -128,6 +128,10 @@ namespace Voxel_Engine
             };
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3Int GetVoxelCoordsFromChunkCoords(ChunkData chunkData, Vector3Int chunkCoords) => GetVoxelCoordsFromChunkCoords(chunkData, chunkCoords.x, chunkCoords.y, chunkCoords.z);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3Int GetVoxelCoordsFromChunkCoords(ChunkData chunkData, int chunkPositionX, int chunkPositionY, int chunkPositionZ)
         {
             return new Vector3Int

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Voxel_Engine.WorldGen.Biomes;
 using Voxel_Engine.WorldGen.Noise;
 
 namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
@@ -22,12 +23,12 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
         public override void Handle(ChunkData chunkData)
         {
             var noise = GenerateTreeNoise(chunkData, treeNoiseSettings);
-            var treePositions = DataProcessing.FindLocalMaxima(noise, closestTreeDistance);
-            treePositions = treePositions.ConvertAll(position => position - new Vector2Int(chunkData.ChunkSizeInVoxel/2, chunkData.ChunkSizeInVoxel/2));
+            var treePositionCandidates = DataProcessing.FindLocalMaxima(noise, closestTreeDistance);
+            treePositionCandidates = treePositionCandidates.ConvertAll(position => position - new Vector2Int(chunkData.ChunkSizeInVoxel/2, chunkData.ChunkSizeInVoxel/2));
 
             // This is just for easier debugging.
-            
-            treePositions = new();
+            /*
+            treePositionCandidates = new();
             for (var x = -10; x < chunkData.ChunkSizeInVoxel+10; x++)
             {
                 for (var z = -10; z < chunkData.ChunkSizeInVoxel+10; z++)
@@ -35,24 +36,33 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
                     var voxelPos = chunkData.ChunkPositionInVoxel + new Vector3Int(x, 0, z);
                     if (voxelPos.x % 10 == 0 && voxelPos.z % 10 == 0)
                     {
-                        treePositions.Add(new Vector2Int(x, z));
+                        treePositionCandidates.Add(new Vector2Int(x, z));
                     }
                 }
             }
+            */
             
-            
-            foreach (var treePosition2D in treePositions)
+            foreach (var treePosition2D in treePositionCandidates)
             {
                 var treePosition3DVoxel = treePosition2D.AsX0Z();
                 treePosition3DVoxel.y = Chunk.GetSurfaceHeight(chunkData, treePosition2D);
-
-                var groundVoxelType = Chunk.GetVoxelTypeAt(chunkData, treePosition3DVoxel);
                 
-                if (allowedTreeGroundTypes.Contains(groundVoxelType))
-                {
-                    CreateTree(chunkData, treePosition3DVoxel);
-                }
+                if (!IsValidTreePosition(chunkData, treePosition3DVoxel)) continue;
+
+                CreateTree(chunkData, treePosition3DVoxel);
             }
+        }
+
+        private bool IsValidTreePosition(ChunkData chunkData, Vector3Int treePosition3DVoxel)
+        {
+            var candidateBiome = WorldDataHelper.GetBiomeAt(chunkData.WorldReference,
+                Chunk.GetVoxelCoordsFromChunkCoords(chunkData, treePosition3DVoxel.x, treePosition3DVoxel.y,
+                    treePosition3DVoxel.z));
+            if (!GeneratesInBiome(candidateBiome))
+                return false;
+                
+            var groundVoxelType = Chunk.GetVoxelTypeAt(chunkData, treePosition3DVoxel);
+            return allowedTreeGroundTypes.Contains(groundVoxelType);
         }
 
         private void CreateTree(ChunkData chunkData, Vector3Int treePosition3D)
@@ -79,10 +89,10 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
                 
             foreach (var leafOffset in _treeLeavesStaticLayout)
             {
-                var leafPosition = leafOffset + treePosition3D;
+                var leafPosition = treePosition3D + leafOffset;
                 if (!Chunk.IsInsideChunkBounds(chunkData, leafPosition))
                     continue;
-
+                
                 Chunk.SetVoxel(chunkData, leafPosition, VoxelType.TreeLeafesTransparent);
             };
         }

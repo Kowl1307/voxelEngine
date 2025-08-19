@@ -25,23 +25,11 @@ namespace Voxel_Engine.WorldGen
         public bool useDomainWarping = true;
 
         public VoxelLayerHandler StartLayerHandler;
-
-        [SerializeField] private GameObject structureGeneratorsHolder;
-        private List<StructureGenerator> _structureGenerators = new();
-
-        [SerializeField] private GameObject decorationGeneratorsHolder;
-        private List<DecorationGenerator> _decorationGenerators = new();
         
         private SurfaceHeightGenerator _surfaceHeightGenerator;
 
         private void Awake()
         {
-            if(structureGeneratorsHolder != null)
-                _structureGenerators = structureGeneratorsHolder.GetComponents<StructureGenerator>().ToList();
-            
-            if(decorationGeneratorsHolder != null)
-                _decorationGenerators = decorationGeneratorsHolder.GetComponents<DecorationGenerator>().ToList();
-            
             _surfaceHeightGenerator = GetComponent<SurfaceHeightGenerator>();
         }
 
@@ -75,9 +63,8 @@ namespace Voxel_Engine.WorldGen
         /// <param name="x">Voxel Coords</param>
         /// <param name="y">Voxel Coords</param>
         /// <param name="z">Voxel Coords</param>
-        /// <param name="mapSeedOffset"></param>
         /// <returns></returns>
-        public VoxelType ProcessVoxel(World world, int x, int y, int z, Vector2Int mapSeedOffset)
+        public VoxelType ProcessVoxel(World world, int x, int y, int z)
         {
             //Create a temporary chunkData so we can use it to set the voxel
             var voxelCoords = new Vector3Int(x, y, z);
@@ -86,54 +73,9 @@ namespace Voxel_Engine.WorldGen
             var voxelInChunkCoord = Chunk.GetChunkCoordinateOfVoxelPosition(chunkData, voxelCoords);
             
             var surfaceHeight = GetSurfaceHeightNoise(x, z, chunkData.WorldReference.WorldData);
-            StartLayerHandler.Handle(chunkData, voxelInChunkCoord.x, voxelInChunkCoord.y, voxelInChunkCoord.z, surfaceHeight, mapSeedOffset, BiomeSettings);
+            StartLayerHandler.Handle(chunkData, voxelInChunkCoord.x, voxelInChunkCoord.y, voxelInChunkCoord.z, surfaceHeight, world.WorldData.WorldSeed, BiomeSettings);
             
             return chunkData.Voxels[Chunk.GetIndexFromPosition(chunkData, voxelInChunkCoord.x, voxelInChunkCoord.y, voxelInChunkCoord.z)];
-        }
-
-        public ChunkData GenerateStructures(ChunkData chunkData)
-        {
-            foreach (var structureGenerator in _structureGenerators)
-            {
-                structureGenerator.Handle(chunkData);
-            }
-            
-            //TODO: This seems to be broken (leaves of trees are not spawned in deserts)
-            //Also check for other generators of the neighboring chunks, as structures can go over biome boundaries.
-            var adjacentChunkPositionsInVoxel = WorldDataHelper.GetAdjacentChunkPositionsInVoxel(chunkData.WorldReference, chunkData.ChunkPositionInVoxel);
-            var structureTypes = _structureGenerators.ConvertAll(generator => generator.GetType());
-            
-            foreach (var adjacentChunkPosition in adjacentChunkPositionsInVoxel)
-            {
-                var adjacentStructureGenerators =
-                    chunkData.WorldReference.terrainGenerator.GetBiomeGeneratorAt(chunkData.WorldReference.WorldData,
-                        adjacentChunkPosition)._structureGenerators;
-                
-                foreach (var adjacentGenerator in adjacentStructureGenerators.Where(adjacentGenerator => !structureTypes.Contains(adjacentGenerator.GetType())))
-                {
-                    adjacentGenerator.Handle(chunkData);
-                }
-            }
-            
-            return chunkData;
-        }
-
-        // TODO: Would be better if decorations are also voxels but are rendered differently. Creating all these objects or having insanely large objectPools seems very inefficient..
-        public void GenerateDecorations(ChunkData chunkData)
-        {
-            Task.Run( () =>
-            {
-                /*Parallel.ForEach(_decorationGenerators, chunkData.WorldReference.WorldParallelOptions,
-                    decorationGenerator =>
-                    {
-                        decorationGenerator.Handle(chunkData);
-                    });
-                */
-                foreach (var decorationGenerator in _decorationGenerators)
-                {
-                    decorationGenerator.Handle(chunkData);
-                }
-            });
         }
 
         /// <summary>

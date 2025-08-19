@@ -7,10 +7,8 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
     /// <summary>
     /// A Decoration is a GameObject that is added to a chunk. This allows disobendience against the voxel grid
     /// </summary>
-    public abstract class DecorationGenerator : MonoBehaviour, IChunkFeatureGenerator
+    public abstract class DecorationGenerator : ChunkFeatureGenerator
     {
-        public abstract void Handle(ChunkData chunkData);
-
         protected static async Task<DecorationObject> InstantiateDecorationOnMainThread(GameObject objectToCreate, Vector3 position, Quaternion rotation, bool isStatic = true, Action<DecorationObject> disposeOperation = null)
         {
             var go = await UnityMainThreadDispatcher.Instance().EnqueueAsync(() => Instantiate(objectToCreate, position, rotation));

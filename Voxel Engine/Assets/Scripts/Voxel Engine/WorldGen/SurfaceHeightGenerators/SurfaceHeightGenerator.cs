@@ -15,7 +15,7 @@ namespace Voxel_Engine.WorldGen.SurfaceHeightGenerators
             // terrainHeight /= voxelScale.y;
             //var terrainHeight = useDomainWarping ? MyNoise.OctaveSimplex(x,z,BiomeNoiseSettings) : MyNoise.SimplexNoise(x, z, BiomeNoiseSettings);
             terrainHeight = MyNoise.Redistribution(terrainHeight, noiseSettings);
-            return MyNoise.RemapValue01ToInt(terrainHeight, 0, maximumHeight) + minimumHeight;
+            return MyNoise.RemapValue01ToInt(terrainHeight, minimumHeight, maximumHeight);
         }
     }
 }
