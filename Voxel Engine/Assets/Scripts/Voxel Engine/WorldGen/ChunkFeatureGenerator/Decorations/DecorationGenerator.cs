@@ -20,6 +20,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
         protected static async Task<DecorationObject> SetupDecorationObject(GameObject objectToSetup, Action<DecorationObject> disposeOperation = null)
         {
             var decorationObject = await UnityMainThreadDispatcher.Instance().EnqueueAsync(objectToSetup.AddComponent<DecorationObject>);
+            
             if(disposeOperation != null)
                 decorationObject.SetDisposeOperation(disposeOperation);
             

@@ -112,5 +112,13 @@ namespace Voxel_Engine
         {
             _refillAmount = amount;
         }
+
+        public int CurrentAmount()
+        {
+            lock (_lock)
+            {
+                return _objects.Count;
+            }
+        }
     }
 }

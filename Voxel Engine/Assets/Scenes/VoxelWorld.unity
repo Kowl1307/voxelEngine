@@ -1640,7 +1640,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allowedBiomes: 01000000
   allowedGroundTypes: 02000000
-  grassProbability: 0.1
+  grassProbability: 0.3
   grassPrefab: {fileID: 919132149155446097, guid: 8f9356c58a417cf408fdc4269575dcd8,
     type: 3}
 --- !u!1 &1728092373
@@ -2168,7 +2168,7 @@ PrefabInstance:
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: ChunkDrawingRange
-      value: 6
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}

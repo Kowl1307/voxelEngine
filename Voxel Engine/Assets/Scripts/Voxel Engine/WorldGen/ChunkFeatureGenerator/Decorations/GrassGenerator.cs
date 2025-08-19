@@ -18,17 +18,18 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
 
         private void Awake()
         {
-            if (_grassPool == null)
-            {
-                _grassPool = new ObjectPool<GameObject>(grassPrefab);
-            }
+            if (_grassPool != null) return;
+            
+            grassPrefab.SetActive(false);
+            _grassPool = new ObjectPool<GameObject>(grassPrefab);
         }
 
         public override async void Handle(ChunkData chunkData)
         {
             if (chunkData.ChunkPositionInVoxel.y+chunkData.ChunkHeightInVoxel < 0) return;
             
-            await UnityMainThreadDispatcher.Instance().EnqueueAsync(() => _grassPool.FillTo(chunkData.ChunkSizeInVoxel*chunkData.ChunkSizeInVoxel));
+            if(_grassPool.CurrentAmount() < 10) 
+                await UnityMainThreadDispatcher.Instance().EnqueueAsync(() => _grassPool.FillTo(chunkData.ChunkSizeInVoxel*chunkData.ChunkSizeInVoxel));
             
             var randomSeed = (uint)chunkData.ChunkPositionInVoxel.sqrMagnitude;
             if (randomSeed == 0) randomSeed = 40; // Avoid 0-seed
@@ -37,17 +38,20 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
             {
                 for (var z = 0; z < chunkData.ChunkSizeInVoxel; z++)
                 {
-                    if (!(random.NextFloat() < grassProbability)) continue;
-                    var positionInChunk = new Vector3Int(x, chunkData.HeightMap[x, z], z);
-
+                    var heightInChunk = Chunk.GetChunkCoordinateOfVoxelPosition(chunkData, new Vector3Int(0, chunkData.HeightMap[x,z],0)).y;
+                    var positionInChunk = new Vector3Int(x, heightInChunk, z);
                     if (!allowedGroundTypes.Contains(Chunk.GetVoxelTypeAt(chunkData, positionInChunk)))
-                        return;
+                        continue;
                     
-                    var voxelPosition = chunkData.ChunkPositionInVoxel + positionInChunk + Vector3Int.up;
+                    var voxelPosition = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, positionInChunk) + Vector3Int.up;
+                    
+                    if (!GeneratesInBiome(WorldDataHelper.GetBiomeAt(chunkData.WorldReference, voxelPosition)))
+                        continue;
+                    
+                    if (!(random.NextFloat() < grassProbability)) continue;
                     
                     var position =
                         WorldDataHelper.GetWorldPositionFromVoxelPosition(chunkData.WorldReference, voxelPosition) + Vector3.down * chunkData.WorldReference.WorldData.VoxelScaling.y/2;
-
                     var grassDecoration = await SetupGrassDecoration(position, Quaternion.identity, chunkData.WorldReference.WorldData.VoxelScaling);
                     chunkData.ChunkDecorations.Add(grassDecoration);
                 }
@@ -71,7 +75,6 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
                 grassDecorationObject.transform.position = position;
                 grassDecorationObject.transform.rotation = rotation;
                 grassDecorationObject.transform.localScale = scale;
-                grassDecorationObject.isStatic = true;
                 grassDecorationObject.SetActive(true);
             });
 

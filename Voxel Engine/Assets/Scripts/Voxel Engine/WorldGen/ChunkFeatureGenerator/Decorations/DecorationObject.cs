@@ -9,7 +9,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
 
         public void SetDisposeOperation(Action<DecorationObject> disposeOperation)
         {
-            _disposeAction = disposeOperation;
+            _disposeAction = disposeOperation ?? DefaultDecorationDispose;
         }
 
         public void Dispose()

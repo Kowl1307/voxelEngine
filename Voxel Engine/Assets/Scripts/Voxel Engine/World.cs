@@ -224,6 +224,7 @@ namespace Voxel_Engine
         {
             //What needs to exist
             var allChunkPositionsNeeded = WorldDataHelper.GetChunkPositionsAroundPlayer(this, playerPosition);
+            // var allChunkDataPositionsNeeded = WorldDataHelper.GetChunkPositionsAroundPlayer(this, playerPosition);
             var allChunkDataPositionsNeeded = WorldDataHelper.GetDataPositionsAroundPlayer(this, playerPosition);
 
             //Things needed to create (do not exist yet)
