@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 using Voxel_Engine;
+using Voxel_Engine.Saving;
 using Voxel_Engine.WorldGen;
 using Debug = UnityEngine.Debug;
 using Random = System.Random;
@@ -30,6 +31,8 @@ namespace Voxel_Engine
             MaxDegreeOfParallelism = Environment.ProcessorCount-1
         };
 
+        public bool saveOnDisable = true;
+
         public int chunkSizeInWorld => Mathf.FloorToInt(chunkSizeInVoxel * voxelScaling.x);
         public int chunkHeightInWorld => Mathf.FloorToInt(chunkHeightInVoxel * voxelScaling.y);
 
@@ -37,9 +40,12 @@ namespace Voxel_Engine
 
         public UnityEvent OnWorldCreated, OnNewChunksGenerated;
 
-        public WorldData WorldData { get; private set; }
+        public WorldData WorldData;
         public WorldRenderer WorldRenderer;
         public int ChunkDrawingRange = 8;
+        
+        //TODO: This should be somewhere else
+        public readonly ConcurrentDictionary<Vector3Int, ChunkSaveData> ChunkSaveCache = new();
         
         public bool IsWorldCreated { get; set; }
 
@@ -88,6 +94,29 @@ namespace Voxel_Engine
         {
             if(_taskTokenSource.Token.CanBeCanceled)
                 _taskTokenSource.Cancel();
+            
+            if(saveOnDisable)
+            {
+                SaveWorld();
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (saveOnDisable)
+            {
+                LoadWorld();
+            }
+        }
+
+        public void SaveWorld()
+        {
+            WorldSaveHelper.SaveWorld(this);
+        }
+
+        public void LoadWorld()
+        {
+            WorldSaveHelper.LoadWorld(this);
         }
 
         public async void GenerateWorld()
@@ -98,6 +127,7 @@ namespace Voxel_Engine
             await GenerateWorld(Vector3Int.zero);
         }
         
+        //TODO: make world position vector3 as it should be..
         private async Task GenerateWorld(Vector3Int worldPosition)
         {
             print("Starting generating World call");
@@ -181,20 +211,32 @@ namespace Voxel_Engine
 
             return await Task.Run(() =>
             {
-                Parallel.ForEach(chunkDataPositionsToCreate, WorldParallelOptions, pos =>
+                Parallel.ForEach(chunkDataPositionsToCreate, WorldParallelOptions, worldPos =>
                 {
                     if (_taskTokenSource.Token.IsCancellationRequested)
                         _taskTokenSource.Token.ThrowIfCancellationRequested();
 
-                    var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, pos,
-                        WorldDataHelper.GetVoxelPositionFromWorldPosition(this, pos));
-                    var newData = terrainGenerator.GenerateChunkData(data, worldSeed);
-                    dictionary.TryAdd(pos, newData);
+                    var newData = CreateAndLoadChunkData(worldPos);
+                    dictionary.TryAdd(worldPos, newData);
                 });
                 
                 return dictionary;
             }, _taskTokenSource.Token);
             
+        }
+
+        private ChunkData CreateAndLoadChunkData(Vector3Int worldPos)
+        {
+            var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, worldPos,
+                WorldDataHelper.GetVoxelPositionFromWorldPosition(this, worldPos));
+            var newData = terrainGenerator.GenerateChunkData(data, worldSeed);
+
+            if (!ChunkSaveCache.TryGetValue(worldPos, out var chunkSaveData)) return newData;
+            
+            print("Modifying voxels due to saved data");
+            newData.SetVoxelsMarkDirty(chunkSaveData.modifiedVoxels);
+
+            return newData;
         }
 
         private IEnumerator ChunkCreationCoroutine(ConcurrentDictionary<Vector3Int, MeshData> meshData)
@@ -265,7 +307,7 @@ namespace Voxel_Engine
             OnNewChunksGenerated?.Invoke();
         }
 
-        public void SetBlock(RaycastHit hit, VoxelType voxelType)
+        public void SetVoxel(RaycastHit hit, VoxelType voxelType)
         {
             var chunk = hit.collider.GetComponent<ChunkRenderer>();
             if (chunk == null) return;

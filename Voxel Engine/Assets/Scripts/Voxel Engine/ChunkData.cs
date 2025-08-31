@@ -49,9 +49,25 @@ namespace Voxel_Engine
 
         public void SetVoxelMarkDirty(int index, VoxelType voxel)
         {
-            _voxels[index] = voxel;
             _modifiedByPlayer = true;
+            _voxels[index] = voxel;
             _modifiedVoxels[index] = voxel;
+        }
+
+        public void SetVoxelsMarkDirty(Dictionary<int, VoxelType> voxels)
+        {
+            _modifiedByPlayer = true;
+
+            foreach (var index in voxels.Keys)
+            {
+                _voxels[index] = voxels[index];
+                _modifiedVoxels[index] = voxels[index];
+            }
+        }
+
+        public bool IsDirty()
+        {
+            return _modifiedByPlayer;
         }
         
         public Dictionary<int, VoxelType> GetModifiedVoxels() => _modifiedVoxels.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);

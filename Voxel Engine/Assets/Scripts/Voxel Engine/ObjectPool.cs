@@ -26,6 +26,7 @@ namespace Voxel_Engine
                 for (var i = _objects.Count; i < capacity; i++)
                 {
                     var newObject = Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
+                    //var newObject = UnityMainThreadDispatcher.Instance().EnqueueAsync(() => Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity)).Result;
                     _objects.Enqueue(newObject);
                 }
             }
@@ -44,18 +45,6 @@ namespace Voxel_Engine
                 var newObject = await UnityMainThreadDispatcher.Instance()
                     .EnqueueAsync(() => Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity));
 
-                lock (_lock)
-                {
-                    _objects.Enqueue(newObject);
-                }
-            }
-        }
-
-        public void AddAmount(int amount)
-        {
-            for (var i = 0; i < amount; i++)
-            {
-                var newObject = Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
                 lock (_lock)
                 {
                     _objects.Enqueue(newObject);
@@ -88,7 +77,8 @@ namespace Voxel_Engine
 
             lock (_lock)
             {
-                return _objects.Dequeue();
+                //TODO: This is not optimal i guess, but queue can be empty due to race conditions
+                return _objects.Count > 0 ? _objects.Dequeue() : GetObject();
             }
         }
 

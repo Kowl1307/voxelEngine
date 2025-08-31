@@ -93,7 +93,7 @@ namespace Player
 
         private void ModifyTerrain(RaycastHit hit)
         {
-            world.SetBlock(hit, VoxelType.Air);
+            world.SetVoxel(hit, VoxelType.Air);
         }
     }
 }

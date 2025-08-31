@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -71,16 +72,41 @@ namespace Voxel_Engine.Saving
             var completePath = Application.persistentDataPath + "/" + filePath;
             if (File.Exists(completePath))
             {
-                var formatter = new BinaryFormatter();
+                //var formatter = new BinaryFormatter();
                 var fileStream = new FileStream(completePath, FileMode.Open);
                 
-                var data = formatter.Deserialize(fileStream) as T;
+                //var data = formatter.Deserialize(fileStream) as T;
+                var json = "";
+                using (var reader = new StreamReader(fileStream, Encoding.UTF8)) 
+                {
+                    json = reader.ReadToEnd();
+                }
+                var data = JsonUtility.FromJson<T>(json);
                 
                 return data;
             }
             
             Debug.LogError("Save-File not found: " + completePath);
             throw new FileNotFoundException("Save-File not found: " + completePath);
+        }
+        
+        public static IEnumerable<string> GetAllFileNamesWithSuffix(string folderPath, string suffix)
+        {
+            var completePath = Application.persistentDataPath + "/" + folderPath + "/";
+            if (!Directory.Exists(completePath))
+            {
+                yield break;
+            }
+            
+            var fileNames = Directory.GetFiles(completePath, $"*{suffix}");
+            if (fileNames.Length <= 0)
+                yield break;
+            
+            foreach (var file in fileNames)
+            {        
+                var relativePath = file.Replace(Application.persistentDataPath + "/", "");
+                yield return relativePath;
+            }
         }
     }
 }
