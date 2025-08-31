@@ -24,7 +24,7 @@ namespace Voxel_Engine
         
         public Chunk.RenderMethod RenderMethod;
 
-        public bool ModifiedByPlayer = false;
+        private bool _modifiedByPlayer = false;
 
         public ChunkData(int chunkSizeInVoxel, int chunkHeightInVoxel, World world, Vector3Int chunkPositionInWorld, Vector3Int chunkPositionInVoxel)
         {
@@ -47,10 +47,10 @@ namespace Voxel_Engine
             _voxels[index] = voxel;
         }
 
-        public void MarkDirty(int index, VoxelType voxel)
+        public void SetVoxelMarkDirty(int index, VoxelType voxel)
         {
             _voxels[index] = voxel;
-            ModifiedByPlayer = true;
+            _modifiedByPlayer = true;
             _modifiedVoxels[index] = voxel;
         }
         
@@ -73,7 +73,7 @@ namespace Voxel_Engine
 
         public void SaveToFile()
         {
-            if (!ModifiedByPlayer)
+            if (!_modifiedByPlayer)
                 return;
             
             var saveData = new ChunkSaveData(this);

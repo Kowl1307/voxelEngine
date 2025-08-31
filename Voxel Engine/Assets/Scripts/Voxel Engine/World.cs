@@ -276,8 +276,7 @@ namespace Voxel_Engine
             //TODO: This should be a function of some sort
             var chunkPos = Chunk.GetChunkCoordinateOfVoxelPosition(chunk.ChunkData, pos);
             var index = Chunk.GetIndexFromPosition(chunk.ChunkData, chunkPos.x, chunkPos.y, chunkPos.z);
-            chunk.ChunkData.MarkDirty(index, voxelType);
-            chunk.ModifiedByPlayer = true;
+            chunk.ChunkData.SetVoxelMarkDirty(index, voxelType);
             
             //If block is on edge, update neighbour chunk
             if (Chunk.IsOnEdge(chunk.ChunkData, pos))
