@@ -15,12 +15,6 @@ namespace Voxel_Engine
     {
         public ChunkData ChunkData { get; private set; }
 
-        public bool ModifiedByPlayer
-        {
-            get => ChunkData.ModifiedByPlayer;
-            set => ChunkData.ModifiedByPlayer = value;
-        }
-
         public bool showGizmo;
         
         private MeshFilter _meshFilter;
