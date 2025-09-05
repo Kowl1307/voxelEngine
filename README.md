@@ -16,6 +16,9 @@ Current Features:
 - Modular list of Voxel Types
 - Voxel Scaling
   - (There are rounding errors with some fractions like 2/5)
+- Save/Load System
+  - Save world settings in a .world file
+  - Save each chunk in a .chunk file if it contained modified voxels. Only modified voxels are saved for obvious space reasons.
 - Basic First Person controller to explore the generated world
 
 ## Screenshots
@@ -30,5 +33,6 @@ Current Features:
 16 Chunk Render-Distance from player
 ![grafik](https://github.com/user-attachments/assets/f3f5afc4-bbf8-45c5-aa1a-1d6cf17dc594)
 ![grafik](https://github.com/user-attachments/assets/e1dc57fc-9876-4cbb-9399-cec3341ec0f6)
+
 
 
