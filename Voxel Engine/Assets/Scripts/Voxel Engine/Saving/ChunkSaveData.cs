@@ -10,23 +10,15 @@ namespace Voxel_Engine.Saving
     public class ChunkSaveData : SaveData
     {
         public SerializableDictionary<int, VoxelType> modifiedVoxels;
-        public int[] positionInVoxel;
-        public int[] positionInWorld;
+        public SerializableVector3Int positionInVoxel;
+        public SerializableVector3 positionInWorld;
         
         public ChunkSaveData(ChunkData chunkData)
         {
             modifiedVoxels = chunkData.GetModifiedVoxels();
-            
-            positionInVoxel = new int[] {
-                chunkData.ChunkPositionInVoxel.x,
-                chunkData.ChunkPositionInVoxel.y,
-                chunkData.ChunkPositionInVoxel.z
-            };
-            positionInWorld = new int[] {
-                chunkData.ChunkPositionInWorld.x,
-                chunkData.ChunkPositionInWorld.y,
-                chunkData.ChunkPositionInWorld.z
-            };
+
+            positionInVoxel = new SerializableVector3Int(chunkData.ChunkPositionInVoxel);
+            positionInWorld = new SerializableVector3(chunkData.ChunkPositionInWorld);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Voxel_Engine.Saving
                     continue;
                 }
                 var chunkSaveData = new ChunkSaveData(chunkDataKvP.Value);
-                SaveSystem.SaveData(chunkSaveData, worldName+"/"+chunkDataKvP.Key+ChunkSuffix);
+                SaveSystem.SaveData(chunkSaveData, worldName+"/"+GetChunkFileName(chunkSaveData));
             }
         }
 
@@ -54,7 +54,7 @@ namespace Voxel_Engine.Saving
                 foreach (var fileName in SaveSystem.GetAllFileNamesWithSuffix(world.name, ChunkSuffix))
                 {
                     var chunkSaveData = SaveSystem.LoadData<ChunkSaveData>(fileName);
-                    var positionInWorld = new Vector3Int(chunkSaveData.positionInWorld[0], chunkSaveData.positionInWorld[1], chunkSaveData.positionInWorld[2]);
+                    var positionInWorld = Vector3Int.RoundToInt((Vector3)chunkSaveData.positionInWorld);
                     world.ChunkSaveCache.TryAdd(positionInWorld, chunkSaveData);
                 }
             }
@@ -63,6 +63,11 @@ namespace Voxel_Engine.Saving
                 // World has no save data, so no need to do anything
                 Debug.LogWarning("Tried loading world with no save data!", world);
             }
+        }
+
+        private static string GetChunkFileName(ChunkSaveData chunkSaveData)
+        {
+            return (Vector3Int)chunkSaveData.positionInVoxel + ChunkSuffix;
         }
     }
 }
