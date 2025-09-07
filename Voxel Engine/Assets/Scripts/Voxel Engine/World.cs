@@ -238,6 +238,7 @@ namespace Voxel_Engine
             return newData;
         }
 
+        /*
         private IEnumerator ChunkCreationCoroutine(ConcurrentDictionary<Vector3Int, MeshData> meshData)
         {
             foreach (var item in meshData)
@@ -253,6 +254,7 @@ namespace Voxel_Engine
             IsWorldCreated = true;
             OnWorldCreated?.Invoke();
         }
+        */
 
         private void CreateChunk(WorldData worldData, Vector3 worldPosition, MeshData meshData)
         {
@@ -370,6 +372,6 @@ public struct WorldData
     public Vector2Int WorldSeed;
     public Vector3 VoxelScaling;
     
-    public float ChunkSizeInWorld => Mathf.FloorToInt(ChunkSizeInVoxel * VoxelScaling.x);
-    public float ChunkHeightInWorld => Mathf.FloorToInt(ChunkHeightInVoxel * VoxelScaling.y);
+    public float ChunkSizeInWorld => ChunkSizeInVoxel * VoxelScaling.x;
+    public float ChunkHeightInWorld => ChunkHeightInVoxel * VoxelScaling.y;
 }
