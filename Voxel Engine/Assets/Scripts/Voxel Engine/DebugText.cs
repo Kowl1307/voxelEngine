@@ -36,7 +36,7 @@ namespace Voxel_Engine
             var voxelPos = WorldDataHelper.GetVoxelPositionFromWorldPosition(_world, _playerTransform.position);
 
             var chunkData = WorldDataHelper.GetChunkDataFromVoxelCoords(_world, voxelPos);
-            var chunkPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(_world, voxelPos) / _world.chunkSizeInWorld;
+            var chunkPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(_world, voxelPos);
             var chunkCoords = Chunk.GetChunkCoordinateOfVoxelPosition(chunkData, voxelPos);
             
             _textComponent.text = Format(_debugText, worldPos.x, worldPos.y, worldPos.z,

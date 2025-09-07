@@ -155,7 +155,7 @@ namespace Voxel_Engine.WorldGen
             return biomeSelector.GetBiomeTypeAt(world.WorldData, voxelPosition);
         }
 
-        public async void InitBiomeSelector(World world, Vector3Int worldPosition)
+        public async void InitBiomeSelector(World world, Vector3 worldPosition)
         {
             await Task.Run(() => biomeSelector.PrecomputeData(world, worldPosition));
         }

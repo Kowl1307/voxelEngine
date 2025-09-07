@@ -33,9 +33,6 @@ namespace Voxel_Engine
 
         public bool saveOnDisable = true;
 
-        public int chunkSizeInWorld => Mathf.FloorToInt(chunkSizeInVoxel * voxelScaling.x);
-        public int chunkHeightInWorld => Mathf.FloorToInt(chunkHeightInVoxel * voxelScaling.y);
-
         public TerrainGenerator terrainGenerator;
 
         public UnityEvent OnWorldCreated, OnNewChunksGenerated;
@@ -53,7 +50,7 @@ namespace Voxel_Engine
         
         private struct ChunkToCreate
         {
-            public Vector3Int Position;
+            public Vector3 WorldPosition;
             public MeshData MeshData;
         }
         private readonly ConcurrentQueue<ChunkToCreate> _chunksToCreate = new();
@@ -81,7 +78,7 @@ namespace Voxel_Engine
             while (!_chunksToCreate.IsEmpty)
             {
                 _chunksToCreate.TryDequeue(out var chunkToCreate);
-                CreateChunk(WorldData, chunkToCreate.Position, chunkToCreate.MeshData);
+                CreateChunk(WorldData, chunkToCreate.WorldPosition, chunkToCreate.MeshData);
             }
 
             if (!_isProcessingChunkMeshData)
@@ -128,23 +125,25 @@ namespace Voxel_Engine
         }
         
         //TODO: make world position vector3 as it should be..
-        private async Task GenerateWorld(Vector3Int worldPosition)
+        private async Task GenerateWorld(Vector3 worldPosition)
         {
+            var voxelPosition = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, worldPosition);
+            
             print("Starting generating World call");
-            var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(worldPosition), _taskTokenSource.Token);
-            terrainGenerator.InitBiomeSelector(this, worldPosition);
+            var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(voxelPosition), _taskTokenSource.Token);
+            terrainGenerator.InitBiomeSelector(this, WorldDataHelper.GetWorldPositionFromVoxelPosition(this, voxelPosition));
             
             print("Deleting old Chunks..");
             //This cant be async because data is on main thread
             //Remove unneeded chunks
-            foreach (var pos in worldGenerationData.ChunkPositionsToRemove)
+            foreach (var voxelPos in worldGenerationData.ChunkPositionsToRemove)
             {
-                WorldDataHelper.RemoveChunk(this, pos);
+                WorldDataHelper.RemoveChunk(this, voxelPos);
             }
             
-            foreach (var pos in worldGenerationData.ChunkDataToRemove)
+            foreach (var voxelPos in worldGenerationData.ChunkDataToRemove)
             {
-                WorldDataHelper.RemoveChunkData(this, pos);
+                WorldDataHelper.RemoveChunkData(this, voxelPos);
             }
             
             print("Populating new world data..");
@@ -183,7 +182,7 @@ namespace Voxel_Engine
             {
                 var meshData = Chunk.GetChunkMeshData(data);
                 if (_taskTokenSource.Token.IsCancellationRequested) _taskTokenSource.Token.ThrowIfCancellationRequested();;
-                dictionary.TryAdd(data.ChunkPositionInWorld, meshData);
+                dictionary.TryAdd(data.ChunkPositionInVoxel, meshData);
             }), _taskTokenSource.Token);
             
             return dictionary;
@@ -198,7 +197,7 @@ namespace Voxel_Engine
                     {
                         var meshData = Chunk.GetChunkMeshData(data);
                         _chunksToCreate.Enqueue(new ChunkToCreate()
-                            { Position = data.ChunkPositionInWorld, MeshData = meshData });
+                            { WorldPosition = data.ChunkPositionInWorld, MeshData = meshData });
                     });
                     _isProcessingChunkMeshData = false;
                 }
@@ -211,13 +210,13 @@ namespace Voxel_Engine
 
             return await Task.Run(() =>
             {
-                Parallel.ForEach(chunkDataPositionsToCreate, WorldParallelOptions, worldPos =>
+                Parallel.ForEach(chunkDataPositionsToCreate, WorldParallelOptions, voxelPosition =>
                 {
                     if (_taskTokenSource.Token.IsCancellationRequested)
                         _taskTokenSource.Token.ThrowIfCancellationRequested();
 
-                    var newData = CreateAndLoadChunkData(worldPos);
-                    dictionary.TryAdd(worldPos, newData);
+                    var newData = CreateAndLoadChunkData(voxelPosition);
+                    dictionary.TryAdd(voxelPosition, newData);
                 });
                 
                 return dictionary;
@@ -225,13 +224,13 @@ namespace Voxel_Engine
             
         }
 
-        private ChunkData CreateAndLoadChunkData(Vector3Int worldPos)
+        private ChunkData CreateAndLoadChunkData(Vector3Int voxelPosition)
         {
-            var data = new ChunkData(chunkSizeInVoxel, chunkHeightInVoxel, this, worldPos,
-                WorldDataHelper.GetVoxelPositionFromWorldPosition(this, worldPos));
+            var data = new ChunkData(WorldData.ChunkSizeInVoxel, WorldData.ChunkHeightInVoxel, this, WorldDataHelper.GetWorldPositionFromVoxelPosition(this, voxelPosition),
+                voxelPosition);
             var newData = terrainGenerator.GenerateChunkData(data, worldSeed);
 
-            if (!ChunkSaveCache.TryGetValue(worldPos, out var chunkSaveData)) return newData;
+            if (!ChunkSaveCache.TryGetValue(voxelPosition, out var chunkSaveData)) return newData;
             
             print("Modifying voxels due to saved data");
             newData.SetVoxelsMarkDirty(chunkSaveData.modifiedVoxels);
@@ -255,23 +254,24 @@ namespace Voxel_Engine
             OnWorldCreated?.Invoke();
         }
 
-        private void CreateChunk(WorldData worldData, Vector3Int position, MeshData meshData)
+        private void CreateChunk(WorldData worldData, Vector3 worldPosition, MeshData meshData)
         {
-            var chunkRenderer = WorldRenderer.RenderChunk(worldData, position, meshData, voxelScaling);
-            WorldData.ChunkDictionary.TryAdd(position, chunkRenderer);
+            var chunkRenderer = WorldRenderer.RenderChunk(this, worldData, worldPosition, meshData);
+            var voxelPosition = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, worldPosition);
+            WorldData.ChunkDictionary.TryAdd(voxelPosition, chunkRenderer);
         }
 
 
-        private WorldGenerationData GetPositionThatPlayerSees(Vector3Int playerPosition)
+        private WorldGenerationData GetPositionThatPlayerSees(Vector3Int voxelPosition)
         {
             //What needs to exist
-            var allChunkPositionsNeeded = WorldDataHelper.GetChunkPositionsAroundPlayer(this, playerPosition);
+            var allChunkPositionsNeeded = WorldDataHelper.GetChunkPositionsAroundPlayer(this, voxelPosition);
             // var allChunkDataPositionsNeeded = WorldDataHelper.GetChunkPositionsAroundPlayer(this, playerPosition);
-            var allChunkDataPositionsNeeded = WorldDataHelper.GetDataPositionsAroundPlayer(this, playerPosition);
+            var allChunkDataPositionsNeeded = WorldDataHelper.GetDataPositionsAroundPlayer(this, voxelPosition);
 
             //Things needed to create (do not exist yet)
-            var chunkPositionsToCreate = WorldDataHelper.SelectPositionsToCreate(WorldData, allChunkPositionsNeeded, playerPosition);
-            var chunkDataPositionsToCreate = WorldDataHelper.SelectDataPositionsToCreate(WorldData, allChunkDataPositionsNeeded, playerPosition);
+            var chunkPositionsToCreate = WorldDataHelper.SelectPositionsToCreate(WorldData, allChunkPositionsNeeded, voxelPosition);
+            var chunkDataPositionsToCreate = WorldDataHelper.SelectDataPositionsToCreate(WorldData, allChunkDataPositionsNeeded, voxelPosition);
 
             var chunkPositionsToRemove = WorldDataHelper.GetUnneededChunks(WorldData, allChunkPositionsNeeded);
             var chunkDataToRemove = WorldDataHelper.GetUnneededData(WorldData, allChunkDataPositionsNeeded);
@@ -289,10 +289,9 @@ namespace Voxel_Engine
         public VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int chunkPositionX, int chunkPositionY, int chunkPositionZ)
         {
             var voxelCoords = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, chunkPositionX, chunkPositionY, chunkPositionZ);
-            var pos = WorldDataHelper.GetChunkWorldPositionFromVoxelCoords(this, voxelCoords);
-            ChunkData containerChunk = null;
+            var pos = WorldDataHelper.GetChunkPositionFromVoxelCoords(this, voxelCoords);
 
-            WorldData.ChunkDataDictionary.TryGetValue(pos, out containerChunk);
+            WorldData.ChunkDataDictionary.TryGetValue(pos, out var containerChunk);
 
             if (containerChunk == null)
                 return VoxelType.Nothing;
@@ -326,7 +325,7 @@ namespace Voxel_Engine
                 var neighbourDataList = Chunk.GetEdgeNeighbourChunk(chunk.ChunkData, pos);
                 foreach (var neighbourData in neighbourDataList)
                 {
-                    var chunkToUpdate = WorldDataHelper.GetChunk(neighbourData.WorldReference, neighbourData.ChunkPositionInWorld);
+                    var chunkToUpdate = WorldDataHelper.GetChunk(neighbourData.WorldReference, neighbourData.ChunkPositionInVoxel);
                     if (chunkToUpdate != null)
                         chunkToUpdate.GetMeshDataAndUpdate();
                 }
@@ -364,10 +363,13 @@ namespace Voxel_Engine
 
 public struct WorldData
 {
-    public ConcurrentDictionary<Vector3Int, ChunkData> ChunkDataDictionary;
-    public ConcurrentDictionary<Vector3Int, ChunkRenderer> ChunkDictionary;
+    public ConcurrentDictionary<Vector3Int, ChunkData> ChunkDataDictionary; // Position in Voxel Space
+    public ConcurrentDictionary<Vector3Int, ChunkRenderer> ChunkDictionary; // Position in Voxel Space
     public int ChunkSizeInVoxel;
     public int ChunkHeightInVoxel;
     public Vector2Int WorldSeed;
     public Vector3 VoxelScaling;
+    
+    public float ChunkSizeInWorld => Mathf.FloorToInt(ChunkSizeInVoxel * VoxelScaling.x);
+    public float ChunkHeightInWorld => Mathf.FloorToInt(ChunkHeightInVoxel * VoxelScaling.y);
 }

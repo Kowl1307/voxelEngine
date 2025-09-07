@@ -17,7 +17,7 @@ namespace Voxel_Engine
         public int ChunkSizeInVoxel { get; }
         public int ChunkHeightInVoxel { get; }
         public World WorldReference{ get; }
-        public Vector3Int ChunkPositionInWorld { get; } // Position of the transform in world space
+        public Vector3 ChunkPositionInWorld { get; } // Position of the transform in world space
         public Vector3Int ChunkPositionInVoxel { get; } // Position of the chunk in voxel space
 
         public readonly int ChunkHeightInWorld;
@@ -26,7 +26,7 @@ namespace Voxel_Engine
 
         private bool _modifiedByPlayer = false;
 
-        public ChunkData(int chunkSizeInVoxel, int chunkHeightInVoxel, World world, Vector3Int chunkPositionInWorld, Vector3Int chunkPositionInVoxel)
+        public ChunkData(int chunkSizeInVoxel, int chunkHeightInVoxel, World world, Vector3 chunkPositionInWorld, Vector3Int chunkPositionInVoxel)
         {
             ChunkSizeInVoxel = chunkSizeInVoxel;
             ChunkHeightInVoxel = chunkHeightInVoxel;

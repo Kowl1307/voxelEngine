@@ -29,12 +29,12 @@ namespace Voxel_Engine
             _chunkPool.Clear();
         }
         
-        public ChunkRenderer RenderChunk(WorldData worldData, Vector3Int position, MeshData meshData, Vector3 voxelScaling)
+        public ChunkRenderer RenderChunk(World world, WorldData worldData, Vector3 worldPosition, MeshData meshData)
         {
             var newChunk = _chunkPool.GetObject();
             
-            newChunk.transform.position = position;
-            newChunk.InitializeChunk(worldData.ChunkDataDictionary[position]);
+            newChunk.transform.position = worldPosition;
+            newChunk.InitializeChunk(worldData.ChunkDataDictionary[WorldDataHelper.GetVoxelPositionFromWorldPosition(world, worldPosition)]);
             newChunk.UpdateChunk(meshData);
             return newChunk;
         }

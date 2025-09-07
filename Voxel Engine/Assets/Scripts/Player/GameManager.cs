@@ -10,8 +10,8 @@ namespace Player
     {
         [SerializeField] private GameObject playerPrefab;
         private GameObject player;
-        private Vector3Int currentPlayerChunkPosition;
-        private Vector3Int currentChunkCenter = Vector3Int.zero;
+        private Vector3 currentPlayerChunkPosition;
+        private Vector3 currentChunkCenter = Vector3.zero;
 
         [SerializeField] private Canvas debugUi;
 
@@ -26,7 +26,7 @@ namespace Player
             if (player != null)
                 return;
 
-            var raycastStartPosition = new Vector3Int(world.chunkSizeInWorld / 2, world.chunkHeightInWorld + 1, world.chunkSizeInWorld / 2);
+            var raycastStartPosition = new Vector3(world.WorldData.ChunkSizeInWorld / 2, world.WorldData.ChunkHeightInWorld + 1, world.WorldData.ChunkSizeInWorld / 2);
             RaycastHit hit;
             if (!Physics.Raycast(raycastStartPosition, Vector3.down, out hit, world.WorldData.ChunkHeightInVoxel * 2)) return;
             player = Instantiate(playerPrefab, hit.point + Vector3.up * .5f, Quaternion.identity);
@@ -63,9 +63,9 @@ namespace Player
         private IEnumerator CheckIfShouldLoadNextPosition()
         {
             yield return new WaitForSeconds(detectionTime);
-            if (Math.Abs(currentChunkCenter.x - player.transform.position.x) > world.chunkSizeInWorld ||
-                Math.Abs(currentChunkCenter.z - player.transform.position.z) > world.chunkSizeInWorld ||
-                Math.Abs(currentPlayerChunkPosition.y - player.transform.position.y) > world.chunkHeightInWorld)
+            if (Math.Abs(currentChunkCenter.x - player.transform.position.x) > world.WorldData.ChunkSizeInWorld ||
+                Math.Abs(currentChunkCenter.z - player.transform.position.z) > world.WorldData.ChunkSizeInWorld ||
+                Math.Abs(currentPlayerChunkPosition.y - player.transform.position.y) > world.WorldData.ChunkHeightInWorld)
             {
                 world.LoadAdditionalChucksRequest(player);
             }
@@ -77,11 +77,11 @@ namespace Player
 
         private void SetCurrentChunkCoordinates()
         {
-            currentPlayerChunkPosition = WorldDataHelper.GetChunkWorldPositionFromWorldCoords(world, Vector3Int.RoundToInt(player.transform.position));
+            currentPlayerChunkPosition = WorldDataHelper.GetChunkWorldPositionFromWorldCoords(world, player.transform.position);
             //currentPlayerChunkPosition =
             //    WorldDataHelper.GetChunkPositionFromVoxelCoords(world, Vector3Int.RoundToInt(player.transform.position));
-            currentChunkCenter.x = currentPlayerChunkPosition.x + world.chunkSizeInWorld / 2;
-            currentChunkCenter.z = currentPlayerChunkPosition.z + world.chunkSizeInWorld / 2;
+            currentChunkCenter.x = currentPlayerChunkPosition.x + world.WorldData.ChunkSizeInWorld / 2;
+            currentChunkCenter.z = currentPlayerChunkPosition.z + world.WorldData.ChunkSizeInWorld / 2;
         }
     }
 }

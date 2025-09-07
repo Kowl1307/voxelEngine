@@ -17,7 +17,6 @@ namespace Voxel_Engine
         public Material Material;
 
         public MeshData WaterMesh;
-        private bool isMainMesh = true;
 
         public MeshData(bool isMainMesh)
         {

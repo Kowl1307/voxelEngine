@@ -135,7 +135,7 @@ namespace Voxel_Engine
             
             Gizmos.color = Selection.activeGameObject == gameObject ? new Color (0,1,0,.4f) : new Color(1,0,1,.4f);
             //var size = new Vector3(ChunkData.ChunkSize, ChunkData.ChunkHeight, ChunkData.ChunkSize);
-            var size = new Vector3(ChunkData.WorldReference.chunkSizeInWorld, ChunkData.WorldReference.chunkHeightInWorld, ChunkData.WorldReference.chunkSizeInWorld);
+            var size = new Vector3(ChunkData.WorldReference.WorldData.ChunkSizeInWorld, ChunkData.WorldReference.WorldData.ChunkHeightInWorld, ChunkData.WorldReference.WorldData.ChunkSizeInWorld);
             Gizmos.DrawCube(transform.position + size/2, size);
         }
         #endif
