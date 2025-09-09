@@ -41,11 +41,13 @@ namespace Voxel_Engine
 
         public void RemoveChunk(ChunkRenderer chunk)
         {
+            /*
             foreach (var chunkDecorationObject in chunk.ChunkData.ChunkDecorations)
             {
                 chunkDecorationObject.Dispose();
             }
             chunk.ChunkData.ChunkDecorations.Clear();
+            */
             
             _chunkPool.ReturnObject(chunk);
         }

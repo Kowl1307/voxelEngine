@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
         
         [SerializeField] private GameObject grassPrefab;
         
-        private static ObjectPool<GameObject> _grassPool;
+        private ObjectPool<GameObject> _grassPool;
 
         private void Awake()
         {
@@ -52,20 +53,28 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations
                     
                     var position =
                         WorldDataHelper.GetWorldPositionFromVoxelPosition(chunkData.WorldReference, voxelPosition) + Vector3.down * chunkData.WorldReference.WorldData.VoxelScaling.y/2;
-                    var grassDecoration = await SetupGrassDecoration(position, Quaternion.identity, chunkData.WorldReference.WorldData.VoxelScaling);
+                    var rotation = Quaternion.Euler(Vector3.up * (random.NextInt(0,3) * 90));
+                    var grassDecoration = await SetupGrassDecoration(position, rotation, chunkData.WorldReference.WorldData.VoxelScaling);
                     chunkData.ChunkDecorations.Add(grassDecoration);
                 }
 
             }
         }
 
-        private static void DisposeDecoration(DecorationObject decorationObject)
+        private void DisposeDecoration(DecorationObject decorationObject)
         {
-            decorationObject.gameObject.SetActive(false);
-            _grassPool.ReturnObject(decorationObject.gameObject);
+            StartCoroutine(DisposeCoroutine());
+            return;
+
+            IEnumerator DisposeCoroutine()
+            {
+                decorationObject.gameObject.SetActive(false);
+                yield return null;
+                _grassPool.ReturnObject(decorationObject.gameObject);    
+            }
         }
 
-        private static async Task<DecorationObject> SetupGrassDecoration(Vector3 position, Quaternion rotation, Vector3 scale)
+        private async Task<DecorationObject> SetupGrassDecoration(Vector3 position, Quaternion rotation, Vector3 scale)
         {
             var grassDecorationObject = await _grassPool.GetObjectAsync();
             var grassDecoration = await SetupDecorationObject(grassDecorationObject, DisposeDecoration);
