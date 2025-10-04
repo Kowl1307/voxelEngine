@@ -174,20 +174,6 @@ namespace Voxel_Engine
             print("Finished World Generation.");
         }
 
-        private async Task<ConcurrentDictionary<Vector3Int, MeshData>> CreateMeshDataAsync(List<ChunkData> dataToRender)
-        {
-            var dictionary = new ConcurrentDictionary<Vector3Int, MeshData>();
-            
-            await Task.Run(() => Parallel.ForEach(dataToRender, WorldParallelOptions, data =>
-            {
-                var meshData = Chunk.GetChunkMeshData(data);
-                if (_taskTokenSource.Token.IsCancellationRequested) _taskTokenSource.Token.ThrowIfCancellationRequested();;
-                dictionary.TryAdd(data.ChunkPositionInVoxel, meshData);
-            }), _taskTokenSource.Token);
-            
-            return dictionary;
-        }
-
         private async Task CreateMeshDataAsyncAddToQueue(List<ChunkData> dataToRender)
         {
             _isProcessingChunkMeshData = true;
@@ -230,31 +216,18 @@ namespace Voxel_Engine
                 voxelPosition);
             var newData = terrainGenerator.GenerateChunkData(data, worldSeed);
 
-            if (!ChunkSaveCache.TryGetValue(voxelPosition, out var chunkSaveData)) return newData;
+            var existsSaveData = ChunkSaveCache.TryGetValue(voxelPosition, out var chunkSaveData);
             
-            print("Modifying voxels due to saved data");
+            if (!existsSaveData)
+            {
+                return newData;
+            }
+            
+            Debug.Log("Modifying voxels due to saved data");
             newData.SetVoxelsMarkDirty(chunkSaveData.modifiedVoxels);
 
             return newData;
         }
-
-        /*
-        private IEnumerator ChunkCreationCoroutine(ConcurrentDictionary<Vector3Int, MeshData> meshData)
-        {
-            foreach (var item in meshData)
-            {
-                //If the data is already gone or this function was called several times and already added the chunk, dont add the chunk
-                if (!WorldData.ChunkDataDictionary.ContainsKey(item.Key) || WorldData.ChunkDictionary.ContainsKey(item.Key))
-                    continue;
-                CreateChunk(WorldData, item.Key, item.Value);
-                yield return null;
-            }
-
-            if (IsWorldCreated) yield break;
-            IsWorldCreated = true;
-            OnWorldCreated?.Invoke();
-        }
-        */
 
         private void CreateChunk(WorldData worldData, Vector3 worldPosition, MeshData meshData)
         {

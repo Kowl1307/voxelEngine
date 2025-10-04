@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 namespace Voxel_Engine.Saving
@@ -54,8 +55,7 @@ namespace Voxel_Engine.Saving
                 foreach (var fileName in SaveSystem.GetAllFileNamesWithSuffix(world.name, ChunkSuffix))
                 {
                     var chunkSaveData = SaveSystem.LoadData<ChunkSaveData>(fileName);
-                    var positionInWorld = Vector3Int.RoundToInt((Vector3)chunkSaveData.positionInWorld);
-                    world.ChunkSaveCache.TryAdd(positionInWorld, chunkSaveData);
+                    world.ChunkSaveCache.TryAdd(chunkSaveData.positionInVoxel, chunkSaveData);
                 }
             }
             catch (Exception e)

@@ -11,7 +11,8 @@ namespace Voxel_Engine
     public class ChunkData
     {
         private readonly VoxelType[] _voxels;
-        private readonly ConcurrentDictionary<int, VoxelType> _modifiedVoxels = new();
+        private readonly ConcurrentBag<int> _modifiedVoxels = new();
+        // private readonly ConcurrentDictionary<int, VoxelType> _modifiedVoxels = new();
         public List<DecorationObject> ChunkDecorations { get; } =  new();
         public int[,] HeightMap { get; } // indices x,z, value = y
         public int ChunkSizeInVoxel { get; }
@@ -51,7 +52,7 @@ namespace Voxel_Engine
         {
             _modifiedByPlayer = true;
             _voxels[index] = voxel;
-            _modifiedVoxels[index] = voxel;
+            _modifiedVoxels.Add(index);
         }
 
         public void SetVoxelsMarkDirty(Dictionary<int, VoxelType> voxels)
@@ -61,7 +62,7 @@ namespace Voxel_Engine
             foreach (var index in voxels.Keys)
             {
                 _voxels[index] = voxels[index];
-                _modifiedVoxels[index] = voxels[index];
+                _modifiedVoxels.Add(index);
             }
         }
 
@@ -69,8 +70,17 @@ namespace Voxel_Engine
         {
             return _modifiedByPlayer;
         }
-        
-        public Dictionary<int, VoxelType> GetModifiedVoxels() => _modifiedVoxels.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        public Dictionary<int, VoxelType> GetModifiedVoxels()
+        {
+            var dict = new Dictionary<int, VoxelType>();
+            foreach (var index in _modifiedVoxels)
+            {
+                dict[index] = _voxels[index];
+            }
+
+            return dict;
+        }
 
         public VoxelType GetVoxel(Vector3Int chunkPosition)
         {

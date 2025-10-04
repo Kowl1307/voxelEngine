@@ -148,7 +148,7 @@ namespace Voxel_Engine
         /// <param name="chunkData"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        private static Vector3Int GetPositionFromIndex(ChunkData chunkData, int index)
+        public static Vector3Int GetPositionFromIndex(ChunkData chunkData, int index)
         {
             var x = index % chunkData.ChunkSizeInVoxel;
             var y = (index / chunkData.ChunkSizeInVoxel) % chunkData.ChunkHeightInVoxel;

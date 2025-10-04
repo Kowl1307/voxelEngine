@@ -1898,7 +1898,7 @@ PrefabInstance:
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: saveOnDisable
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
@@ -1938,7 +1938,7 @@ PrefabInstance:
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
       propertyPath: ChunkDrawingRange
-      value: 2
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7885068278507148076, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
         type: 3}
