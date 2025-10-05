@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Saving;
-using Saving.SerializableTypes;
+using Kowl.Utils.Saving;
+using Kowl.Utils.Saving.SerializableTypes;
 
 namespace Voxel_Engine.Saving
 {
