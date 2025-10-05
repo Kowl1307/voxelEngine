@@ -1,0 +1,3 @@
+[submodule "Voxel Engine/Packages/de.kowl.utilities"]
+	path = Voxel Engine/Packages/de.kowl.utilities
+	url = https://github.com/Kowl1307/de.kowl.utilities.git
