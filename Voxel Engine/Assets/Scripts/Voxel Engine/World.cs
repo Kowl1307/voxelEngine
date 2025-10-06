@@ -1,24 +1,21 @@
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 using Voxel_Engine;
+using Voxel_Engine.ChunkSelectors;
 using Voxel_Engine.Saving;
 using Voxel_Engine.WorldGen;
 using Debug = UnityEngine.Debug;
-using Random = System.Random;
 using Vector3 = UnityEngine.Vector3;
 
 namespace Voxel_Engine
 {
+    [RequireComponent(typeof(IChunkSelector))]
     public class World : MonoBehaviour
     {
         [SerializeField] private int chunkSizeInVoxel = 16;
@@ -39,6 +36,7 @@ namespace Voxel_Engine
 
         public WorldData WorldData;
         public WorldRenderer WorldRenderer;
+        public IChunkSelector chunkSelector;
         public int ChunkDrawingRange = 8;
         
         //TODO: This should be somewhere else
@@ -67,6 +65,8 @@ namespace Voxel_Engine
                 WorldSeed = worldSeed,
                 VoxelScaling = voxelScaling
             };
+                
+            chunkSelector = GetComponent<IChunkSelector>();
 
             //MapSeedOffset = new Vector2Int(new Random().Next(10000), new Random().Next(10000));
         }
@@ -130,7 +130,8 @@ namespace Voxel_Engine
             var voxelPosition = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, worldPosition);
             
             print("Starting generating World call");
-            var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(voxelPosition), _taskTokenSource.Token);
+            var worldGenerationData = chunkSelector.GetWorldGenerationData(this, voxelPosition);
+            //var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(voxelPosition), _taskTokenSource.Token);
             terrainGenerator.InitBiomeSelector(this, WorldDataHelper.GetWorldPositionFromVoxelPosition(this, voxelPosition));
             
             print("Deleting old Chunks..");
@@ -223,7 +224,6 @@ namespace Voxel_Engine
                 return newData;
             }
             
-            Debug.Log("Modifying voxels due to saved data");
             newData.SetVoxelsMarkDirty(chunkSaveData.modifiedVoxels);
 
             return newData;
@@ -235,32 +235,7 @@ namespace Voxel_Engine
             var voxelPosition = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, worldPosition);
             WorldData.ChunkDictionary.TryAdd(voxelPosition, chunkRenderer);
         }
-
-
-        private WorldGenerationData GetPositionThatPlayerSees(Vector3Int voxelPosition)
-        {
-            //What needs to exist
-            var allChunkPositionsNeeded = WorldDataHelper.GetChunkPositionsAroundPlayer(this, voxelPosition);
-            // var allChunkDataPositionsNeeded = WorldDataHelper.GetChunkPositionsAroundPlayer(this, playerPosition);
-            var allChunkDataPositionsNeeded = WorldDataHelper.GetDataPositionsAroundPlayer(this, voxelPosition);
-
-            //Things needed to create (do not exist yet)
-            var chunkPositionsToCreate = WorldDataHelper.SelectPositionsToCreate(WorldData, allChunkPositionsNeeded, voxelPosition);
-            var chunkDataPositionsToCreate = WorldDataHelper.SelectDataPositionsToCreate(WorldData, allChunkDataPositionsNeeded, voxelPosition);
-
-            var chunkPositionsToRemove = WorldDataHelper.GetUnneededChunks(WorldData, allChunkPositionsNeeded);
-            var chunkDataToRemove = WorldDataHelper.GetUnneededData(WorldData, allChunkDataPositionsNeeded);
-
-            var data = new WorldGenerationData
-            {
-                ChunkPositionsToCreate = chunkPositionsToCreate,
-                ChunkDataPositionsToCreate = chunkDataPositionsToCreate,
-                ChunkPositionsToRemove = chunkPositionsToRemove,
-                ChunkDataToRemove = chunkDataToRemove
-            };
-            return data;
-        }
-
+        
         public VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int chunkPositionX, int chunkPositionY, int chunkPositionZ)
         {
             var voxelCoords = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, chunkPositionX, chunkPositionY, chunkPositionZ);

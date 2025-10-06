@@ -59,7 +59,7 @@ namespace Voxel_Engine.Saving
                     world.ChunkSaveCache.TryAdd(chunkSaveData.positionInVoxel, chunkSaveData);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // World has no save data, so no need to do anything
                 Debug.LogWarning("Tried loading world with no save data!", world);
