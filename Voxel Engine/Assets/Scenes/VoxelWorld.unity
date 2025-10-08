@@ -2079,6 +2079,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8062480196732032011}
+    - targetCorrespondingSourceObject: {fileID: 5353300478322915642, guid: ebf574bf546ca1a4e99c38aef4ecdee9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8062480196732032012}
   m_SourcePrefab: {fileID: 100100000, guid: ebf574bf546ca1a4e99c38aef4ecdee9, type: 3}
 --- !u!114 &8062480196732032009 stripped
 MonoBehaviour:
@@ -2109,6 +2113,18 @@ MonoBehaviour:
   chunkMaterialPerVoxel: {fileID: 2100000, guid: fdd0278031be170479d5769502a77a09,
     type: 2}
   chunkMaterialGreedy: {fileID: 2100000, guid: f5d5772526d21ac47a64fc06e6909435, type: 2}
+--- !u!114 &8062480196732032012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141426909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd8a47d7ed134c9a9148cbbed9e4a8a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Voxel_Engine.ChunkSelectors.RangeChunkSelector
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
