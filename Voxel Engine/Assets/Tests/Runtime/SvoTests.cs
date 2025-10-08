@@ -71,6 +71,8 @@ namespace Tests.Runtime
             var tree = new SparseVoxelOctree<TestEnum>(64, voxelPositions, voxelColors);
             tree.Insert(new Vector3Int(25,13,5), TestEnum.Green);
             Assert.NotNull(tree.Root[0]);
+            
+            Assert.AreEqual(TestEnum.Red, tree.GetVoxelColorAt(new Vector3Int(63, 0, 0)));
         }
     }
 }

@@ -109,6 +109,23 @@ namespace Voxel_Engine.SVO
             }
         }
 
+        public TColor GetVoxelColorAt(Vector3Int voxelPosition)
+        {
+            TraverseTree(GetOctalNumber(voxelPosition), out var lastNode, out var lastNodeIndex, out _, out _);
+            switch (lastNode)
+            {
+                case SvoArrayNode<TColor> arrayNode:
+                    return arrayNode[lastNodeIndex];
+                case SvoLeafNode<TColor> leafNode:
+                    return leafNode.Color;
+                case SvoInnerNode innerNode:
+                    Debug.LogError("GetVoxelColorAt: invalid voxel position; Found inner node!");
+                    throw new Exception("GetVoxelColorAt: invalid voxel position; Found inner node!");
+                default:
+                    return default;
+            }
+        }
+        
         private int TraverseTree(OctalNumber octalNumber, out SvoNode lastNode, out int indexInLastNode, out SvoInnerNode lastNodeParent, out int indexInParent)
         {
             var depth = 0;
