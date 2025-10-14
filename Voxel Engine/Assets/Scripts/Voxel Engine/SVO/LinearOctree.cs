@@ -1,22 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Voxel_Engine.SVO
 {
     public class LinearOctree<TContent>
     {
-        public readonly Dictionary<ulong, TContent> _octree = new();
+        public readonly Dictionary<MortonCode, TContent> _octree = new() {{RootCode, default}};
 
+        private static readonly MortonCode RootCode = new MortonCode() { Code = 0, Depth = -1 };
+        
         public TContent GetValueAt(Vector3Int voxelPosition)
         {
-            var voxelMortonCode = MortonEncode(voxelPosition);
-            if (_octree.TryGetValue(voxelMortonCode, out var content))
+            var mortonCode = MortonEncode(voxelPosition);
+            
+            if (_octree.TryGetValue(mortonCode, out var content))
             {
                 return content;
             }
 
-            var parentCode = GetParentCode(voxelMortonCode);
-            while (parentCode != 0)
+            var parentCode = GetParentCode(mortonCode);
+            while (!IsRoot(parentCode))
             {
                 if (_octree.TryGetValue(parentCode, out var parentType))
                 {
@@ -35,21 +39,21 @@ namespace Voxel_Engine.SVO
             SetVoxel(code, content);
         }
         
-        public void SetVoxel(ulong voxelMortonCode, TContent content)
+        public void SetVoxel(MortonCode mortonCode, TContent content)
         {
             // Leaf exists, change it if necessary
-            if (_octree.ContainsKey(voxelMortonCode))
+            if (_octree.ContainsKey(mortonCode))
             {
-                InsertAndCollapse(voxelMortonCode, content);
+                InsertAndCollapse(mortonCode, content);
                 return;
             }
             
             // Find the first parent node
             // If the parent has the same TContent, we don't need to do anything
             // If the parent has a different type, we add the position as leaf.
-            var parentMortonCode = GetParentCode(voxelMortonCode);
+            var parentMortonCode = GetParentCode(mortonCode);
             
-            while (parentMortonCode != 0)
+            while (!IsRoot(parentMortonCode))
             {
                 if (!_octree.TryGetValue(parentMortonCode, out var parentContent))
                 {
@@ -59,22 +63,22 @@ namespace Voxel_Engine.SVO
 
                 if (parentContent.Equals(content)) return;
                 
-                InsertAndCollapse(voxelMortonCode, content);
+                InsertAndCollapse(mortonCode, content);
                 return;
             }
 
             // If root node exists, check its type
-            if (_octree.TryGetValue(0, out var rootContent))
+            if (_octree.TryGetValue(RootCode, out var rootContent))
             {
                 if (rootContent.Equals(content))
                     return;
             }
             
             // No parent found, insert the leaf
-            InsertAndCollapse(voxelMortonCode, content);
+            InsertAndCollapse(mortonCode, content);
         }
 
-        private void InsertAndCollapse(ulong voxelMortonCode, TContent content)
+        private void InsertAndCollapse(MortonCode voxelMortonCode, TContent content)
         {
             _octree[voxelMortonCode] = content;
             BottomUpCollapse(voxelMortonCode);
@@ -85,17 +89,11 @@ namespace Voxel_Engine.SVO
         /// Applies iteratively upwards, collapsing as far as possible.
         /// </summary>
         /// <param name="voxelMortonCode"></param>
-        private void BottomUpCollapse(ulong voxelMortonCode)
+        private void BottomUpCollapse(MortonCode voxelMortonCode)
         {
-            while (true)
+            while (!IsRoot(voxelMortonCode))
             {
                 Debug.Assert(_octree.ContainsKey(voxelMortonCode));
-
-                // If the given is already the root, we can't collapse
-                if (voxelMortonCode == 0)
-                {
-                    return;
-                }
                 
                 var collapsingType = _octree[voxelMortonCode];
                 
@@ -138,38 +136,46 @@ namespace Voxel_Engine.SVO
             return log;
         }
 
-        public ulong MortonEncode(Vector3Int position)
+        public MortonCode MortonEncode(Vector3Int position)
         {
-            // Avoid 0 vector
-            position += Vector3Int.one;
+            // Spezialfall 0: Da das der linkeste Pfad im Baum ist, schauen wir einfach nach dem erstbesten fit, der noch nicht existiert.
+            if (position == Vector3Int.zero)
+            {
+                var depth = 0;
+                while (_octree.ContainsKey(new MortonCode(0, depth)))
+                    depth++;
+                return new MortonCode(0, depth);
+            }
+            
             return MortonEncode(position.x, position.y, position.z);
         }
 
-        public ulong MortonEncode(int x, int y, int z)
+        public MortonCode MortonEncode(int x, int y, int z)
         {
-            ulong res = 0;
+            ulong code = 0;
             for (var i = 0; i < 21; i++) // 21, as 21*3 = 63, ulong has 64 bits
             {
-                res |= ((ulong)(x >> i) & 1) << (3 * i + 0);
-                res |= ((ulong)(y >> i) & 1) << (3 * i + 1);
-                res |= ((ulong)(z >> i) & 1) << (3 * i + 2);
+                code |= ((ulong)(x >> i) & 1) << (3 * i + 0);
+                code |= ((ulong)(y >> i) & 1) << (3 * i + 1);
+                code |= ((ulong)(z >> i) & 1) << (3 * i + 2);
             }
 
-            return res;
+            //return new MortonCode(code, GetDepth(code));
+            return new MortonCode(code, 20);
         }
 
-        public ulong GetParentCode(ulong childCode)
+        public MortonCode GetParentCode(MortonCode childCode)
         {
-            return childCode >> 3;
+            return new MortonCode(childCode.Code >> 3, childCode.Depth-1);
         }
         
-        public ulong GetChildCode(ulong parentCode, ulong childIndex)
+        public MortonCode GetChildCode(MortonCode parentCode, ulong childIndex)
         {
             Debug.Assert(childIndex < 8);
-            return (parentCode << 3) | childIndex;
+            return new MortonCode((parentCode.Code << 3) | childIndex, parentCode.Depth+1);
         }
 
-        public bool HasChild(ulong parentCode)
+        public bool HasChild(MortonCode parentCode)
         {
             for (var i = 0; i < 8; i++)
             {
@@ -178,10 +184,37 @@ namespace Voxel_Engine.SVO
 
             return false;
         }
+
+        public bool IsRoot(MortonCode mortonCode)
+        {
+            return mortonCode.Equals(RootCode);
+        }
     }
 
-    public struct MortonCode
+    public struct MortonCode : IEquatable<MortonCode>
     {
-        
+        public ulong Code;
+        public int Depth;
+
+        public MortonCode(ulong code, int depth)
+        {
+            Code = code;
+            Depth = depth;
+        }
+
+        public bool Equals(MortonCode other)
+        {
+            return Code == other.Code && Depth == other.Depth;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is MortonCode other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Code, Depth);
+        }
     }
 }
