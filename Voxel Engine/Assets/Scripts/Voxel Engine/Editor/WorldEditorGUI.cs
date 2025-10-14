@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Voxel_Engine.Editor
 {
+    #if UNITY_EDITOR
     [CustomEditor(typeof(World))]
     public class WorldEditorGUI : UnityEditor.Editor
     {
@@ -16,4 +17,5 @@ namespace Voxel_Engine.Editor
             }
         }
     }
+    #endif
 }
