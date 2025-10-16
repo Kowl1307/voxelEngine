@@ -130,7 +130,7 @@ namespace Voxel_Engine
         #if UNITY_EDITOR
         public void OnDrawGizmos()
         {
-            if (!showGizmo || !Application.isPlaying || ChunkData == null)
+            if (!showGizmo || !Application.isPlaying || !ChunkData.IsValid)
                 return;
             
             Gizmos.color = Selection.activeGameObject == gameObject ? new Color (0,1,0,.4f) : new Color(1,0,1,.4f);

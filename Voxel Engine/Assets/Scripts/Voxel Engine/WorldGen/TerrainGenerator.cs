@@ -61,7 +61,8 @@ namespace Voxel_Engine.WorldGen
         /// <exception cref="Exception"></exception>
         public ChunkData GenerateChunkData(ChunkData chunkData, Vector2Int mapSeedOffset)
         {
-            Parallel.For(0, chunkData.ChunkSizeInVoxel, chunkData.WorldReference.WorldParallelOptions, (x) =>
+            //Parallel.For(0, chunkData.ChunkSizeInVoxel, chunkData.WorldReference.WorldParallelOptions, (x) =>
+            for (var x = 0; x<chunkData.ChunkSizeInVoxel; x++)
             {
                 var voxelInChunk = new Vector3Int(x, 0, 0);
                 for (var z = 0; z < chunkData.ChunkSizeInVoxel; z++)
@@ -70,7 +71,7 @@ namespace Voxel_Engine.WorldGen
                     var biomeGenerator = GetBiomeGeneratorAt(chunkData.WorldReference.WorldData, Chunk.GetVoxelCoordsFromChunkCoords(chunkData, voxelInChunk));
                     chunkData = biomeGenerator.ProcessChunkColumn(chunkData, x, z, mapSeedOffset);
                 }
-            });
+            };
             
             chunkData = GenerateStructures(chunkData);
             GenerateDecorations(chunkData);

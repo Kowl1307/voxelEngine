@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 using Voxel_Engine;
 using Voxel_Engine.ChunkSelectors;
 using Voxel_Engine.Saving;
@@ -38,7 +37,7 @@ namespace Voxel_Engine
 
         public WorldData WorldData;
         public WorldRenderer WorldRenderer;
-        public IChunkSelector chunkSelector;
+        public IChunkSelector ChunkSelector;
         
         //TODO: This should be somewhere else
         public readonly ConcurrentDictionary<Vector3Int, ChunkSaveData> ChunkSaveCache = new();
@@ -52,8 +51,9 @@ namespace Voxel_Engine
             public Vector3 WorldPosition;
             public MeshData MeshData;
         }
+        
         private readonly ConcurrentQueue<ChunkToCreate> _chunksToCreate = new();
-        private bool _isProcessingChunkMeshData = false;
+        private bool _isProcessingChunkMeshData;
         
         private void Awake()
         {
@@ -68,7 +68,7 @@ namespace Voxel_Engine
                 ChunkDrawingRange = chunkDrawingRange
             };
                 
-            chunkSelector = GetComponent<IChunkSelector>();
+            ChunkSelector = GetComponent<IChunkSelector>();
 
             //MapSeedOffset = new Vector2Int(new Random().Next(10000), new Random().Next(10000));
         }
@@ -126,13 +126,12 @@ namespace Voxel_Engine
             await GenerateWorld(Vector3Int.zero);
         }
         
-        //TODO: make world position vector3 as it should be..
         private async Task GenerateWorld(Vector3 worldPosition)
         {
             var voxelPosition = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, worldPosition);
             
             print("Starting generating World call");
-            var worldGenerationData = chunkSelector.GetWorldGenerationData(WorldData, voxelPosition);
+            var worldGenerationData = ChunkSelector.GetWorldGenerationData(WorldData, voxelPosition);
             //var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(voxelPosition), _taskTokenSource.Token);
             terrainGenerator.InitBiomeSelector(WorldData, WorldDataHelper.GetWorldPositionFromVoxelPosition(this, voxelPosition));
             
@@ -150,7 +149,7 @@ namespace Voxel_Engine
             }
             
             print("Populating new world data..");
-            ConcurrentDictionary<Vector3Int, ChunkData> dataDictionary = null;
+            ConcurrentDictionary<Vector3Int, ChunkData> dataDictionary;
             try
             {
                 dataDictionary = await CalculateWorldChunkData(worldGenerationData.ChunkDataPositionsToCreate);
@@ -176,10 +175,11 @@ namespace Voxel_Engine
             await CreateMeshDataAsyncAddToQueue(dataToRender);
             print("Finished World Generation.");
         }
-
+        
         private async Task CreateMeshDataAsyncAddToQueue(List<ChunkData> dataToRender)
         {
             _isProcessingChunkMeshData = true;
+
             await Task.Run(
                 () => {
                     Parallel.ForEach(dataToRender, WorldParallelOptions, data =>
@@ -245,7 +245,7 @@ namespace Voxel_Engine
 
             WorldData.ChunkDataDictionary.TryGetValue(pos, out var containerChunk);
 
-            if (containerChunk == null)
+            if (!containerChunk.IsValid)
                 return VoxelType.Nothing;
             var voxelChunkCoordinates = Chunk.GetChunkCoordinateOfVoxelPosition(containerChunk,
                 voxelCoords);

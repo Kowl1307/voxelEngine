@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Voxel_Engine
@@ -53,6 +54,28 @@ namespace Voxel_Engine
             ColliderTriangles.Add(Vertices.Count - 4);
             ColliderTriangles.Add(Vertices.Count - 2);
             ColliderTriangles.Add(Vertices.Count - 1);
+        }
+    }
+
+    public struct MeshDataStruct
+    {
+        public NativeArray<Vector3> Vertices;
+        public NativeArray<int> Triangles;
+        public NativeArray<Vector2> UV;
+        public NativeArray<Vector2> UV2;
+        public NativeArray<Vector2> UV3;
+        public NativeArray<Vector3> ColliderVertices;
+        public NativeArray<int> ColliderTriangles;
+
+        public MeshDataStruct(MeshData meshData)
+        {
+            Vertices = meshData.Vertices.ToNativeArray(Allocator.TempJob);
+            Triangles = meshData.Triangles.ToNativeArray(Allocator.TempJob);
+            UV = meshData.UV.ToNativeArray(Allocator.TempJob);
+            UV2 = meshData.UV2.ToNativeArray(Allocator.TempJob);
+            UV3 = meshData.UV3.ToNativeArray(Allocator.TempJob);
+            ColliderVertices = meshData.ColliderVertices.ToNativeArray(Allocator.TempJob);
+            ColliderTriangles = meshData.ColliderTriangles.ToNativeArray(Allocator.TempJob);
         }
     }
 }
