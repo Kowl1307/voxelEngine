@@ -306,9 +306,23 @@ namespace Voxel_Engine
 
     public struct WorldGenerationData
     {
+        /// <summary>
+        /// List of chunks that have to be created (data & render)
+        /// </summary>
         public List<Vector3Int> ChunkPositionsToCreate;
+        /// <summary>
+        /// List of chunk data that needs to be created (no render needed yet)
+        /// </summary>
         public List<Vector3Int> ChunkDataPositionsToCreate;
+        
+        /// <summary>
+        /// List of chunks to remove (render only)
+        /// </summary>
         public List<Vector3Int> ChunkPositionsToRemove;
+        
+        /// <summary>
+        /// List of chunk data to remove
+        /// </summary>
         public List<Vector3Int> ChunkDataToRemove;
     }
 }

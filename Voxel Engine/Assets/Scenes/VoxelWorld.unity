@@ -2122,9 +2122,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 141426909}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd8a47d7ed134c9a9148cbbed9e4a8a2, type: 3}
+  m_Script: {fileID: 11500000, guid: 2b0a87e36b2644d78fbc2c21d11cab4c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Voxel_Engine.ChunkSelectors.RangeChunkSelector
+  m_EditorClassIdentifier: de.kowl.voxelengine::Voxel_Engine.ChunkSelectors.SphereChunkSelector
+  _renderRadius: 6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

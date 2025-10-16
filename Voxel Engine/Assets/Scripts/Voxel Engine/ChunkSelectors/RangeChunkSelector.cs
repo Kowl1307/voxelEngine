@@ -57,11 +57,11 @@ namespace Voxel_Engine.ChunkSelectors
 
             return GetPositionsAroundPlayer(worldData, startX, startZ, endX, endZ, playerVoxelPosition);
         }
-        
+
         /// <summary>
         /// Get Chunk positions around the player
         /// </summary>
-        /// <param name="world"></param>
+        /// <param name="worldData"></param>
         /// <param name="startX"></param>
         /// <param name="startZ"></param>
         /// <param name="endX"></param>
