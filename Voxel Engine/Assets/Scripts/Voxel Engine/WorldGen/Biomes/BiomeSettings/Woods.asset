@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00ae645fdab1476399264b103d29e836, type: 3}
   m_Name: Woods
   m_EditorClassIdentifier: 
-  MinimumHeight: 0
+  MinimumHeight: 20
+  MaximumHeight: 80
   WaterLevel: 13

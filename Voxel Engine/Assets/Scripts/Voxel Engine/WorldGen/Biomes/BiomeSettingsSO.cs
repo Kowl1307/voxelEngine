@@ -6,6 +6,7 @@ namespace Voxel_Engine.WorldGen.Biomes
     public class BiomeSettingsSO : ScriptableObject
     {
         public int MinimumHeight = 0;
+        public int MaximumHeight = 50;
         public int WaterLevel = 10;
     }
 }

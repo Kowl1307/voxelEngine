@@ -88,8 +88,7 @@ namespace Voxel_Engine.WorldGen
         /// <returns></returns>
         public int GetSurfaceHeightNoise(int x, int z, WorldData worldData)
         {
-            var chunkHeight = worldData.ChunkHeightInVoxel;
-            return _surfaceHeightGenerator.GetSurfaceHeight(x, z, BiomeSettings.MinimumHeight, chunkHeight, BiomeNoiseSettings, worldData);
+            return _surfaceHeightGenerator.GetSurfaceHeight(x, z, BiomeSettings.MinimumHeight, BiomeSettings.MaximumHeight, BiomeNoiseSettings, worldData);
         }
     }
 }

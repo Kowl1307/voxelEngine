@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Desert
   m_EditorClassIdentifier: 
   MinimumHeight: 0
+  MaximumHeight: 20
   WaterLevel: 0
