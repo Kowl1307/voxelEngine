@@ -30,9 +30,9 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
             public float Distance;
         }
 
-        public override void PrecomputeData(World world, Vector3 worldPosition)
+        public override void PrecomputeData(WorldData worldData, Vector3 worldPosition)
         {
-            GenerateBiomePoints(worldPosition, world.ChunkDrawingRange, world.WorldData.ChunkSizeInVoxel, world.WorldData.WorldSeed);
+            GenerateBiomePoints(worldPosition, worldData.ChunkDrawingRange, worldData.ChunkSizeInVoxel, worldData.WorldSeed);
         }
 
         public override BiomeType GetBiomeTypeAt(WorldData worldData, Vector3Int voxelPosition)

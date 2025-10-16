@@ -26,7 +26,7 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors.BiomeRefining
             throw new Exception("No biome found for this biome color");
         }
 
-        public override void PrecomputeData(World world, Vector3 worldPosition)
+        public override void PrecomputeData(WorldData worldData, Vector3 worldPosition)
         {
             
         }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using Voxel_Engine;
 using Voxel_Engine.ChunkSelectors;
 using Voxel_Engine.Saving;
@@ -22,6 +23,7 @@ namespace Voxel_Engine
         [SerializeField] private int chunkHeightInVoxel = 100;
         [SerializeField] private Vector2Int worldSeed;
         [SerializeField] private Vector3 voxelScaling = Vector3.one;
+        [SerializeField] private int chunkDrawingRange = 8;
         
         public readonly ParallelOptions WorldParallelOptions = new()
         {
@@ -37,7 +39,6 @@ namespace Voxel_Engine
         public WorldData WorldData;
         public WorldRenderer WorldRenderer;
         public IChunkSelector chunkSelector;
-        public int ChunkDrawingRange = 8;
         
         //TODO: This should be somewhere else
         public readonly ConcurrentDictionary<Vector3Int, ChunkSaveData> ChunkSaveCache = new();
@@ -63,7 +64,8 @@ namespace Voxel_Engine
                 ChunkDataDictionary = new ConcurrentDictionary<Vector3Int, ChunkData>(),
                 ChunkDictionary = new ConcurrentDictionary<Vector3Int, ChunkRenderer>(),
                 WorldSeed = worldSeed,
-                VoxelScaling = voxelScaling
+                VoxelScaling = voxelScaling,
+                ChunkDrawingRange = chunkDrawingRange
             };
                 
             chunkSelector = GetComponent<IChunkSelector>();
@@ -119,7 +121,7 @@ namespace Voxel_Engine
         public async void GenerateWorld()
         {
             // Fill the Chunk Pool of the WorldRenderer
-            WorldRenderer.FillChunkPool(ChunkDrawingRange);
+            WorldRenderer.FillChunkPool(chunkDrawingRange);
 
             await GenerateWorld(Vector3Int.zero);
         }
@@ -132,7 +134,7 @@ namespace Voxel_Engine
             print("Starting generating World call");
             var worldGenerationData = chunkSelector.GetWorldGenerationData(this, voxelPosition);
             //var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(voxelPosition), _taskTokenSource.Token);
-            terrainGenerator.InitBiomeSelector(this, WorldDataHelper.GetWorldPositionFromVoxelPosition(this, voxelPosition));
+            terrainGenerator.InitBiomeSelector(WorldData, WorldDataHelper.GetWorldPositionFromVoxelPosition(this, voxelPosition));
             
             print("Deleting old Chunks..");
             //This cant be async because data is on main thread
@@ -319,6 +321,7 @@ public struct WorldData
     public int ChunkHeightInVoxel;
     public Vector2Int WorldSeed;
     public Vector3 VoxelScaling;
+    public int ChunkDrawingRange;
     
     public float ChunkSizeInWorld => ChunkSizeInVoxel * VoxelScaling.x;
     public float ChunkHeightInWorld => ChunkHeightInVoxel * VoxelScaling.y;

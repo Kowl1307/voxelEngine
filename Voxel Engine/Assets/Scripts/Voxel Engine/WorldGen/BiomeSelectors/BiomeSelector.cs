@@ -12,6 +12,6 @@ namespace Voxel_Engine.WorldGen.BiomeSelectors
     {
         public abstract BiomeType GetBiomeTypeAt(WorldData worldData, Vector3Int voxelPosition);
 
-        public abstract void PrecomputeData(World world, Vector3 worldPosition);
+        public abstract void PrecomputeData(WorldData worldData, Vector3 worldPosition);
     }
 }
