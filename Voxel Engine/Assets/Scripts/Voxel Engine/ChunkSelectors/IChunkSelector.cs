@@ -5,6 +5,6 @@ namespace Voxel_Engine.ChunkSelectors
 {
     public interface IChunkSelector
     {
-        public WorldGenerationData GetWorldGenerationData(World world, Vector3Int voxelPosition);
+        public WorldGenerationData GetWorldGenerationData(WorldData worldData, Vector3Int voxelPosition);
     }
 }

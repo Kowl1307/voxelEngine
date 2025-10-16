@@ -69,7 +69,7 @@ namespace Voxel_Engine.WorldGen
             //Create a temporary chunkData so we can use it to set the voxel
             var voxelCoords = new Vector3Int(x, y, z);
             var chunkData = new ChunkData(world.WorldData.ChunkSizeInVoxel, world.WorldData.ChunkHeightInVoxel, world, WorldDataHelper.GetChunkWorldPositionFromVoxelCoords(world, voxelCoords),
-                WorldDataHelper.GetChunkPositionFromVoxelCoords(world, voxelCoords));
+                WorldDataHelper.GetChunkPositionFromVoxelCoords(world.WorldData, voxelCoords));
             var voxelInChunkCoord = Chunk.GetChunkCoordinateOfVoxelPosition(chunkData, voxelCoords);
             
             var surfaceHeight = GetSurfaceHeightNoise(x, z, chunkData.WorldReference.WorldData);

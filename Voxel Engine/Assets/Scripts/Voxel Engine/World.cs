@@ -132,7 +132,7 @@ namespace Voxel_Engine
             var voxelPosition = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, worldPosition);
             
             print("Starting generating World call");
-            var worldGenerationData = chunkSelector.GetWorldGenerationData(this, voxelPosition);
+            var worldGenerationData = chunkSelector.GetWorldGenerationData(WorldData, voxelPosition);
             //var worldGenerationData = await Task.Run(() => GetPositionThatPlayerSees(voxelPosition), _taskTokenSource.Token);
             terrainGenerator.InitBiomeSelector(WorldData, WorldDataHelper.GetWorldPositionFromVoxelPosition(this, voxelPosition));
             
@@ -241,7 +241,7 @@ namespace Voxel_Engine
         public VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int chunkPositionX, int chunkPositionY, int chunkPositionZ)
         {
             var voxelCoords = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, chunkPositionX, chunkPositionY, chunkPositionZ);
-            var pos = WorldDataHelper.GetChunkPositionFromVoxelCoords(this, voxelCoords);
+            var pos = WorldDataHelper.GetChunkPositionFromVoxelCoords(WorldData, voxelCoords);
 
             WorldData.ChunkDataDictionary.TryGetValue(pos, out var containerChunk);
 

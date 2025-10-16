@@ -6,12 +6,11 @@ namespace Voxel_Engine.ChunkSelectors
 {
     public class RangeChunkSelector : MonoBehaviour, IChunkSelector
     {
-        public WorldGenerationData GetWorldGenerationData(World world, Vector3Int voxelPosition)
+        public WorldGenerationData GetWorldGenerationData(WorldData worldData, Vector3Int voxelPosition)
         {
-            var worldData = world.WorldData;
             //What needs to exist
-            var allChunkPositionsNeeded = GetChunkPositionsAroundPlayer(world, voxelPosition);
-            var allChunkDataPositionsNeeded = GetDataPositionsAroundPlayer(world, voxelPosition);
+            var allChunkPositionsNeeded = GetChunkPositionsAroundPlayer(worldData, voxelPosition);
+            var allChunkDataPositionsNeeded = GetDataPositionsAroundPlayer(worldData, voxelPosition);
 
             //Things needed to create (do not exist yet)
             var chunkPositionsToCreate = SelectPositionsToCreate(worldData, allChunkPositionsNeeded, voxelPosition);
@@ -30,33 +29,33 @@ namespace Voxel_Engine.ChunkSelectors
             return data;
         }
         
-        public static List<Vector3Int> GetChunkPositionsAroundPlayer(World world, Vector3Int playerVoxelPosition)
+        public static List<Vector3Int> GetChunkPositionsAroundPlayer(WorldData worldData, Vector3Int playerVoxelPosition)
         {
             //TODO This whole thing is working with ints, even though the world coordinates are not ints...
             // This needs to be changed to calculate the voxel positions instead.
             //We calculate the chunk world position to avoid potential rounding errors in calculation
             //var playerWorldPos = GetChunkWorldPositionFromWorldCoords(world, voxelPosition);
             // var chunkWorldPos = GetChunkWorldPositionFromVoxelCoords(world, voxelPosition);
-            var chunkVoxelPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(world, playerVoxelPosition);
-            var startX = chunkVoxelPos.x - (world.WorldData.ChunkDrawingRange) * world.WorldData.ChunkSizeInVoxel;
-            var startZ = chunkVoxelPos.z - (world.WorldData.ChunkDrawingRange) * world.WorldData.ChunkSizeInVoxel;
-            var endX =   chunkVoxelPos.x + (world.WorldData.ChunkDrawingRange) * world.WorldData.ChunkSizeInVoxel; 
-            var endZ =   chunkVoxelPos.z + (world.WorldData.ChunkDrawingRange) * world.WorldData.ChunkSizeInVoxel;
+            var chunkVoxelPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(worldData, playerVoxelPosition);
+            var startX = chunkVoxelPos.x - (worldData.ChunkDrawingRange) * worldData.ChunkSizeInVoxel;
+            var startZ = chunkVoxelPos.z - (worldData.ChunkDrawingRange) * worldData.ChunkSizeInVoxel;
+            var endX =   chunkVoxelPos.x + (worldData.ChunkDrawingRange) * worldData.ChunkSizeInVoxel; 
+            var endZ =   chunkVoxelPos.z + (worldData.ChunkDrawingRange) * worldData.ChunkSizeInVoxel;
 
-            return GetPositionsAroundPlayer(world, startX, startZ, endX, endZ, playerVoxelPosition);
+            return GetPositionsAroundPlayer(worldData, startX, startZ, endX, endZ, playerVoxelPosition);
         }
         
-        public static List<Vector3Int> GetDataPositionsAroundPlayer(World world, Vector3Int playerVoxelPosition)
+        public static List<Vector3Int> GetDataPositionsAroundPlayer(WorldData worldData, Vector3Int playerVoxelPosition)
         {
             //We calculate the chunk world position to avoid potential rounding errors in calculation
             // var chunkWorldPos = GetChunkWorldPositionFromVoxelCoords(world, voxelPosition);
-            var chunkVoxelPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(world, playerVoxelPosition);
-            var startX = chunkVoxelPos.x - (world.WorldData.ChunkDrawingRange + 1) * world.WorldData.ChunkSizeInVoxel;
-            var startZ = chunkVoxelPos.z - (world.WorldData.ChunkDrawingRange + 1) * world.WorldData.ChunkSizeInVoxel;
-            var endX =   chunkVoxelPos.x   + (world.WorldData.ChunkDrawingRange + 1) *   world.WorldData.ChunkSizeInVoxel;
-            var endZ =   chunkVoxelPos.z   + (world.WorldData.ChunkDrawingRange + 1) *   world.WorldData.ChunkSizeInVoxel;
+            var chunkVoxelPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(worldData, playerVoxelPosition);
+            var startX = chunkVoxelPos.x - (worldData.ChunkDrawingRange + 1) * worldData.ChunkSizeInVoxel;
+            var startZ = chunkVoxelPos.z - (worldData.ChunkDrawingRange + 1) * worldData.ChunkSizeInVoxel;
+            var endX =   chunkVoxelPos.x   + (worldData.ChunkDrawingRange + 1) *   worldData.ChunkSizeInVoxel;
+            var endZ =   chunkVoxelPos.z   + (worldData.ChunkDrawingRange + 1) *   worldData.ChunkSizeInVoxel;
 
-            return GetPositionsAroundPlayer(world, startX, startZ, endX, endZ, playerVoxelPosition);
+            return GetPositionsAroundPlayer(worldData, startX, startZ, endX, endZ, playerVoxelPosition);
         }
         
         /// <summary>
@@ -69,27 +68,27 @@ namespace Voxel_Engine.ChunkSelectors
         /// <param name="endZ"></param>
         /// <param name="playerVoxelPosition"></param>
         /// <returns></returns>
-        private static List<Vector3Int> GetPositionsAroundPlayer(World world, int startX, int startZ, int endX,
+        private static List<Vector3Int> GetPositionsAroundPlayer(WorldData worldData, int startX, int startZ, int endX,
             int endZ, Vector3Int playerVoxelPosition)
         {
             var positions = new List<Vector3Int>();
-            for (var x = startX; x <= endX; x += world.WorldData.ChunkSizeInVoxel)
+            for (var x = startX; x <= endX; x += worldData.ChunkSizeInVoxel)
             {
-                for (var z = startZ; z <= endZ; z += world.WorldData.ChunkSizeInVoxel)
+                for (var z = startZ; z <= endZ; z += worldData.ChunkSizeInVoxel)
                 {
-                    var chunkVoxelPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(world, new Vector3Int(x, playerVoxelPosition.y, z));
+                    var chunkVoxelPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(worldData, new Vector3Int(x, playerVoxelPosition.y, z));
                     positions.Add(chunkVoxelPos);
                     
-                    if(    x < playerVoxelPosition.x - world.WorldData.ChunkSizeInVoxel
-                           || x > playerVoxelPosition.x + world.WorldData.ChunkSizeInVoxel
-                           || z < playerVoxelPosition.z - world.WorldData.ChunkSizeInVoxel
-                           || z > playerVoxelPosition.z + world.WorldData.ChunkSizeInVoxel) continue;
+                    if(    x < playerVoxelPosition.x - worldData.ChunkSizeInVoxel
+                           || x > playerVoxelPosition.x + worldData.ChunkSizeInVoxel
+                           || z < playerVoxelPosition.z - worldData.ChunkSizeInVoxel
+                           || z > playerVoxelPosition.z + worldData.ChunkSizeInVoxel) continue;
                     
                     //Also add chunks below the current one, for digging down scenarios
-                    for (var y = -world.WorldData.ChunkHeightInVoxel; y >= playerVoxelPosition.y - world.WorldData.ChunkHeightInVoxel * 2; y -= world.WorldData.ChunkHeightInVoxel)
+                    for (var y = -worldData.ChunkHeightInVoxel; y >= playerVoxelPosition.y - worldData.ChunkHeightInVoxel * 2; y -= worldData.ChunkHeightInVoxel)
                     {
                         if (y == 0) continue;
-                        chunkVoxelPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(world, new Vector3Int(x, y, z));
+                        chunkVoxelPos = WorldDataHelper.GetChunkPositionFromVoxelCoords(worldData, new Vector3Int(x, y, z));
                         positions.Add(chunkVoxelPos);
                     }
                 }
