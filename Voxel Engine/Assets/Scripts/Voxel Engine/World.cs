@@ -245,7 +245,7 @@ namespace Voxel_Engine
 
             WorldData.ChunkDataDictionary.TryGetValue(pos, out var containerChunk);
 
-            if (!containerChunk.IsValid)
+            if (containerChunk == null)
                 return VoxelType.Nothing;
             var voxelChunkCoordinates = Chunk.GetChunkCoordinateOfVoxelPosition(containerChunk,
                 voxelCoords);

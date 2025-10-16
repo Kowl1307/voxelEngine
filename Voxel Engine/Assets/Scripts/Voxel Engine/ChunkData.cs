@@ -8,7 +8,7 @@ using Voxel_Engine.WorldGen.ChunkFeatureGenerator.Decorations;
 
 namespace Voxel_Engine
 {
-    public struct ChunkData
+    public class ChunkData
     {
         private readonly VoxelType[] _voxels;
         private readonly ConcurrentBag<int> _modifiedVoxels;
@@ -26,8 +26,6 @@ namespace Voxel_Engine
         public Chunk.RenderMethod RenderMethod;
 
         private bool _modifiedByPlayer;
-
-        public bool IsValid { get; }
 
         public ChunkData(int chunkSizeInVoxel, int chunkHeightInVoxel, World world, Vector3 chunkPositionInWorld, Vector3Int chunkPositionInVoxel)
         {
@@ -47,8 +45,6 @@ namespace Voxel_Engine
             _modifiedVoxels = new();
             _modifiedByPlayer = false;
             ChunkDecorations = new();
-
-            IsValid = true;
         }
 
         public void SetVoxel(int index, VoxelType voxel)

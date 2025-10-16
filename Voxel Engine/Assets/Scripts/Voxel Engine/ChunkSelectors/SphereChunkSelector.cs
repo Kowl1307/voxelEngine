@@ -21,6 +21,7 @@ namespace Voxel_Engine.ChunkSelectors
             
             var chunkPositionsToCreate = allPositionsInSphere.Where(position => !existingPositions.Contains(position) && IsInSphere(chunkPosition, position, renderRadius * worldData.ChunkSizeInVoxel)).ToList();
             var chunkDataPositionsToCreate = allPositionsInSphere.Where(position => !existingDataPositions.Contains(position) && IsInSphere(chunkPosition, position, (renderRadius+1) * worldData.ChunkSizeInVoxel)).ToList();
+           
             var chunkPositionsToRemove = worldData.ChunkDictionary.Keys.Where(pos => !allPositionsInSphere.Contains(pos)).ToList();
             var chunkDataToRemove = worldData.ChunkDataDictionary.Keys.Where(pos => !allPositionsInSphere.Contains(pos) && !worldData.ChunkDataDictionary[pos].IsDirty()).ToList();
             

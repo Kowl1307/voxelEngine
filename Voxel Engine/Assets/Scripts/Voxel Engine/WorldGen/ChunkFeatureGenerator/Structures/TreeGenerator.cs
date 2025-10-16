@@ -56,6 +56,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
 
         private bool IsValidTreePosition(ChunkData chunkData, Vector3Int treePosition3DVoxel)
         {
+            //TODO: y position may be out of bounds. Convert the position into a valid one.
             var candidateBiome = WorldDataHelper.GetBiomeAt(chunkData.WorldReference,
                 Chunk.GetVoxelCoordsFromChunkCoords(chunkData, treePosition3DVoxel.x, treePosition3DVoxel.y,
                     treePosition3DVoxel.z));
@@ -68,15 +69,6 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
 
         private void CreateTree(ChunkData chunkData, Vector3Int treePosition3D)
         {
-            /*Parallel.ForEach(_trunkPositions, chunkData.WorldReference.WorldParallelOptions, trunkOffset =>
-            {
-                var trunkPosition = treePosition3D + trunkOffset;
-                if (!Chunk.IsInsideChunkBounds(chunkData, trunkPosition))
-                    return;
-                
-                Chunk.SetVoxel(chunkData, trunkPosition, VoxelType.TreeTrunk);
-            });*/
-            
             foreach (var trunkOffset in _trunkPositions)
             {
                 var trunkPosition = treePosition3D + trunkOffset;
@@ -85,8 +77,6 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
                 
                 Chunk.SetVoxel(chunkData, trunkPosition, VoxelType.TreeTrunk);
             }
-            
-            //Parallel.ForEach(_treeLeavesStaticLayout, chunkData.WorldReference.WorldParallelOptions, leafOffset =>
                 
             foreach (var leafOffset in _treeLeavesStaticLayout)
             {
