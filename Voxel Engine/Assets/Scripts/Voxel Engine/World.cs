@@ -187,9 +187,10 @@ namespace Voxel_Engine
                         _chunksToCreate.Enqueue(new ChunkToCreate()
                             { WorldPosition = data.ChunkPositionInWorld, MeshData = meshData });
                     });
-                    _isProcessingChunkMeshData = false;
                 }
                 , _taskTokenSource.Token);
+            
+            _isProcessingChunkMeshData = false;
         }
 
         private async Task<ConcurrentDictionary<Vector3Int, ChunkData>> CalculateWorldChunkData(List<Vector3Int> chunkDataPositionsToCreate)
