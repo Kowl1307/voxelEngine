@@ -41,10 +41,8 @@ namespace Voxel_Engine
         
         //TODO: This should be somewhere else
         public readonly ConcurrentDictionary<Vector3Int, ChunkSaveData> ChunkSaveCache = new();
-        
-        public bool IsWorldCreated { get; set; }
 
-        private readonly CancellationTokenSource _taskTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource _taskTokenSource = new();
         
         private struct ChunkToCreate
         {
@@ -237,60 +235,11 @@ namespace Voxel_Engine
             var voxelPosition = WorldDataHelper.GetVoxelPositionFromWorldPosition(this, worldPosition);
             WorldData.ChunkDictionary.TryAdd(voxelPosition, chunkRenderer);
         }
-        
-        public VoxelType GetVoxelFromChunkCoordinates(ChunkData chunkData, int chunkPositionX, int chunkPositionY, int chunkPositionZ)
-        {
-            var voxelCoords = Chunk.GetVoxelCoordsFromChunkCoords(chunkData, chunkPositionX, chunkPositionY, chunkPositionZ);
-            var pos = WorldDataHelper.GetChunkPositionFromVoxelCoords(WorldData, voxelCoords);
-
-            WorldData.ChunkDataDictionary.TryGetValue(pos, out var containerChunk);
-
-            if (containerChunk == null)
-                return VoxelType.Nothing;
-            var voxelChunkCoordinates = Chunk.GetChunkCoordinateOfVoxelPosition(containerChunk,
-                voxelCoords);
-            return Chunk.GetVoxelFromChunkCoordinates(containerChunk, voxelChunkCoordinates);
-        }
 
         public async void LoadAdditionalChucksRequest(GameObject player)
         {
             await GenerateWorld(Vector3Int.RoundToInt(player.transform.position));
             OnNewChunksGenerated?.Invoke();
-        }
-
-        public void SetVoxel(RaycastHit hit, VoxelType voxelType)
-        {
-            var chunk = hit.collider.GetComponent<ChunkRenderer>();
-            if (chunk == null) return;
-
-            var pos = GetVoxelPosOfRaycastHit(hit);
-
-            WorldDataHelper.SetVoxel(chunk.ChunkData.WorldReference, pos, voxelType);
-            //TODO: This should be a function of some sort
-            var chunkPos = Chunk.GetChunkCoordinateOfVoxelPosition(chunk.ChunkData, pos);
-            var index = Chunk.GetIndexFromPosition(chunk.ChunkData, chunkPos.x, chunkPos.y, chunkPos.z);
-            chunk.ChunkData.SetVoxelMarkDirty(index, voxelType);
-            
-            //If block is on edge, update neighbour chunk
-            if (Chunk.IsOnEdge(chunk.ChunkData, pos))
-            {
-                var neighbourDataList = Chunk.GetEdgeNeighbourChunk(chunk.ChunkData, pos);
-                foreach (var neighbourData in neighbourDataList)
-                {
-                    var chunkToUpdate = WorldDataHelper.GetChunk(neighbourData.WorldReference, neighbourData.ChunkPositionInVoxel);
-                    if (chunkToUpdate != null)
-                        chunkToUpdate.GetMeshDataAndUpdate();
-                }
-            }
-            
-            chunk.GetMeshDataAndUpdate();
-        }
-
-        public Vector3Int GetVoxelPosOfRaycastHit(RaycastHit hit)
-        {
-            var hitPos = hit.point;
-            hitPos -= Vector3.Scale(hit.normal, voxelScaling / 2);
-            return WorldDataHelper.GetVoxelPositionFromWorldPosition(this, hitPos);
         }
 
         private float GetVoxelPosIn(float pos, float normal)

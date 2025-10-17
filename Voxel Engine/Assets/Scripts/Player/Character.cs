@@ -2,6 +2,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Voxel_Engine;
+using Voxel_Engine.WorldGen;
 
 namespace Player
 {
@@ -93,7 +94,7 @@ namespace Player
 
         private void ModifyTerrain(RaycastHit hit)
         {
-            world.SetVoxel(hit, VoxelType.Air);
+            WorldInteractionHelper.SetVoxel(world, hit, VoxelType.Air);
         }
     }
 }

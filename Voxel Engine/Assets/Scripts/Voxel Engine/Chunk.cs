@@ -100,7 +100,7 @@ namespace Voxel_Engine
         {
             if (!InRange(chunkData, x) || !InRangeHeight(chunkData, y) ||
                 !InRange(chunkData, z))
-                return chunkData.WorldReference.GetVoxelFromChunkCoordinates(chunkData, x,
+                return WorldDataHelper.GetVoxelFromChunkCoordinates(chunkData, x,
                     y, z);
             
             var index = GetIndexFromPosition(chunkData, x, y, z);
