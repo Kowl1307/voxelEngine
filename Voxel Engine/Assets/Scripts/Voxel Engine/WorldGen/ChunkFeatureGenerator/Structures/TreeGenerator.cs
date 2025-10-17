@@ -43,14 +43,15 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
             }
             */
             
-            foreach (var treePosition2D in treePositionCandidates)
+            foreach (var treePosition2DInChunk in treePositionCandidates)
             {
-                var treePosition3DVoxel = treePosition2D.AsX0Z();
-                treePosition3DVoxel.y = Chunk.GetSurfaceHeight(chunkData, treePosition2D);
-                
-                if (!IsValidTreePosition(chunkData, treePosition3DVoxel)) continue;
+                var treePosition3DInChunk = treePosition2DInChunk.AsX0Z();
+                treePosition3DInChunk.y = Chunk.GetSurfaceHeight(chunkData, treePosition2DInChunk);
+                //Make the y position in chunk coords
+                treePosition3DInChunk.y = Chunk.GetChunkCoordinateOfVoxelPosition(chunkData, treePosition3DInChunk).y;
+                if (!IsValidTreePosition(chunkData, treePosition3DInChunk)) continue;
 
-                CreateTree(chunkData, treePosition3DVoxel);
+                CreateTree(chunkData, treePosition3DInChunk);
             }
         }
 
@@ -67,11 +68,11 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
             return allowedTreeGroundTypes.Contains(groundVoxelType);
         }
 
-        private void CreateTree(ChunkData chunkData, Vector3Int treePosition3D)
+        private void CreateTree(ChunkData chunkData, Vector3Int treePositionInChunk)
         {
             foreach (var trunkOffset in _trunkPositions)
             {
-                var trunkPosition = treePosition3D + trunkOffset;
+                var trunkPosition = treePositionInChunk + trunkOffset;
                 if (!Chunk.IsInsideChunkBounds(chunkData, trunkPosition))
                     continue;
                 
@@ -80,7 +81,7 @@ namespace Voxel_Engine.WorldGen.ChunkFeatureGenerator.Structures
                 
             foreach (var leafOffset in _treeLeavesStaticLayout)
             {
-                var leafPosition = treePosition3D + leafOffset;
+                var leafPosition = treePositionInChunk + leafOffset;
                 if (!Chunk.IsInsideChunkBounds(chunkData, leafPosition))
                     continue;
                 
