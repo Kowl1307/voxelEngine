@@ -179,7 +179,8 @@ namespace Voxel_Engine
             _isProcessingChunkMeshData = true;
 
             await Task.Run(
-                () => {
+                () =>
+                {
                     Parallel.ForEach(dataToRender, WorldParallelOptions, data =>
                     {
                         var meshData = Chunk.GetChunkMeshData(data);
@@ -205,7 +206,7 @@ namespace Voxel_Engine
                     var newData = CreateAndLoadChunkData(voxelPosition);
                     dictionary.TryAdd(voxelPosition, newData);
                 });
-                
+
                 return dictionary;
             }, _taskTokenSource.Token);
             

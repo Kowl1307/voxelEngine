@@ -45,10 +45,10 @@ namespace Voxel_Engine.WorldGen
                 _biomeGenerators.Add(pair.type, pair.generator);
             }
             
-            if(structureGeneratorsHolder != null)
+            if(structureGeneratorsHolder != null && structureGeneratorsHolder.activeSelf)
                 _structureGenerators = structureGeneratorsHolder.GetComponents<StructureGenerator>().ToList();
             
-            if(decorationGeneratorsHolder != null)
+            if(decorationGeneratorsHolder != null && decorationGeneratorsHolder.activeSelf)
                 _decorationGenerators = decorationGeneratorsHolder.GetComponents<DecorationGenerator>().ToList();
         }
 
